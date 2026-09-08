@@ -73,7 +73,8 @@ docs/_build/
 
 # PyBuilder
 .pybuilder/
-target/
+# root-only: the Rust/Maven build directory, never src/emoharness/target
+/target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
