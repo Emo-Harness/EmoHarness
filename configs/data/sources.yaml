@@ -1,0 +1,20 @@
+# Construction corpus sources (ADR-0003). Paths are filled in after download.
+benchmark:
+  origin: mme_emotion
+  hf_repo: Karl28/MME-Emotion
+  root: data/raw/mme_emotion
+  tasks: [ER_Lab, ER_Wild, SA, Noise_ER, FG_ER, ML_ER, FG_SA, IR]
+external:
+  - {origin: meld, kind: wild_er, root: data/raw/meld, splits: [train, dev]}
+  - {origin: meld_sentiment, kind: sentiment_3, root: data/raw/meld, splits: [train, dev]}
+  - {origin: mosei, kind: sentiment_3, root: data/raw/mosei, splits: [train]}
+  - {origin: chsims, kind: sentiment_3, root: data/raw/chsims, splits: [train]}
+  - {origin: iemocap, kind: lab_er, root: data/raw/iemocap, sessions: [1, 2, 3, 4]}
+  - {origin: cremad, kind: lab_er, root: data/raw/cremad, fallback_for: iemocap}
+splits:
+  per_kind: {build: 150, val: 150, ext_test: 100}
+  seed: 20260907
+leakage:
+  phash_hamming_threshold: 8
+  transcript_jaccard_threshold: 0.8
+  transcript_min_words: 5

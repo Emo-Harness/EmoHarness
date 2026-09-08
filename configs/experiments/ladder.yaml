@@ -1,0 +1,14 @@
+# The method ladder (ADR-0009). Rows carry the main claims; item sets are 'full' or 'subset'.
+rows:
+  L0: {method: direct, inputs: video, calls: 1, item_set: full, priority: P0}
+  L1: {method: direct_audio, inputs: video+audio_text, calls: 1, item_set: subset, priority: P0}
+  L2: {method: handcrafted, inputs: video+audio_text, calls: 1, item_set: subset, priority: P0}
+  L3: {method: harness, stage: 1, calls: 4, item_set: full, priority: P0}
+  L4: {method: harness, stage: 2, calls: 6, item_set: subset, priority: P0}
+  L5: {method: harness, stage: 3, calls: 6, item_set: full, priority: P0}
+  L6: {method: teacher_direct, inputs: matched_protocol, calls: 1, item_set: subset, priority: P0}
+  best_of_4: {method: best_of_n, base: L2, n: 4, temperature: 0.7, top_p: 0.9, item_set: subset, priority: P0}
+subset:
+  size_per_task: 125
+  seed: 20260907
+  stratify: proportional_by_label

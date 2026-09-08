@@ -1,0 +1,11 @@
+# Proxy judge for the Reasoning gate (ADR-0007). Gemini 3 Flash: a different
+# family from the Builder, so the gate is not scored by the model that wrote the
+# patch. `provider: openai` selects OpenAIStepScorer instead.
+provider: gemini
+model_id: gemini-3-flash
+api_key_env: GEMINI_API_KEY
+temperature: 0.0
+frame_interval_seconds: 1.0
+max_frames: 10
+calibration: {reference_model: gpt-4o-2024-11-20, sample_size: 200, min_agreement: 0.70}
+pricing_usd_per_million: {input: 0.3, output: 2.5}     # placeholder; confirm before Phase 5

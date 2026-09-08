@@ -1,0 +1,10 @@
+# Shared preprocessing cache (ADR-0004, ADR-0011).
+frames: {fps: 2.0, min_frames: 4, max_frames: 32, judge_fps: 1.0, judge_max_frames: 10}
+asr: {model: large-v3, backend: faster_whisper, word_timestamps: true}
+prosody: {feature_set: eGeMAPSv02, reference_stats: data/derived/reference_stats.json}
+diarization: {backend: pyannote, subject_rule: dominant_by_duration}
+describer:
+  primary: {model_id: Qwen/Qwen3-Omni-30B-A3B-Captioner, mode: audio_only}
+  fallback: {model_id: Qwen/Qwen3-Omni-30B-A3B-Instruct, mode: audio_only}
+  lexicon_path: configs/emotion_lexicon.txt
+cache_root: data/derived
