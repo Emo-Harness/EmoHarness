@@ -28,6 +28,7 @@ from emoharness.common.constants import GATE_SAMPLE_SIZE, NUM_STEPS, SUBSET_SEED
 from emoharness.common.errors import ValidationError
 from emoharness.common.io import write_json_atomic
 from emoharness.common.logging import get_logger
+from emoharness.common.parallel import map_ordered
 from emoharness.common.stats import mean, percentile
 from emoharness.data.label_set import normalize_label
 from emoharness.data.manifest import Example
@@ -207,7 +208,7 @@ def proxy_reasoning(
     if not inputs:
         return None
     scorer = ctx.step_scorer(ctx.step_score_table(_score_specs(board, gold)))
-    rated = tuple(scorer.score(item) for item in inputs)
+    rated = map_ordered(scorer.score, inputs)
     return mean(item.reasoning for item in rated)
 
 
@@ -252,7 +253,32 @@ def forbidden_ids(ctx: RunContext) -> tuple[str, ...]:
     for example in examples:
         media = PurePosixPath(example.media_path)
         found.update({example.example_id, media.name, media.stem})
-    return tuple(sorted(i for i in found if len(i) >= MIN_FORBIDDEN_ID_LENGTH))
+    # A recording the construction set legitimately contains is not a leak when
+    # the benchmark reuses the same file under another task (MME's seen and
+    # held-out tasks share media); its example ids stay forbidden.
+    found -= _construction_media_names(ctx)
+    # A bare number is not an identifier: ER_Wild stems like ``2670`` would match
+    # any count or timestamp in a packet, and every id that contains them.
+    return tuple(
+        sorted(
+            i for i in found if len(i) >= MIN_FORBIDDEN_ID_LENGTH and not i.isdigit()
+        )
+    )
+
+
+def _construction_media_names(ctx: RunContext) -> set[str]:
+    """File names and stems of every construction clip; empty without a manifest."""
+    from emoharness.runner.items import load_external
+
+    try:
+        external = load_external(ctx.paths)
+    except ValidationError:
+        return set()
+    names: set[str] = set()
+    for example in external:
+        media = PurePosixPath(example.media_path)
+        names.update({media.name, media.stem})
+    return names
 
 
 def base_bundle_for(stage: int, ctx: RunContext) -> Path:

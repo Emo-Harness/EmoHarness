@@ -5,8 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-import pytest
-
 from emoharness.target.base import TargetRequest, TargetResponse
 from emoharness.target.cache import CachedTarget, CallCache, request_key
 from emoharness.target.fake import FakeTarget

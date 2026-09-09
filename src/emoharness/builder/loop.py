@@ -290,7 +290,10 @@ def _candidates_document(outcome: _Outcome) -> Mapping[str, Any]:
     return {
         'evaluated': [
             {
-                'name': item.patch.name,
+                # ``name`` is the directory-safe form the gate entries use;
+                # ``patch_name`` is the Builder's own wording.
+                'name': item.scores.name,
+                'patch_name': item.patch.name,
                 'targeted_cluster': item.patch.targeted_cluster,
                 'patch_hash': patch_hash(item.patch),
                 'directory': str(item.directory),

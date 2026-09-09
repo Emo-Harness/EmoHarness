@@ -38,7 +38,13 @@ def test_video_mime_type_by_suffix() -> None:
 
 def test_video_mime_type_rejects_unknown_suffix() -> None:
     with pytest.raises(ValidationError):
-        video_mime_type('clip.avi')
+        video_mime_type('clip.flv')
+
+
+def test_video_mime_type_knows_the_benchmark_containers() -> None:
+    """MME-Emotion ships .mp4, .avi, and .mkv clips; all three must encode."""
+    assert video_mime_type('clip.avi') == 'video/x-msvideo'
+    assert video_mime_type('clip.mkv') == 'video/x-matroska'
 
 
 def test_encode_image_data_uri_round_trips_bytes(

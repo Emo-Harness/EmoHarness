@@ -9,6 +9,7 @@ semantics.
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -66,6 +67,7 @@ class CachedTarget:
         self._cache = cache
         self._hits = 0
         self._misses = 0
+        self._lock = threading.Lock()
 
     @property
     def model_id(self) -> str:
@@ -84,9 +86,11 @@ class CachedTarget:
         key = request_key(self._inner.model_id, request)
         cached = self._cache.get(key)
         if cached is not None:
-            self._hits += 1
+            with self._lock:
+                self._hits += 1
             return cached
-        self._misses += 1
+        with self._lock:
+            self._misses += 1
         response = self._inner.generate(request)
         self._cache.put(key, response)
         return response

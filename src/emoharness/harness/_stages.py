@@ -12,7 +12,9 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any, Final, NamedTuple
 
+from emoharness.common.errors import TargetError, TargetUnavailableError
 from emoharness.common.jsonish import extract_json_object
+from emoharness.common.logging import get_logger
 from emoharness.data.label_set import LabelSet
 from emoharness.harness._controller import MODEL_WRITTEN_STEPS
 from emoharness.harness.schema import (
@@ -39,6 +41,9 @@ class StageOutcome(NamedTuple):
     trace: StageTrace
 
 
+_LOGGER = get_logger(__name__)
+
+
 def run_json_stage(
     stage: str, target: TargetModel, request: TargetRequest, max_calls: int
 ) -> StageOutcome:
@@ -48,7 +53,17 @@ def run_json_stage(
     calls = failures = input_tokens = output_tokens = 0
     latency = 0.0
     while calls < max_calls and payload is None:
-        response = target.generate(attempt)
+        try:
+            response = target.generate(attempt)
+        except TargetUnavailableError:
+            raise
+        except TargetError as exc:
+            # One undecodable clip must not abort a row: the controller
+            # already knows how to answer from whatever this stage lacks.
+            _LOGGER.warning('stage %s: target call failed, no payload: %s', stage, exc)
+            calls += 1
+            failures += 1
+            break
         calls += 1
         input_tokens += response.input_tokens
         output_tokens += response.output_tokens

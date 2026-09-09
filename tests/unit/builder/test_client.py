@@ -395,3 +395,24 @@ class TestOpenAIBuilder:
             builder.propose('packet', ())
 
         assert handler.call_count == 0
+
+
+def test_parse_proposal_trims_an_overlong_candidate_name() -> None:
+    """Luna wrote a 70-character name on 2026-09-08; the patch is still usable."""
+    long_name = 'Affect-sensitive visual and vocal cue weighting for happy-vs-neutral calibration'
+    text = json.dumps(
+        {
+            'summary': 's',
+            'candidates': [
+                {
+                    'name': long_name,
+                    'targeted_cluster': 'c',
+                    'rationale': 'r',
+                    'files': [{'path': 'prompts/verify.md', 'content': 'x'}],
+                }
+            ],
+        }
+    )
+    proposal = parse_proposal(text)
+    assert len(proposal.candidates[0].name) <= 64
+    assert proposal.candidates[0].name.startswith('Affect-sensitive')

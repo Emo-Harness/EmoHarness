@@ -10,6 +10,7 @@ told the seen request wording and nothing else about the benchmark.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable, Mapping
 from typing import Final
 
@@ -256,10 +257,24 @@ def _render_sample(
     return '\n'.join(lines)
 
 
+#: What counts as one identifier in a packet: an id is present only when it
+#: appears as a whole token, so ``mme_er_wild_226`` is not "in" ``mme_er_wild_2260``.
+_TOKEN: Final = re.compile(r'[A-Za-z0-9_\-]+')
+
+
 def assert_no_forbidden_ids(text: str, forbidden_ids: Iterable[str]) -> None:
-    """Raise if any benchmark id reached the Builder's input (ADR-0012 §firewall)."""
-    hits = sorted({item for item in forbidden_ids if item and item in text})
+    """Raise if any benchmark id reached the Builder's input (ADR-0012 §firewall).
+
+    Ids are matched as whole tokens. An id that is not itself one token (a file
+    name with its suffix) is matched as a substring instead.
+    """
+    forbidden = {item for item in forbidden_ids if item}
+    if not forbidden:
+        return
+    tokens = set(_TOKEN.findall(text))
+    hits = {item for item in forbidden if _TOKEN.fullmatch(item) and item in tokens}
+    hits |= {item for item in forbidden if not _TOKEN.fullmatch(item) and item in text}
     if hits:
         raise LeakageError(
-            'benchmark ids present in builder input: ' + ', '.join(hits[:10])
+            'benchmark ids present in builder input: ' + ', '.join(sorted(hits)[:10])
         )

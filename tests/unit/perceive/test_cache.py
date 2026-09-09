@@ -60,8 +60,9 @@ def test_preprocess_config_loads_real_config_file(repo_root: Path) -> None:
     assert config.asr.model == 'large-v3'
     assert config.asr.backend == 'faster_whisper'
     assert config.prosody.feature_set == 'eGeMAPSv02'
-    assert config.diarization.backend == 'pyannote'
-    assert config.describer.primary.model_id == 'Qwen/Qwen3-Omni-30B-A3B-Captioner'
+    # This run: no diarizer and the 7B Omni describer (see the YAML's comment).
+    assert config.diarization.backend == 'none'
+    assert config.describer.primary.model_id == 'Qwen/Qwen2.5-Omni-7B'
     assert config.describer.fallback.model_id == 'Qwen/Qwen3-Omni-30B-A3B-Instruct'
     assert config.describer.fallback.mode == 'audio_only'
     assert config.cache_root == 'data/derived'

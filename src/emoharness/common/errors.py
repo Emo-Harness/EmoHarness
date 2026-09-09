@@ -25,6 +25,14 @@ class TargetError(EmoHarnessError):
     """A Target model call failed after retries."""
 
 
+class TargetUnavailableError(TargetError):
+    """The Target endpoint itself is down or its engine is dead.
+
+    Unlike a failed call, this is never absorbed as one wrong answer: a row that
+    kept going would record a thousand fallbacks against a dead server.
+    """
+
+
 class LeakageError(EmoHarnessError):
     """A leakage check found benchmark material where it must not be."""
 

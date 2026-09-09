@@ -96,8 +96,11 @@ def test_the_committed_teacher_config_is_the_openai_one(ctx: RunContext) -> None
 
 def test_the_proxy_judge_names_its_provider_and_key(ctx: RunContext) -> None:
     config = ctx.proxy_judge()
-    assert config.provider == 'gemini'
-    assert config.key_env() == 'GEMINI_API_KEY'
+    # The committed config scores the gate with GPT 5.6 Luna (no Gemini key on
+    # the run box); ADR-0007's Gemini 3 Flash default is documented in the YAML.
+    assert config.provider == 'openai'
+    assert config.key_env() == 'OPENAI_API_KEY'
+    assert config.reasoning_effort == 'none'
 
 
 def test_a_fake_run_is_priced_from_the_nominal_list(ctx: RunContext) -> None:

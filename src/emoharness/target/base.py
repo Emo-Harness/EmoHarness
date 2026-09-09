@@ -15,13 +15,15 @@ class TargetRequest(BaseModel):
 
     prompt: str = Field(min_length=1)
     tag: str | None = Field(
-        default=None, description='the harness stage or ladder row that issued this call'
+        default=None,
+        description='the harness stage or ladder row that issued this call',
     )
     system: str | None = None
     video_path: str | None = None
     image_paths: tuple[str, ...] = ()
     json_schema: Mapping[str, Any] | None = Field(
-        default=None, description='when set, the client asks for JSON matching this schema'
+        default=None,
+        description='when set, the client asks for JSON matching this schema',
     )
     max_tokens: int = Field(default=1024, ge=1)
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)

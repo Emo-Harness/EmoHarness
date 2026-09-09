@@ -204,6 +204,7 @@ class OpenAIStepScorer:
         experiment: str,
         pricing: Mapping[str, float],
         multi_label: bool = False,
+        reasoning_effort: str | None = None,
     ) -> None:
         self._model_id = model_id
         self._api_key_env = api_key_env
@@ -212,6 +213,21 @@ class OpenAIStepScorer:
         self._experiment = experiment
         self._pricing = pricing
         self._multi_label = multi_label
+        self._reasoning_effort = reasoning_effort
+
+    def generation_params(self) -> dict[str, Any]:
+        """Sampling fields for this scorer's model family.
+
+        The GPT-5 family takes ``reasoning_effort`` and rejects a temperature at
+        any effort other than ``none``; every other model gets temperature 0.
+        """
+        effort = self._reasoning_effort
+        params: dict[str, Any] = {}
+        if effort is not None:
+            params['reasoning_effort'] = effort
+        if effort is None or effort == 'none':
+            params['temperature'] = 0.0
+        return params
 
     def score(self, inp: JudgeInput) -> StepScores:  # pragma: no cover
         from openai import OpenAI  # pragma: no cover
@@ -225,7 +241,7 @@ class OpenAIStepScorer:
         messages: Any = build_score_messages(inp, self._multi_label)
         started = time.perf_counter()
         response = client.chat.completions.create(
-            model=self._model_id, messages=messages, temperature=0.0
+            model=self._model_id, messages=messages, **self.generation_params()
         )
         latency = time.perf_counter() - started
         text = response.choices[0].message.content or ''

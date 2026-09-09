@@ -25,7 +25,7 @@ _FEATURES = (
 
 def _reference(std: float = 1.0) -> ReferenceStats:
     return ReferenceStats(
-        mean={name: 0.0 for name in _FEATURES}, std={name: std for name in _FEATURES}
+        mean=dict.fromkeys(_FEATURES, 0.0), std=dict.fromkeys(_FEATURES, std)
     )
 
 
@@ -52,7 +52,7 @@ def test_fit_reference_empty_rows_yields_empty_stats() -> None:
 
 
 def test_describe_prosody_high_extreme_phrases_in_declared_order() -> None:
-    features = {name: 2.0 for name in _FEATURES}
+    features = dict.fromkeys(_FEATURES, 2.0)
     assert describe_prosody(features, _reference()) == (
         'high pitch',
         'variable pitch',
@@ -63,7 +63,7 @@ def test_describe_prosody_high_extreme_phrases_in_declared_order() -> None:
 
 
 def test_describe_prosody_low_extreme_phrases() -> None:
-    features = {name: -2.0 for name in _FEATURES}
+    features = dict.fromkeys(_FEATURES, -2.0)
     assert describe_prosody(features, _reference()) == (
         'low pitch',
         'flat pitch',
@@ -74,12 +74,12 @@ def test_describe_prosody_low_extreme_phrases() -> None:
 
 
 def test_describe_prosody_within_one_z_is_silent() -> None:
-    features = {name: 0.5 for name in _FEATURES}
+    features = dict.fromkeys(_FEATURES, 0.5)
     assert describe_prosody(features, _reference()) == ()
 
 
 def test_describe_prosody_boundary_z_is_inclusive() -> None:
-    features = {name: 1.0 for name in _FEATURES}
+    features = dict.fromkeys(_FEATURES, 1.0)
     assert len(describe_prosody(features, _reference())) == 5
 
 

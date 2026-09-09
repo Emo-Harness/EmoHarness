@@ -44,9 +44,7 @@ def test_video_config_accepts_valid_bounds() -> None:
 
 def test_video_config_sends_video_unless_frames_are_asked_for() -> None:
     assert VideoConfig(fps=2.0, min_frames=4, max_frames=32).frames_as_images is False
-    frames = VideoConfig(
-        fps=2.0, min_frames=4, max_frames=32, frames_as_images=True
-    )
+    frames = VideoConfig(fps=2.0, min_frames=4, max_frames=32, frames_as_images=True)
     assert frames.frames_as_images is True
 
 

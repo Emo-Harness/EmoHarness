@@ -38,7 +38,7 @@ def test_paired_bootstrap_negative_difference_is_also_significant() -> None:
 
 def test_paired_bootstrap_no_effect_gives_large_p_value() -> None:
     strata = {f'item{i}': _TASKS[i % 4] for i in range(80)}
-    a = {item_id: 0.5 for item_id in strata}
+    a = dict.fromkeys(strata, 0.5)
     b = dict(a)
     result = paired_bootstrap(a, b, strata, n_resamples=500, seed=0)
     assert result.estimate == 0.0

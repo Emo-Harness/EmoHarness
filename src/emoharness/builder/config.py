@@ -16,6 +16,7 @@ from typing import Final, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from emoharness.common.constants import (
+    CALL_BUDGET_EXPECTED,
     EARLY_STOP_ROUNDS,
     GATE_SAMPLE_SIZE,
     JUDGE_MAX_FRAMES,
@@ -58,6 +59,12 @@ class GateThresholds(BaseModel):
     regression_rate_limit: float = Field(default=REGRESSION_RATE_LIMIT, ge=0.0, le=1.0)
     reasoning_floor_points: float = Field(default=REASONING_GATE_FLOOR_POINTS, ge=0.0)
     gate_sample_size: int = Field(default=GATE_SAMPLE_SIZE, ge=1)
+    max_mean_calls: float = Field(
+        default=float(CALL_BUDGET_EXPECTED),
+        ge=1.0,
+        description='mean Target calls per item a candidate may not exceed; the '
+        'expected 4 plus room for the odd retry, never the hard cap of 6',
+    )
 
 
 class BuilderPricing(BaseModel):
@@ -93,6 +100,11 @@ class BuilderConfig(BaseModel):
     api_key_env: str = Field(default=DEFAULT_API_KEY_ENV, min_length=1)
     endpoint: str = Field(default=DEFAULT_ENDPOINT, min_length=1)
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
+    reasoning_effort: str | None = Field(
+        default=None,
+        description='GPT-5 family only: sent as reasoning_effort; any value other '
+        "than 'none' also drops temperature, which those models reject",
+    )
     max_candidates_per_round: int = Field(
         default=MAX_CANDIDATES_PER_ROUND, ge=1, le=MAX_CANDIDATES_PER_ROUND
     )

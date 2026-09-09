@@ -49,8 +49,11 @@ def test_load_model_reads_the_committed_builder_config(
     assert config.packet.max_keyframe_samples == 20
     assert config.packet.target_input_tokens == 100_000
     assert config.gates.gate_sample_size == 200
-    assert config.pricing.input_usd_per_million == 2.0
-    assert config.pricing.output_usd_per_million == 12.0
+    # GPT-5 family: reasoning on, so the client must not send a temperature.
+    assert config.reasoning_effort == 'high'
+    # Luna list price, measured 2026-09-08: $0.20 in, $1.20 out per million.
+    assert config.pricing.input_usd_per_million == 0.2
+    assert config.pricing.output_usd_per_million == 1.2
 
 
 def test_load_model_reads_the_alternative_gemini_builder_config(

@@ -10,11 +10,12 @@ from typing import Any
 import httpx
 import pytest
 
-from emoharness.common.errors import TargetError
+from emoharness.common.errors import TargetError, TargetUnavailableError
 from emoharness.common.ledger import read_entries
 from emoharness.target.base import TargetRequest
 from emoharness.target.config import TargetConfig
 from emoharness.target.openai_compat import (
+    JSON_SCHEMA_NAME,
     MM_PROCESSOR_KWARGS_FIELD,
     OpenAICompatTarget,
 )
@@ -126,12 +127,37 @@ def test_request_includes_system_message_when_given(
 def test_json_schema_mode_sets_response_format(target_config: TargetConfig) -> None:
     handler = _ScriptedHandler([httpx.Response(200, json=_OK_BODY)])
     target = _target(target_config, handler)
-    schema = {'name': 'evidence', 'schema': {'type': 'object'}}
+    schema = {'type': 'object', 'properties': {'face': {'type': 'array'}}}
 
     target.generate(TargetRequest(prompt='describe', json_schema=schema))
 
     body = _json_body(handler.requests[0])
-    assert body['response_format'] == {'type': 'json_schema', 'json_schema': schema}
+    # vLLM and the OpenAI API both want {name, schema}, never the bare schema.
+    assert body['response_format'] == {
+        'type': 'json_schema',
+        'json_schema': {'name': JSON_SCHEMA_NAME, 'schema': schema},
+    }
+
+
+def test_openai_reasoning_flavor_spells_length_and_effort(
+    target_config: TargetConfig,
+) -> None:
+    """GPT-5 rejects max_tokens and, above effort none, every sampling field."""
+    handler = _ScriptedHandler([httpx.Response(200, json=_OK_BODY)] * 2)
+    quiet = target_config.model_copy(
+        update={'api_flavor': 'openai_reasoning', 'reasoning_effort': 'none'}
+    )
+    thinking = quiet.model_copy(update={'reasoning_effort': 'high'})
+
+    _target(quiet, handler).generate(TargetRequest(prompt='p', max_tokens=99, seed=7))
+    _target(thinking, handler).generate(TargetRequest(prompt='p', max_tokens=99))
+
+    first, second = (_json_body(r) for r in handler.requests)
+    assert 'max_tokens' not in first and first['max_completion_tokens'] == 99
+    assert first['reasoning_effort'] == 'none'
+    assert first['temperature'] == 0.0 and first['seed'] == 7
+    assert second['reasoning_effort'] == 'high'
+    assert not {'temperature', 'top_p', 'seed', 'max_tokens'} & second.keys()
 
 
 def test_frames_as_images_drops_the_video_part(
@@ -140,9 +166,9 @@ def test_frames_as_images_drops_the_video_part(
     make_image: Callable[..., Path],
 ) -> None:
     config = target_config.model_copy(
-        update={'video': target_config.video.model_copy(
-            update={'frames_as_images': True}
-        )}
+        update={
+            'video': target_config.video.model_copy(update={'frames_as_images': True})
+        }
     )
     handler = _ScriptedHandler([httpx.Response(200, json=_OK_BODY)])
     target = _target(config, handler)
@@ -254,14 +280,30 @@ def test_retries_after_timeout_then_succeeds(target_config: TargetConfig) -> Non
     assert handler.call_count == 2
 
 
-def test_exhausts_retries_raises_target_error(target_config: TargetConfig) -> None:
+def test_exhausts_retries_then_asks_health(target_config: TargetConfig) -> None:
+    """After the retries a /health probe decides between a failed call and a dead server."""
+    handler = _ScriptedHandler(
+        [httpx.Response(500), httpx.Response(500), httpx.Response(200, json={})]
+    )
+    target = _target(target_config, handler, max_retries=1)
+
+    with pytest.raises(TargetError) as caught:
+        target.generate(TargetRequest(prompt='describe'))
+
+    assert not isinstance(caught.value, TargetUnavailableError)
+    assert handler.call_count == 3  # two attempts, then the health probe
+    assert handler.requests[-1].url.path == '/health'
+
+
+def test_dead_engine_is_unavailable_not_a_failed_call(
+    target_config: TargetConfig,
+) -> None:
+    """vLLM keeps answering /v1 with 500s after its engine dies; /health says so."""
     handler = _ScriptedHandler([httpx.Response(500)])
     target = _target(target_config, handler, max_retries=1)
 
-    with pytest.raises(TargetError):
+    with pytest.raises(TargetUnavailableError):
         target.generate(TargetRequest(prompt='describe'))
-
-    assert handler.call_count == 2
 
 
 def test_client_error_fails_without_retry(target_config: TargetConfig) -> None:

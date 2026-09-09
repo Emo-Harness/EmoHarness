@@ -26,6 +26,7 @@ from emoharness.baselines.direct import (
 from emoharness.common.errors import ValidationError, assert_never
 from emoharness.common.io import write_jsonl_atomic
 from emoharness.common.logging import get_logger
+from emoharness.common.parallel import map_ordered
 from emoharness.data.manifest import Example
 from emoharness.evaluation.ladder import MethodName, RowSpec
 from emoharness.evaluation.schema import PredictionRecord
@@ -138,9 +139,9 @@ def _run_single_call(
     row: RowSpec, requests: Requests, ctx: RunContext
 ) -> tuple[PredictionRecord, ...]:
     target, cost = ctx.target(), cost_fn(ctx)
-    return tuple(
-        run_single_call(target, request, example, row.name, cost)
-        for example, request in requests
+    return map_ordered(
+        lambda pair: run_single_call(target, pair[1], pair[0], row.name, cost),
+        requests,
     )
 
 
@@ -153,20 +154,15 @@ def _run_best_of_n(
         raise ValidationError(f'{row.name}: best_of_n needs a known base row and n')
     target, cost = ctx.target(), cost_fn(ctx)
     requests = build(examples, ctx)
-    return tuple(
-        run_best_of_n(
-            target,
-            request,
-            example,
-            row.n,
-            row.temperature or 0.0,
-            row.top_p or 1.0,
-            None,
-            row.name,
-            cost,
+    n, temperature, top_p = row.n, row.temperature or 0.0, row.top_p or 1.0
+
+    def one(pair: tuple[Example, TargetRequest]) -> PredictionRecord:
+        example, request = pair
+        return run_best_of_n(
+            target, request, example, n, temperature, top_p, None, row.name, cost
         )
-        for example, request in requests
-    )
+
+    return map_ordered(one, requests)
 
 
 def prediction_from_output(
@@ -204,8 +200,8 @@ def run_harness(
     """
     pipeline = HarnessPipeline(load_bundle(bundle_dir), target, pipeline_config(ctx))
     inputs = perceived if perceived is not None else inputs_for(examples, ctx)
-    return tuple(
-        pipeline.run(example, inputs[example.example_id]) for example in examples
+    return map_ordered(
+        lambda example: pipeline.run(example, inputs[example.example_id]), examples
     )
 
 
@@ -261,9 +257,8 @@ def _run_teacher_direct(
         pairs = tuple(
             (e, _matched_request(e, perceived[e.example_id])) for e in examples
         )
-    return tuple(
-        run_single_call(target, request, example, row.name, cost)
-        for example, request in pairs
+    return map_ordered(
+        lambda pair: run_single_call(target, pair[1], pair[0], row.name, cost), pairs
     )
 
 

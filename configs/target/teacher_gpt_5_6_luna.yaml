@@ -1,11 +1,17 @@
 # Teacher Direct upper bound (ADR-0008). The OpenAI API takes images, not video,
 # so the row runs the matched protocol: the shared cache's sampled frames plus
 # the audio-evidence text appended to the official prompt.
+# GPT-5 family request spelling (`api_flavor: openai_reasoning`): the API wants
+# max_completion_tokens and only accepts temperature at reasoning_effort none,
+# which is what keeps this row at temperature 0 like every other rung.
+# Pricing measured 2026-09-08 on the API: $0.20 / $1.20 per 1M tokens.
 provider: openai_compat
-model_id: gpt-5.6-luna   # confirm the exact API id before Phase 7
+model_id: gpt-5.6-luna
 endpoint: ${OPENAI_ENDPOINT:-https://api.openai.com/v1}
 api_key_env: OPENAI_API_KEY
+api_flavor: openai_reasoning
+reasoning_effort: none
 decoding: {temperature: 0.0, top_p: 1.0, seed: 0, max_tokens: 1024}
 video: {fps: 2.0, min_frames: 4, max_frames: 32, frames_as_images: true}
 call_budget: {expected: 1, hard_cap: 2, retries_per_stage: 1}
-pricing_usd_per_million: {input: 2.0, output: 12.0}   # placeholder; confirm before Phase 7
+pricing_usd_per_million: {input: 0.2, output: 1.2}

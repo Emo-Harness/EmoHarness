@@ -7,6 +7,7 @@ side-effecting functions and are isolated here so the pipeline can monkeypatch t
 from __future__ import annotations
 
 import math
+import shutil
 import subprocess
 from collections.abc import Sequence
 from pathlib import Path
@@ -18,6 +19,10 @@ from emoharness.common.errors import ValidationError
 _EPSILON: Final = 1e-9
 _PROBE_TIMEOUT_S: Final = 30.0
 _EXTRACT_TIMEOUT_S: Final = 60.0
+#: Frames are read by the teacher, the Builder, and the proxy judge as images,
+#: all of which tokenize by area: a 640-wide frame costs a third of a 720p one
+#: and shows the same face. Smaller sources are left alone; height keeps aspect.
+_FRAME_SCALE_FILTER: Final = "scale='min(640,iw)':-2"
 
 
 def frame_timestamps(
@@ -116,6 +121,13 @@ def extract_frames(
         out_path = out_dir / f'{prefix}_{index:04d}.jpg'
         if not out_path.exists():
             _extract_one_frame(path, timestamp, out_path)
+        if not out_path.exists():
+            # ffmpeg writes nothing when a seek lands past the last frame of a
+            # clip a few frames long; repeat the previous frame so the entry
+            # keeps ``min_frames`` and every listed path exists.
+            if not outputs:
+                raise ValidationError(f'no frame could be extracted from {path}')
+            shutil.copyfile(outputs[-1], out_path)
         outputs.append(out_path)
     return tuple(outputs)
 
@@ -131,6 +143,8 @@ def _extract_one_frame(path: Path, timestamp: float, out_path: Path) -> None:
             str(path),
             '-frames:v',
             '1',
+            '-vf',
+            _FRAME_SCALE_FILTER,
             '-q:v',
             '2',
             str(out_path),

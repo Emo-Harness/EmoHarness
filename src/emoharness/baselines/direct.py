@@ -12,6 +12,8 @@ from collections.abc import Callable
 from typing import Final
 
 from emoharness.common.constants import ANSWER_CLOSE, ANSWER_OPEN, STEP_TITLES
+from emoharness.common.errors import TargetError, TargetUnavailableError
+from emoharness.common.logging import get_logger
 from emoharness.data.label_set import LabelSet
 from emoharness.data.manifest import Example
 from emoharness.evaluation.schema import PredictionRecord
@@ -27,6 +29,9 @@ HANDCRAFTED_TAG: Final = 'handcrafted'
 
 _HANDCRAFTED_PACKAGE: Final = 'emoharness.baselines'
 _HANDCRAFTED_RESOURCE: Final = 'handcrafted_prompt.md'
+
+
+_LOGGER = get_logger(__name__)
 
 
 def direct_request(
@@ -96,7 +101,20 @@ def run_single_call(
     candidate label is emitted and one parse failure is counted, so every row
     always produces a valid `PredictionRecord`.
     """
-    response = target.generate(request)
+    try:
+        response = target.generate(request)
+    except TargetUnavailableError:
+        raise
+    except TargetError as exc:
+        # An undecodable clip is one wrong answer, not a dead row.
+        _LOGGER.warning('%s %s: target call failed: %s', row, example.example_id, exc)
+        response = TargetResponse(
+            text='',
+            model_id=target.model_id,
+            input_tokens=0,
+            output_tokens=0,
+            latency_s=0.0,
+        )
     labels = LabelSet.from_prompt(example.prompt).parse_answer(response.text)
     parse_failures = 0
     if not labels:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import threading
 from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any
@@ -69,11 +70,17 @@ def write_jsonl_atomic(path: Path, rows: Iterable[Any]) -> None:
     _write_atomic(path, body)
 
 
+#: Ledger appends come from every worker thread; one lock keeps lines whole.
+_APPEND_LOCK = threading.Lock()
+
+
 def append_jsonl(path: Path, row: Any) -> None:
     """Append one JSON object as a line; used for append-only ledgers."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open('a', encoding='utf-8') as handle:
-        handle.write(json.dumps(row, ensure_ascii=False) + '\n')
+    line = json.dumps(row, ensure_ascii=False) + '\n'
+    with _APPEND_LOCK:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('a', encoding='utf-8') as handle:
+            handle.write(line)
 
 
 def _write_atomic(path: Path, text: str) -> None:

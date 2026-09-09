@@ -12,6 +12,7 @@ same :class:`PreprocessCache` entries, which is what makes the ladder's
 from __future__ import annotations
 
 import os
+import threading
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import Final
@@ -20,10 +21,13 @@ from emoharness.common.config import load_model
 from emoharness.common.errors import ValidationError
 from emoharness.common.hashing import sha256_file_cached
 from emoharness.common.logging import get_logger
+from emoharness.common.parallel import map_ordered, worker_count
 from emoharness.data.leakage import phash_image
 from emoharness.data.manifest import Example
 from emoharness.harness.schema import PerceivedInputs
 from emoharness.perceive.audio import (
+    Diarizer,
+    NullDiarizer,
     OpenAICompatDescriber,
     OpenSmileProsody,
     PyannoteDiarizer,
@@ -47,6 +51,13 @@ ClipPreprocessor = Callable[
 
 DESCRIBER_ENDPOINT_ENV: Final = 'AUDIO_DESCRIBER_ENDPOINT'
 DEFAULT_DESCRIBER_ENDPOINT: Final = 'http://127.0.0.1:8001/v1/chat/completions'
+#: ``diarization.backend`` values: the pyannote pipeline, or no diarization.
+PYANNOTE_BACKEND: Final = 'pyannote'
+NO_DIARIZATION_BACKEND: Final = 'none'
+PYANNOTE_MODEL: Final = 'pyannote/speaker-diarization-3.1'
+#: Preprocessing is one ffmpeg-bound and one model-bound pass per clip, so a
+#: couple of clips in flight overlap the two; more just contend for the cores.
+_MAX_PREPROCESS_WORKERS: Final = 3
 _LOG_EVERY: Final = 25
 
 _LOGGER = get_logger(__name__)
@@ -93,9 +104,20 @@ def real_perception_tools(
         transcriber=WhisperTranscriber(config.asr.model),
         prosody=OpenSmileProsody(),
         describer=OpenAICompatDescriber(endpoint, config.describer.primary.model_id),
-        diarizer=PyannoteDiarizer(config.diarization.backend),
+        diarizer=_diarizer_for(config.diarization.backend),
         reference=_reference_stats(paths, config),
         banned=load_lexicon(lexicon_path),
+    )
+
+
+def _diarizer_for(backend: str) -> Diarizer:
+    if backend == NO_DIARIZATION_BACKEND:
+        return NullDiarizer()
+    if backend == PYANNOTE_BACKEND:
+        return PyannoteDiarizer(PYANNOTE_MODEL)
+    raise ValidationError(
+        f'unknown diarization backend {backend!r}; '
+        f'expected {PYANNOTE_BACKEND!r} or {NO_DIARIZATION_BACKEND!r}'
     )
 
 
@@ -162,13 +184,22 @@ def preprocess_all(
     config: PreprocessConfig,
     preprocess: ClipPreprocessor,
 ) -> tuple[PreprocessedClip, ...]:
-    """Preprocess every example in order, reusing whatever the cache already holds."""
-    clips = []
-    for index, example in enumerate(examples, start=1):
-        clips.append(preprocess(example, cache, config))
-        if index % _LOG_EVERY == 0 or index == len(examples):
-            _LOGGER.info('preprocessed %d/%d clips', index, len(examples))
-    return tuple(clips)
+    """Preprocess every example, in manifest order, reusing what the cache holds."""
+    total = len(examples)
+    done = 0
+    lock = threading.Lock()
+
+    def one(example: Example) -> PreprocessedClip:
+        nonlocal done
+        clip = preprocess(example, cache, config)
+        with lock:
+            done += 1
+            if done % _LOG_EVERY == 0 or done == total:
+                _LOGGER.info('preprocessed %d/%d clips', done, total)
+        return clip
+
+    workers = min(worker_count(), _MAX_PREPROCESS_WORKERS)
+    return map_ordered(one, examples, workers)
 
 
 def verify_cache(

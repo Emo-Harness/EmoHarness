@@ -19,6 +19,13 @@ from emoharness.target.pricing import Pricing
 #: endpoint (vLLM and the OpenAI API alike) or the Gemini SDK.
 ProviderName = Literal['openai_compat', 'gemini']
 
+#: How the OpenAI-compatible client spells a request. ``standard`` is what vLLM
+#: and the classic OpenAI models take; ``openai_reasoning`` is the GPT-5 family,
+#: which rejects ``max_tokens`` (it wants ``max_completion_tokens``), takes a
+#: ``reasoning_effort``, and only accepts sampling parameters when that effort
+#: is ``none``.
+ApiFlavor = Literal['standard', 'openai_reasoning']
+
 _FREE: Pricing = Pricing(input_per_million=0.0, output_per_million=0.0)
 
 
@@ -86,6 +93,15 @@ class TargetConfig(BaseModel):
         default=None,
         description='environment variable holding the bearer token, when the '
         'endpoint needs one; local vLLM serving needs none',
+    )
+    api_flavor: ApiFlavor = Field(
+        default='standard',
+        description='request spelling: standard, or openai_reasoning for GPT-5',
+    )
+    reasoning_effort: str = Field(
+        default='none',
+        min_length=1,
+        description='reasoning_effort sent under the openai_reasoning flavor',
     )
     pricing: Pricing = Field(default=_FREE, alias='pricing_usd_per_million')
 

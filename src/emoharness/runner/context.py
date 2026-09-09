@@ -63,6 +63,8 @@ GEMINI_PROVIDER: Final[ProviderName] = 'gemini'
 OPENAI_COMPAT_PROVIDER: Final[ProviderName] = 'openai_compat'
 #: Ledger role the teacher row's calls are billed under, whatever the provider.
 TEACHER_ROLE: Final = 'teacher_direct'
+#: Under data/derived: mp4 copies of clips whose container the server cannot count.
+REMUX_DIR: Final = 'remux'
 #: Environment variable each proxy-judge provider reads its API key from.
 JUDGE_KEY_ENV: Final[Mapping[str, str]] = {
     'gemini': 'GEMINI_API_KEY',
@@ -92,6 +94,10 @@ class ProxyJudgeConfig(BaseModel):
     api_key_env: str | None = None
     endpoint: str | None = None
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
+    reasoning_effort: str | None = Field(
+        default=None,
+        description='openai provider, GPT-5 family: the reasoning_effort to send',
+    )
     frame_interval_seconds: float = Field(default=1.0, gt=0.0)
     max_frames: int = Field(default=10, ge=1)
     calibration: CalibrationSpec
@@ -148,7 +154,10 @@ class RunContext:
         from emoharness.target.openai_compat import OpenAICompatTarget
 
         return OpenAICompatTarget(
-            self.target_model_config(), self.ledger, self.experiment
+            self.target_model_config(),
+            self.ledger,
+            self.experiment,
+            media_dir=self.paths.derived / REMUX_DIR,
         )
 
     def pricing(self) -> Pricing:
@@ -201,7 +210,11 @@ class RunContext:
             from emoharness.target.openai_compat import OpenAICompatTarget
 
             inner = OpenAICompatTarget(
-                config, self.ledger, self.experiment, role=TEACHER_ROLE
+                config,
+                self.ledger,
+                self.experiment,
+                role=TEACHER_ROLE,
+                media_dir=self.paths.derived / REMUX_DIR,
             )
         return CachedTarget(inner, self.call_cache())
 
@@ -244,6 +257,7 @@ class RunContext:
         return GateConfig(
             regression_rate_limit=gates.regression_rate_limit,
             reasoning_margin_points=gates.reasoning_floor_points,
+            max_mean_calls=gates.max_mean_calls,
         )
 
     def proxy_judge(self) -> ProxyJudgeConfig:
@@ -274,6 +288,7 @@ class RunContext:
                 ledger_path=self.ledger,
                 experiment=self.experiment,
                 pricing=config.pricing,
+                reasoning_effort=config.reasoning_effort,
             )
         return GeminiStepScorer(
             model_id=config.model_id,

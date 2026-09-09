@@ -8,6 +8,7 @@ the root when it carries its own copies and from the source checkout otherwise.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Final
 
@@ -25,9 +26,15 @@ BENCHMARK_REPORT_FILE: Final = 'mme_emotion_report.json'
 EXTERNAL_REPORT_FILE: Final = 'external_report.json'
 LEAKAGE_REPORT_FILE: Final = 'leakage_report.json'
 LEDGER_FILE: Final = 'ledger.jsonl'
+#: A second machine sharing the run root writes its own ledger file (NFS appends
+#: from two hosts can interleave); ``read_all_ledgers`` merges them.
+LEDGER_NAME_ENV: Final = 'EMOHARNESS_LEDGER_NAME'
 FREEZE_FILE: Final = 'freeze.json'
 PREREGISTRATION_FILE: Final = 'preregistration.md'
 BUILDER_CONFIG_FILE: Final = 'teacher_gpt_5_6_luna.yaml'
+#: Another file under configs/builder/ to build with (e.g. a stronger teacher
+#: for a Builder-strength replicate); the default is the committed Luna config.
+BUILDER_CONFIG_ENV: Final = 'EMOHARNESS_BUILDER_CONFIG'
 TEACHER_CONFIG_FILE: Final = 'teacher_gpt_5_6_luna.yaml'
 CALL_CACHE_DIR: Final = 'calls'
 CALIBRATION_DIR: Final = 'calibration'
@@ -89,7 +96,7 @@ class ProjectPaths(BaseModel):
             judge=results / 'judge',
             construction=results / 'construction',
             metrics=results / 'metrics',
-            ledger=results / LEDGER_FILE,
+            ledger=results / os.environ.get(LEDGER_NAME_ENV, LEDGER_FILE),
         )
 
     @property
@@ -198,7 +205,8 @@ class ProjectPaths(BaseModel):
 
     @property
     def builder_config(self) -> Path:
-        return self.configs / 'builder' / BUILDER_CONFIG_FILE
+        name = os.environ.get(BUILDER_CONFIG_ENV, BUILDER_CONFIG_FILE)
+        return self.configs / 'builder' / name
 
     @property
     def teacher_config(self) -> Path:

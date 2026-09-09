@@ -333,7 +333,8 @@ def test_describer_raises_validation_error_on_unexpected_shape(tmp_path: Path) -
         describer.describe(wav)
 
 
-def test_opine_raises_validation_error_on_non_json_content(tmp_path: Path) -> None:
+def test_opine_records_unknown_on_non_json_content(tmp_path: Path) -> None:
+    """A prose answer must not abort a corpus: the opinion is one voter, never evidence."""
     wav = tmp_path / 'a.wav'
     wav.write_bytes(b'x')
 
@@ -344,14 +345,18 @@ def test_opine_raises_validation_error_on_non_json_content(tmp_path: Path) -> No
     describer = OpenAICompatDescriber(
         'https://example.test', 'm', client=_mock_client(handler)
     )
-    with pytest.raises(ValidationError):
-        describer.opine(wav)
+    assert describer.opine(wav) == AudioOpinion()
 
 
-def test_opine_raises_validation_error_on_schema_mismatch(tmp_path: Path) -> None:
+def test_opine_coerces_off_schema_fields_to_unknown(tmp_path: Path) -> None:
+    """Qwen2.5-Omni answers 'mixed' valence on some clips; that is unknown, not a crash."""
     wav = tmp_path / 'a.wav'
     wav.write_bytes(b'x')
-    payload = {'valence': 'sideways', 'arousal': 'high', 'candidates': []}
+    payload = {
+        'valence': 'mixed',
+        'arousal': 'high',
+        'candidates': ['sad', 'happy', 'x'],
+    }
 
     def handler(_request: httpx.Request) -> httpx.Response:
         return httpx.Response(
@@ -361,5 +366,6 @@ def test_opine_raises_validation_error_on_schema_mismatch(tmp_path: Path) -> Non
     describer = OpenAICompatDescriber(
         'https://example.test', 'm', client=_mock_client(handler)
     )
-    with pytest.raises(ValidationError):
-        describer.opine(wav)
+    assert describer.opine(wav) == AudioOpinion(
+        valence='unknown', arousal='high', candidates=('sad', 'happy')
+    )

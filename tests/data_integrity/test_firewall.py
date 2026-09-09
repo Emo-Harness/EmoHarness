@@ -30,9 +30,9 @@ def test_only_the_official_wrapper_mentions_audio_clue_files() -> None:
         if path not in AUDIO_CLUE_ALLOWED
         and AUDIO_CLUE_FILE_PATTERN.search(path.read_text())
     ]
-    assert (
-        offenders == []
-    ), f'audio_clue files referenced outside the official wrapper: {offenders}'
+    assert offenders == [], (
+        f'audio_clue files referenced outside the official wrapper: {offenders}'
+    )
 
 
 def test_inference_code_never_names_a_benchmark_task() -> None:
@@ -41,6 +41,6 @@ def test_inference_code_never_names_a_benchmark_task() -> None:
         for path in _python_files(*INFERENCE_DIRS)
         if TASK_ENUM_PATTERN.search(path.read_text())
     ]
-    assert (
-        offenders == []
-    ), f'inference-time modules must not branch on Task: {offenders}'
+    assert offenders == [], (
+        f'inference-time modules must not branch on Task: {offenders}'
+    )

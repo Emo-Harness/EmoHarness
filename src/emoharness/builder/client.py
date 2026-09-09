@@ -27,8 +27,14 @@ from emoharness.common.ledger import LedgerEntry, record
 from emoharness.target.media import encode_image_data_uri
 
 BUILDER_ROLE: Final = 'builder'
+#: ``CandidatePatch.name``'s max_length; a longer name is cut, not rejected.
+MAX_CANDIDATE_NAME: Final = 64
 DEFAULT_MAX_RETRIES: Final = 3
 DEFAULT_BACKOFF_S: Final = 1.0
+#: The one reasoning_effort at which the GPT-5 family still takes a temperature.
+_NO_REASONING: Final = 'none'
+#: A packet answer can take minutes; httpx's 5 s default would never see one.
+_DEFAULT_TIMEOUT: Final = httpx.Timeout(1800.0, connect=30.0)
 _MIME_TYPES: Final[dict[str, str]] = {
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
@@ -99,11 +105,34 @@ def parse_proposal(text: str) -> BuilderProposal:
     if payload is None:
         raise ValidationError('builder response contains no JSON object')
     try:
-        return BuilderProposal.model_validate(payload)
+        return BuilderProposal.model_validate(_trimmed(payload))
     except PydanticValidationError as exc:
         raise ValidationError(
             f'builder response does not match the schema: {exc}'
         ) from exc
+
+
+def _trimmed(payload: dict[str, Any]) -> dict[str, Any]:
+    """The payload with candidate names cut to the schema's limit.
+
+    A Builder that writes a 70-character name has still proposed a usable
+    patch; the name only labels a directory and a ledger row. Anything else
+    off-schema is still rejected by validation.
+    """
+    candidates = payload.get('candidates')
+    if not isinstance(candidates, list):
+        return payload
+    trimmed = []
+    for index, candidate in enumerate(candidates):
+        if isinstance(candidate, dict) and isinstance(candidate.get('name'), str):
+            name = candidate['name'].strip()
+            if len(name) > MAX_CANDIDATE_NAME:
+                name = f'{name[: MAX_CANDIDATE_NAME - 3].rstrip()}_{index}'[
+                    :MAX_CANDIDATE_NAME
+                ]
+            candidate = {**candidate, 'name': name}
+        trimmed.append(candidate)
+    return {**payload, 'candidates': trimmed}
 
 
 class _RetryableError(Exception):
@@ -132,7 +161,9 @@ class OpenAIBuilder:
         self._config = config
         self._ledger_path = ledger_path
         self._experiment = experiment
-        self._client = client if client is not None else httpx.Client()
+        self._client = (
+            client if client is not None else httpx.Client(timeout=_DEFAULT_TIMEOUT)
+        )
         self._max_retries = max_retries
         self._backoff_s = backoff_s
         self._url = f'{config.endpoint.rstrip("/")}/chat/completions'
@@ -163,12 +194,17 @@ class OpenAIBuilder:
     ) -> dict[str, Any]:
         content: list[dict[str, Any]] = [{'type': 'text', 'text': packet_text}]
         content.extend(_image_url_part(path) for path in image_paths)
-        return {
+        payload: dict[str, Any] = {
             'model': self._config.model_id,
             'messages': [{'role': 'user', 'content': content}],
-            'temperature': self._config.temperature,
             'response_format': {'type': 'json_object'},
         }
+        effort = self._config.reasoning_effort
+        if effort is not None:
+            payload['reasoning_effort'] = effort
+        if effort is None or effort == _NO_REASONING:
+            payload['temperature'] = self._config.temperature
+        return payload
 
     def _headers(self) -> dict[str, str]:
         api_key = os.environ.get(self._config.api_key_env, '')

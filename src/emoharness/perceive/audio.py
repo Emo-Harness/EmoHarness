@@ -11,15 +11,17 @@ from __future__ import annotations
 
 import base64
 import json
+import threading
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Final, Protocol, runtime_checkable
 
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic import ValidationError as PydanticValidationError
 
 from emoharness.common.errors import EmoHarnessError, ValidationError
+from emoharness.common.jsonish import extract_json_object
+from emoharness.common.logging import get_logger
 from emoharness.harness.schema import AudioOpinion
 
 _CUE_PROMPT: Final = (
@@ -27,6 +29,8 @@ _CUE_PROMPT: Final = (
     'clip: pitch, pace, volume, tone quality, laughter, crying, sighing, silence, '
     'and background noise. Do not name, imply, or guess any emotion.'
 )
+_LOGGER = get_logger(__name__)
+
 _OPINION_PROMPT: Final = (
     'Listen to this audio clip and reply with only a JSON object with three '
     'fields: "valence" (one of "negative", "neutral", "positive"), "arousal" '
@@ -136,21 +140,33 @@ class FakeDiarizer:
 
 
 class WhisperTranscriber:
-    """faster-whisper transcription with word timestamps."""
+    """faster-whisper transcription with word timestamps.
+
+    The model is loaded on the first call and kept: loading large-v3 costs
+    seconds and a few gigabytes, and a corpus has thousands of clips.
+    """
 
     def __init__(self, model_size: str = 'large-v3', device: str = 'auto') -> None:
         self._model_size = model_size
         self._device = device
+        self._model: Any = None
+        self._lock = threading.Lock()
+
+    def _loaded(self) -> Any:
+        with self._lock:
+            if self._model is None:
+                try:
+                    from faster_whisper import WhisperModel  # pragma: no cover
+                except ImportError as exc:
+                    raise EmoHarnessError(
+                        'faster_whisper is required for WhisperTranscriber; '
+                        "install the 'audio' extra"
+                    ) from exc
+                self._model = WhisperModel(self._model_size, device=self._device)
+            return self._model
 
     def transcribe(self, wav: Path) -> Transcript:
-        try:
-            from faster_whisper import WhisperModel  # pragma: no cover
-        except ImportError as exc:
-            raise EmoHarnessError(
-                'faster_whisper is required for WhisperTranscriber; '
-                "install the 'audio' extra"
-            ) from exc
-        model = WhisperModel(self._model_size, device=self._device)
+        model = self._loaded()
         raw_segments, info = model.transcribe(str(wav), word_timestamps=True)
         segments = list(raw_segments)
         words = tuple(
@@ -163,39 +179,68 @@ class WhisperTranscriber:
 
 
 class OpenSmileProsody:
-    """openSMILE eGeMAPSv02 functionals for one audio file."""
+    """openSMILE eGeMAPSv02 functionals for one audio file; the extractor is built once."""
+
+    def __init__(self) -> None:
+        self._smile: Any = None
+        self._lock = threading.Lock()
+
+    def _loaded(self) -> Any:
+        with self._lock:
+            if self._smile is None:
+                try:
+                    import opensmile  # pragma: no cover
+                except ImportError as exc:
+                    raise EmoHarnessError(
+                        'opensmile is required for OpenSmileProsody; '
+                        "install the 'audio' extra"
+                    ) from exc
+                self._smile = opensmile.Smile(
+                    feature_set=opensmile.FeatureSet.eGeMAPSv02,
+                    feature_level=opensmile.FeatureLevel.Functionals,
+                )
+            return self._smile
 
     def extract(self, wav: Path) -> Mapping[str, float]:
-        try:
-            import opensmile  # pragma: no cover
-        except ImportError as exc:
-            raise EmoHarnessError(
-                "opensmile is required for OpenSmileProsody; install the 'audio' extra"
-            ) from exc
-        smile = opensmile.Smile(
-            feature_set=opensmile.FeatureSet.eGeMAPSv02,
-            feature_level=opensmile.FeatureLevel.Functionals,
-        )
-        frame = smile.process_file(str(wav))
+        frame = self._loaded().process_file(str(wav))
         return {str(column): float(frame[column].iloc[0]) for column in frame.columns}
 
 
+class NullDiarizer:
+    """No diarization: every clip is treated as one speaker.
+
+    ``dominant_speaker`` then finds nobody and ``subject_transcript`` falls back
+    to the whole transcript, which is the right answer for single-utterance
+    clips and the documented degradation for the rest (ADR-0004 §4).
+    """
+
+    def diarize(self, _wav: Path) -> tuple[SpeechSegment, ...]:
+        return ()
+
+
 class PyannoteDiarizer:
-    """Speaker diarization via a pretrained pyannote.audio pipeline."""
+    """Speaker diarization via a pretrained pyannote.audio pipeline, loaded once."""
 
     def __init__(self, model_name: str) -> None:
         self._model_name = model_name
+        self._pipeline: Any = None
+        self._lock = threading.Lock()
+
+    def _loaded(self) -> Any:
+        with self._lock:
+            if self._pipeline is None:
+                try:
+                    from pyannote.audio import Pipeline  # pragma: no cover
+                except ImportError as exc:
+                    raise EmoHarnessError(
+                        'pyannote.audio is required for PyannoteDiarizer; '
+                        "install the 'audio' extra"
+                    ) from exc
+                self._pipeline = Pipeline.from_pretrained(self._model_name)
+            return self._pipeline
 
     def diarize(self, wav: Path) -> tuple[SpeechSegment, ...]:
-        try:
-            from pyannote.audio import Pipeline  # pragma: no cover
-        except ImportError as exc:
-            raise EmoHarnessError(
-                'pyannote.audio is required for PyannoteDiarizer; '
-                "install the 'audio' extra"
-            ) from exc
-        pipeline = Pipeline.from_pretrained(self._model_name)
-        diarization = pipeline(str(wav))
+        diarization = self._loaded()(str(wav))
         return tuple(
             SpeechSegment(
                 speaker=str(speaker), start=float(segment.start), end=float(segment.end)
@@ -279,18 +324,38 @@ def _extract_content(data: Any) -> str:
         raise ValidationError(f'unexpected describer response shape: {data!r}') from exc
 
 
+#: What the opinion channel may say; anything else is recorded as ``unknown``.
+_VALENCES: Final = frozenset({'negative', 'neutral', 'positive'})
+_AROUSALS: Final = frozenset({'low', 'medium', 'high'})
+_MAX_CANDIDATES: Final = 2
+
+
 def _parse_opinion(raw: str) -> AudioOpinion:
-    cleaned = raw.strip().strip('`').strip()
-    if cleaned.lower().startswith('json'):
-        cleaned = cleaned[4:].strip()
-    try:
-        data = json.loads(cleaned)
-    except json.JSONDecodeError as exc:
-        raise ValidationError(f'describer opinion is not valid JSON: {raw!r}') from exc
-    try:
-        return AudioOpinion.model_validate(data)
-    except PydanticValidationError as exc:
-        raise ValidationError(f'describer opinion failed validation: {data!r}') from exc
+    """The describer's opinion, or ``unknown`` wherever its answer strays.
+
+    The opinion is one voter, never evidence (ADR-0004 §2), so an answer that
+    is not JSON, or says ``"valence": "mixed"``, must not abort a corpus: the
+    off-schema part becomes ``unknown`` and a warning names the clip's answer.
+    """
+    data = extract_json_object(raw)
+    if data is None:
+        _LOGGER.warning('describer opinion is not JSON; recording unknown: %r', raw)
+        return AudioOpinion()
+    valence = str(data.get('valence', 'unknown')).strip().lower()
+    arousal = str(data.get('arousal', 'unknown')).strip().lower()
+    raw_candidates = data.get('candidates', ())
+    candidates = tuple(
+        str(item).strip()
+        for item in (raw_candidates if isinstance(raw_candidates, list) else ())
+        if str(item).strip()
+    )[:_MAX_CANDIDATES]
+    if valence not in _VALENCES or arousal not in _AROUSALS:
+        _LOGGER.warning('describer opinion off schema; coercing to unknown: %r', data)
+    return AudioOpinion(
+        valence=valence if valence in _VALENCES else 'unknown',  # type: ignore[arg-type]
+        arousal=arousal if arousal in _AROUSALS else 'unknown',  # type: ignore[arg-type]
+        candidates=candidates,
+    )
 
 
 def dominant_speaker(segments: Sequence[SpeechSegment]) -> str | None:
