@@ -179,3 +179,6 @@ data/fake/
 results/fake/
 results/metrics/
 results/freeze.json
+
+# packaged exports of a run (scripts/export_indist_results.py); regenerable
+results/export/
