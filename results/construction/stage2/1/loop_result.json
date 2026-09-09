@@ -1,0 +1,138 @@
+{
+  "stage": 2,
+  "replicate": 1,
+  "rounds": [
+    {
+      "round_index": 0,
+      "packet_hash": "9dcc3da16cbac21b2c88e281edb5c6bc93202d38eae9325cb9e3f2697aed01b9",
+      "candidates": [
+        {
+          "name": "affect-over-neutral-ranking",
+          "recognition": 0.4847715736040609,
+          "reasoning": 0.85875,
+          "regression_rate": 0.13829787234042554,
+          "mean_calls": 4.00761421319797,
+          "p95_latency_s": 30.05642611123623
+        },
+        {
+          "name": "richer-visible-affect-cues",
+          "recognition": 0.46446700507614214,
+          "reasoning": 0.81875,
+          "regression_rate": 0.09042553191489362,
+          "mean_calls": 4.00253807106599,
+          "p95_latency_s": 31.334108446724716
+        },
+        {
+          "name": "specific-negative-state-verification",
+          "recognition": 0.45685279187817257,
+          "reasoning": 0.81875,
+          "regression_rate": 0.11702127659574468,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 31.232382589881308
+        }
+      ],
+      "gate_results": [
+        {
+          "name": "affect-over-neutral-ranking",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.1383 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "richer-visible-affect-cues",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4645 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.0904 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "specific-negative-state-verification",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4569 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.1170 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "0bed779ef9d42fe34d3c35b5f01c89878d8c52d997a82a0ffc6ac5ed8d2fde15"
+    },
+    {
+      "round_index": 1,
+      "packet_hash": "258b9ac0790b4d9a82da4c039d27c93463e4fbe11a04006c9304f6b00056975b",
+      "candidates": [
+        {
+          "name": "specific_visual_affect_over_neutral",
+          "recognition": 0.4746192893401015,
+          "reasoning": 0.83875,
+          "regression_rate": 0.0797872340425532,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 30.603919445513753
+        },
+        {
+          "name": "semantic_sentiment_over_flat_prosody",
+          "recognition": 0.4543147208121827,
+          "reasoning": 0.83875,
+          "regression_rate": 0.16489361702127658,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 30.66691292057513
+        },
+        {
+          "name": "obstacle_and_complaint_signal",
+          "recognition": 0.46954314720812185,
+          "reasoning": 0.84,
+          "regression_rate": 0.047872340425531915,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 31.673649241786922
+        },
+        {
+          "name": "negative_content_over_neutrality",
+          "recognition": 0.467005076142132,
+          "reasoning": 0.82375,
+          "regression_rate": 0.09574468085106383,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 30.959586168942064
+        }
+      ],
+      "gate_results": [
+        {
+          "name": "specific_visual_affect_over_neutral",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4746 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.0798 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "semantic_sentiment_over_flat_prosody",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4543 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.1649 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "obstacle_and_complaint_signal",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4695 does not exceed incumbent 0.4772 by more than 0.0000"
+          ]
+        },
+        {
+          "name": "negative_content_over_neutrality",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4670 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.0957 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "0bed779ef9d42fe34d3c35b5f01c89878d8c52d997a82a0ffc6ac5ed8d2fde15"
+    }
+  ],
+  "final_bundle": "/home/max7/EmoHarness/results/construction/stage2/1/final",
+  "stopped_reason": "early_stop"
+}

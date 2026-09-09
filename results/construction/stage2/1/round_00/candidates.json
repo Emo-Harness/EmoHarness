@@ -1,0 +1,72 @@
+{
+  "evaluated": [
+    {
+      "name": "affect-over-neutral-ranking",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "4d40eb00dc9927814a81693a766499af3e574217301836ccf980f593b9e7d057",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/1/round_00/candidates/affect-over-neutral-ranking",
+      "scores": {
+        "name": "affect-over-neutral-ranking",
+        "recognition": 0.4847715736040609,
+        "reasoning": 0.85875,
+        "regression_rate": 0.13829787234042554,
+        "mean_calls": 4.00761421319797,
+        "p95_latency_s": 30.05642611123623
+      }
+    },
+    {
+      "name": "richer-visible-affect-cues",
+      "targeted_cluster": "Excited | Happiness | agree",
+      "patch_hash": "5c967f88fd07eebf738b2cef6369ff791246c1fedc49f12962a65422f27ed0da",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/1/round_00/candidates/richer-visible-affect-cues",
+      "scores": {
+        "name": "richer-visible-affect-cues",
+        "recognition": 0.46446700507614214,
+        "reasoning": 0.81875,
+        "regression_rate": 0.09042553191489362,
+        "mean_calls": 4.00253807106599,
+        "p95_latency_s": 31.334108446724716
+      }
+    },
+    {
+      "name": "specific-negative-state-verification",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "e3bf468fa8a5b2d42b90e26632f06378eb1f5b77c375ab5f9d6e1200b3b44719",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/1/round_00/candidates/specific-negative-state-verification",
+      "scores": {
+        "name": "specific-negative-state-verification",
+        "recognition": 0.45685279187817257,
+        "reasoning": 0.81875,
+        "regression_rate": 0.11702127659574468,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 31.232382589881308
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "affect-over-neutral-ranking",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1383 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "richer-visible-affect-cues",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4645 does not exceed incumbent 0.4772 by more than 0.0000",
+        "regression rate 0.0904 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "specific-negative-state-verification",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4569 does not exceed incumbent 0.4772 by more than 0.0000",
+        "regression rate 0.1170 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": []
+}

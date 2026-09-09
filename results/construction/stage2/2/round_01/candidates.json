@@ -1,0 +1,28 @@
+{
+  "evaluated": [
+    {
+      "name": "calibrate_happy_vs_neutral",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "9ba44067827dea45cc6c7266f023d2b8448d52263d60037fcddb4f97b5a265bb",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_01/candidates/calibrate_happy_vs_neutral",
+      "scores": {
+        "name": "calibrate_happy_vs_neutral",
+        "recognition": 0.4796954314720812,
+        "reasoning": 0.85875,
+        "regression_rate": 0.10106382978723404,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 28.48492846812591
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "calibrate_happy_vs_neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1011 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": []
+}

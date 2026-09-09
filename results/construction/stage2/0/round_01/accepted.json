@@ -1,0 +1,15 @@
+{
+  "accepted": "Promote explicit smiles over neutral audio",
+  "targeted_cluster": "happy | neutral | agree",
+  "rationale": "For emotion prompts containing the exact happy and neutral labels, explicit visible smiling should outweigh an audio model's weak neutral vote and the mere absence of laughter. This directly targets the largest cluster without changing calls or latency.",
+  "patch_hash": "83025a936f79bc99bf235449efb5e57ec5accaeb318f327018a9d6f8058c6a67",
+  "bundle": "/home/max7/EmoHarness/results/construction/stage2/0/round_01/candidates/Promote_explicit_smiles_over_neutral_audio",
+  "scores": {
+    "name": "Promote_explicit_smiles_over_neutral_audio",
+    "recognition": 0.48223350253807107,
+    "reasoning": 0.83125,
+    "regression_rate": 0.0425531914893617,
+    "mean_calls": 4.00507614213198,
+    "p95_latency_s": 31.63477994016139
+  }
+}

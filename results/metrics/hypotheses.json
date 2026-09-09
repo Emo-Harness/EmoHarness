@@ -1,0 +1,91 @@
+{
+  "family": [
+    "H1",
+    "H2",
+    "H-B_seen",
+    "H-B_held_out",
+    "H3"
+  ],
+  "holm_adjusted": {},
+  "tests": [
+    {
+      "id": "H1",
+      "statement": "Rec-S(L5) - Rec-S(L0) > 0 on seen macro",
+      "rows": [
+        "L0",
+        "L5"
+      ],
+      "item_set": "full",
+      "group": "seen",
+      "status": "missing rows",
+      "missing": [
+        "L5",
+        "L0"
+      ]
+    },
+    {
+      "id": "H2",
+      "statement": "Rec-S(L5) - Rec-S(L0) > 0 on held-out macro",
+      "rows": [
+        "L0",
+        "L5"
+      ],
+      "item_set": "full",
+      "group": "held_out",
+      "status": "missing rows",
+      "missing": [
+        "L5",
+        "L0"
+      ]
+    },
+    {
+      "id": "H-B_seen",
+      "statement": "Rec-S(L5) - Rec-S(L3) > 0 on seen macro",
+      "rows": [
+        "L3",
+        "L5"
+      ],
+      "item_set": "full",
+      "group": "seen",
+      "status": "missing rows",
+      "missing": [
+        "L5",
+        "L3"
+      ]
+    },
+    {
+      "id": "H-B_held_out",
+      "statement": "Rec-S(L5) - Rec-S(L3) > 0 on held-out macro",
+      "rows": [
+        "L3",
+        "L5"
+      ],
+      "item_set": "full",
+      "group": "held_out",
+      "status": "missing rows",
+      "missing": [
+        "L5",
+        "L3"
+      ]
+    },
+    {
+      "id": "H3",
+      "statement": "Gap Closed = (Rec-S(L5) - Rec-S(L0)) / (Rec-S(L6) - Rec-S(L0))",
+      "rows": [
+        "L0",
+        "L5",
+        "L6"
+      ],
+      "item_set": "subset",
+      "group": "overall",
+      "tiers": {
+        "tier_1": 0.25,
+        "tier_2": 0.5
+      },
+      "status": "missing rows",
+      "missing": [
+        "L5"
+      ]
+    }
+  ]
+}

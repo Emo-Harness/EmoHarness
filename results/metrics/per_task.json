@@ -1,0 +1,150 @@
+{
+  "L0@subset": {
+    "source": "local",
+    "tasks": {
+      "ER_Lab": {
+        "recognition": 0.08,
+        "count": 125
+      },
+      "ER_Wild": {
+        "recognition": 0.368,
+        "count": 125
+      },
+      "FG_ER": {
+        "recognition": 0.28826666666666667,
+        "count": 125
+      },
+      "FG_SA": {
+        "recognition": 0.144,
+        "count": 125
+      },
+      "IR": {
+        "recognition": 0.2,
+        "count": 125
+      },
+      "ML_ER": {
+        "recognition": 0.3473333333333333,
+        "count": 125
+      },
+      "Noise_ER": {
+        "recognition": 0.528,
+        "count": 125
+      },
+      "SA": {
+        "recognition": 0.384,
+        "count": 125
+      }
+    }
+  },
+  "L3@subset": {
+    "source": "local",
+    "tasks": {
+      "ER_Lab": {
+        "recognition": 0.28,
+        "count": 125
+      },
+      "ER_Wild": {
+        "recognition": 0.344,
+        "count": 125
+      },
+      "FG_ER": {
+        "recognition": 0.24493333333333334,
+        "count": 125
+      },
+      "FG_SA": {
+        "recognition": 0.28,
+        "count": 125
+      },
+      "IR": {
+        "recognition": 0.504,
+        "count": 125
+      },
+      "ML_ER": {
+        "recognition": 0.45866666666666667,
+        "count": 125
+      },
+      "Noise_ER": {
+        "recognition": 0.592,
+        "count": 125
+      },
+      "SA": {
+        "recognition": 0.6,
+        "count": 125
+      }
+    }
+  },
+  "L4@subset": {
+    "source": "local",
+    "tasks": {
+      "ER_Lab": {
+        "recognition": 0.288,
+        "count": 125
+      },
+      "ER_Wild": {
+        "recognition": 0.328,
+        "count": 125
+      },
+      "FG_ER": {
+        "recognition": 0.25693333333333335,
+        "count": 125
+      },
+      "FG_SA": {
+        "recognition": 0.28,
+        "count": 125
+      },
+      "IR": {
+        "recognition": 0.504,
+        "count": 125
+      },
+      "ML_ER": {
+        "recognition": 0.4493333333333333,
+        "count": 125
+      },
+      "Noise_ER": {
+        "recognition": 0.608,
+        "count": 125
+      },
+      "SA": {
+        "recognition": 0.608,
+        "count": 125
+      }
+    }
+  },
+  "L6@subset": {
+    "source": "local",
+    "tasks": {
+      "ER_Lab": {
+        "recognition": 0.28,
+        "count": 125
+      },
+      "ER_Wild": {
+        "recognition": 0.456,
+        "count": 125
+      },
+      "FG_ER": {
+        "recognition": 0.3718666666666667,
+        "count": 125
+      },
+      "FG_SA": {
+        "recognition": 0.304,
+        "count": 125
+      },
+      "IR": {
+        "recognition": 0.4,
+        "count": 125
+      },
+      "ML_ER": {
+        "recognition": 0.4786666666666667,
+        "count": 125
+      },
+      "Noise_ER": {
+        "recognition": 0.64,
+        "count": 125
+      },
+      "SA": {
+        "recognition": 0.624,
+        "count": 125
+      }
+    }
+  }
+}

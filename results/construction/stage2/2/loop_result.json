@@ -1,0 +1,106 @@
+{
+  "stage": 2,
+  "replicate": 2,
+  "rounds": [
+    {
+      "round_index": 0,
+      "packet_hash": "9dcc3da16cbac21b2c88e281edb5c6bc93202d38eae9325cb9e3f2697aed01b9",
+      "candidates": [
+        {
+          "name": "Prioritize_direct_positive_facial_affect_over_generic_neutral_0",
+          "recognition": 0.4746192893401015,
+          "reasoning": 0.84125,
+          "regression_rate": 0.0797872340425532,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 31.18079312478659
+        },
+        {
+          "name": "Use_semantic_valence_for_positive_sentiment",
+          "recognition": 0.4593908629441624,
+          "reasoning": 0.84625,
+          "regression_rate": 0.14893617021276595,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 30.862998640409206
+        },
+        {
+          "name": "Recognize_frustration_from_obstacle_and_exasperation_cues",
+          "recognition": 0.4746192893401015,
+          "reasoning": 0.84,
+          "regression_rate": 0.03723404255319149,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 31.802588040335106
+        },
+        {
+          "name": "Separate_negative_sentiment_from_calm_delivery",
+          "recognition": 0.4720812182741117,
+          "reasoning": 0.8375,
+          "regression_rate": 0.05319148936170213,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 31.410630418278753
+        }
+      ],
+      "gate_results": [
+        {
+          "name": "Prioritize_direct_positive_facial_affect_over_generic_neutral_0",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4746 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.0798 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "Use_semantic_valence_for_positive_sentiment",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4594 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.1489 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "Recognize_frustration_from_obstacle_and_exasperation_cues",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4746 does not exceed incumbent 0.4772 by more than 0.0000"
+          ]
+        },
+        {
+          "name": "Separate_negative_sentiment_from_calm_delivery",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4721 does not exceed incumbent 0.4772 by more than 0.0000",
+            "regression rate 0.0532 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "0bed779ef9d42fe34d3c35b5f01c89878d8c52d997a82a0ffc6ac5ed8d2fde15"
+    },
+    {
+      "round_index": 1,
+      "packet_hash": "258b9ac0790b4d9a82da4c039d27c93463e4fbe11a04006c9304f6b00056975b",
+      "candidates": [
+        {
+          "name": "calibrate_happy_vs_neutral",
+          "recognition": 0.4796954314720812,
+          "reasoning": 0.85875,
+          "regression_rate": 0.10106382978723404,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 28.48492846812591
+        }
+      ],
+      "gate_results": [
+        {
+          "name": "calibrate_happy_vs_neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.1011 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "0bed779ef9d42fe34d3c35b5f01c89878d8c52d997a82a0ffc6ac5ed8d2fde15"
+    }
+  ],
+  "final_bundle": "/home/max7/EmoHarness/results/construction/stage2/2/final",
+  "stopped_reason": "early_stop"
+}

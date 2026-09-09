@@ -1,0 +1,29 @@
+{
+  "loaded": 6500,
+  "assigned": 923,
+  "test_remaining": 5577,
+  "label_histograms": {
+    "mme_emotion_indist": {
+      "anger": 53,
+      "anxiety": 8,
+      "contempt": 4,
+      "disappointment": 3,
+      "disgust": 17,
+      "excited": 46,
+      "fear": 54,
+      "frustration": 76,
+      "happiness": 107,
+      "helplessness": 4,
+      "joy": 3,
+      "negative": 105,
+      "neutral": 189,
+      "other": 3,
+      "positive": 117,
+      "sadness": 79,
+      "sarcastic": 4,
+      "scared": 3,
+      "shy": 1,
+      "surprise": 47
+    }
+  }
+}

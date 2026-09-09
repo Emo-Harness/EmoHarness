@@ -1,0 +1,127 @@
+{
+  "task_counts": {
+    "ER_Lab": 500,
+    "ER_Wild": 1800,
+    "SA": 1600,
+    "Noise_ER": 500,
+    "FG_ER": 500,
+    "ML_ER": 600,
+    "FG_SA": 500,
+    "IR": 500
+  },
+  "label_histograms": {
+    "ER_Lab": {
+      "anger": 53,
+      "sadness": 72,
+      "surprise": 19,
+      "happiness": 39,
+      "excited": 83,
+      "fear": 22,
+      "frustration": 120,
+      "neutral": 89,
+      "other": 3
+    },
+    "ER_Wild": {
+      "disgust": 130,
+      "anger": 268,
+      "surprise": 225,
+      "neutral": 369,
+      "fear": 135,
+      "happiness": 261,
+      "sadness": 203,
+      "sarcastic": 28,
+      "shy": 23,
+      "scared": 24,
+      "joy": 41,
+      "disappointment": 21,
+      "contempt": 22,
+      "anxiety": 29,
+      "helplessness": 21
+    },
+    "SA": {
+      "negative": 628,
+      "positive": 576,
+      "neutral": 396
+    },
+    "Noise_ER": {
+      "happiness": 95,
+      "neutral": 99,
+      "anger": 101,
+      "surprise": 32,
+      "sadness": 119,
+      "worried": 54
+    },
+    "FG_ER": {
+      "engagement": 105,
+      "peace": 44,
+      "anticipation": 73,
+      "fear": 32,
+      "annoyance": 36,
+      "affection": 54,
+      "sympathy": 17,
+      "sensitivity": 20,
+      "sadness": 23,
+      "suffering": 15,
+      "disconnection": 27,
+      "disapproval": 38,
+      "anger": 19,
+      "excitement": 35,
+      "aversion": 17,
+      "disquietment": 39,
+      "pleasure": 38,
+      "surprise": 28,
+      "doubt/confusion": 49,
+      "yearning": 11,
+      "esteem": 28,
+      "confidence": 80,
+      "happiness": 62,
+      "pain": 6,
+      "fatigue": 9,
+      "embarrassment": 3
+    },
+    "ML_ER": {
+      "anger": 241,
+      "disgust": 233,
+      "fear": 143,
+      "surprise": 148,
+      "sadness": 221,
+      "happiness": 191,
+      "contempt": 27,
+      "helplessness": 57,
+      "anxiety": 53,
+      "disappointment": 22
+    },
+    "FG_SA": {
+      "negative": 119,
+      "very strong negative": 5,
+      "weak positive": 69,
+      "weak negative": 58,
+      "strong positive": 53,
+      "neutral": 25,
+      "positive": 76,
+      "strong negative": 92,
+      "very strong positive": 3
+    },
+    "IR": {
+      "neutral": 133,
+      "questioning": 108,
+      "consoling": 55,
+      "suggesting": 61,
+      "encouraging": 29,
+      "agreeing": 52,
+      "wishing": 50,
+      "acknowledging": 12
+    }
+  },
+  "label_violation_counts": {
+    "ER_Lab": 0,
+    "ER_Wild": 0,
+    "SA": 0,
+    "Noise_ER": 0,
+    "FG_ER": 0,
+    "ML_ER": 0,
+    "FG_SA": 0,
+    "IR": 0
+  },
+  "missing_media_count": 0
+}

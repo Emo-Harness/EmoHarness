@@ -1,0 +1,93 @@
+{
+  "evaluated": [
+    {
+      "name": "calibrate_low_arousal_frustration",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "ae41a3187414152e11f3164d04faf59b5abdd4ee9731a39b0e214f1a4d8ba7bb",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_03/candidates/calibrate_low_arousal_frustration",
+      "scores": {
+        "name": "calibrate_low_arousal_frustration",
+        "recognition": 0.4847715736040609,
+        "reasoning": 0.8375,
+        "regression_rate": 0.050505050505050504,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 32.07556454922306
+      }
+    },
+    {
+      "name": "prioritize_observable_smiles",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "d028fdb267d719c7ff20ab190d6a35208ba4cc9461eb7e8292a21facea1c756d",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_03/candidates/prioritize_observable_smiles",
+      "scores": {
+        "name": "prioritize_observable_smiles",
+        "recognition": 0.4796954314720812,
+        "reasoning": 0.86125,
+        "regression_rate": 0.15151515151515152,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 31.308479577139963
+      }
+    },
+    {
+      "name": "separate_anger_from_frustration",
+      "targeted_cluster": "Anger | Frustration | agree",
+      "patch_hash": "cfabff75af4ce1dee40b532b0514f4da620d1dbaeb209ab26ed5a38dfc9adcfe",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_03/candidates/separate_anger_from_frustration",
+      "scores": {
+        "name": "separate_anger_from_frustration",
+        "recognition": 0.4796954314720812,
+        "reasoning": 0.83125,
+        "regression_rate": 0.045454545454545456,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 32.28220709764865
+      }
+    },
+    {
+      "name": "recognize_explicit_disgust_cues",
+      "targeted_cluster": "disgust | neutral | agree",
+      "patch_hash": "3acb627790a0f9ba020f1cb962cb78f1a2022c1fab7a7f51ed7f561fdffb723a",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_03/candidates/recognize_explicit_disgust_cues",
+      "scores": {
+        "name": "recognize_explicit_disgust_cues",
+        "recognition": 0.48223350253807107,
+        "reasoning": 0.83,
+        "regression_rate": 0.050505050505050504,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 32.25784139507451
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "calibrate_low_arousal_frustration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0505 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "prioritize_observable_smiles",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4797 does not exceed incumbent 0.4822 by more than 0.0000",
+        "regression rate 0.1515 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "separate_anger_from_frustration",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4797 does not exceed incumbent 0.4822 by more than 0.0000"
+      ]
+    },
+    {
+      "name": "recognize_explicit_disgust_cues",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4822 does not exceed incumbent 0.4822 by more than 0.0000",
+        "regression rate 0.0505 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": []
+}

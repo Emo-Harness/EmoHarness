@@ -1,0 +1,92 @@
+{
+  "evaluated": [
+    {
+      "name": "Prioritize explicit visible smiles over neutral audio",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "d0a75f1101fb31d238c64f852030c19cc648cdb4726f3d24ee16fb1ebd1e2013",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_02/candidates/Prioritize_explicit_visible_smiles_over_neutral_audio",
+      "scores": {
+        "name": "Prioritize_explicit_visible_smiles_over_neutral_audio",
+        "recognition": 0.47715736040609136,
+        "reasoning": 0.83875,
+        "regression_rate": 0.08080808080808081,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 30.838330560305625
+      }
+    },
+    {
+      "name": "Use affective meaning for positive sentiment",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "e949ad2c849485e5dc61546804125899b657aa4659a1aac4de5fb5d5b026d3d9",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_02/candidates/Use_affective_meaning_for_positive_sentiment",
+      "scores": {
+        "name": "Use_affective_meaning_for_positive_sentiment",
+        "recognition": 0.49746192893401014,
+        "reasoning": 0.83875,
+        "regression_rate": 0.05555555555555555,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 27.58594124687372
+      }
+    },
+    {
+      "name": "Detect frustration in conflict and problem language",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "31c59007138689000762360f7eab16d0a739a568da1f04f7f3de04f1cc3e57d4",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_02/candidates/Detect_frustration_in_conflict_and_problem_language",
+      "scores": {
+        "name": "Detect_frustration_in_conflict_and_problem_language",
+        "recognition": 0.5,
+        "reasoning": 0.82875,
+        "regression_rate": 0.07575757575757576,
+        "mean_calls": 4.00761421319797,
+        "p95_latency_s": 28.469850913737915
+      }
+    },
+    {
+      "name": "Use explicit adverse meaning for negative sentiment",
+      "targeted_cluster": "negative | neutral | agree",
+      "patch_hash": "7c987296cf81a97a3eefcd5fa86e076a9b64be01cf74bf7a5d7c27e7223efaac",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_02/candidates/Use_explicit_adverse_meaning_for_negative_sentiment",
+      "scores": {
+        "name": "Use_explicit_adverse_meaning_for_negative_sentiment",
+        "recognition": 0.49746192893401014,
+        "reasoning": 0.85375,
+        "regression_rate": 0.07575757575757576,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 28.18789948388003
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "Prioritize_explicit_visible_smiles_over_neutral_audio",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4772 does not exceed incumbent 0.4822 by more than 0.0000",
+        "regression rate 0.0808 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Use_affective_meaning_for_positive_sentiment",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0556 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Detect_frustration_in_conflict_and_problem_language",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0758 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Use_explicit_adverse_meaning_for_negative_sentiment",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0758 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": []
+}
