@@ -1,6 +1,6 @@
 # ADR-0004: Audio evidence pipeline
 
-Date: 2026-09-06. Amended 2026-09-07 after the strict review. Status: accepted.
+Date: 2026-09-06. Amended 2026-09-07 after the strict review; amended 2026-09-11 (describer removed). Status: accepted.
 
 ## Context
 
@@ -18,6 +18,22 @@ The review found two problems with the first version of this ADR. First, forbidd
 4. **Clips with several speakers** are diarized (pyannote). The dominant speaker by speech duration is treated as the subject; the Builder may replace this heuristic through `routing.yaml` at Stage 2.
 5. **Language** detected by Whisper is stored in the manifest and used for the per-language analysis (ADR-0013), never for routing that names a task.
 6. **Same-family check (P1).** One extra row runs Qwen2-Audio-7B in place of the default describer to quantify how much Reasoning score comes from aligning with the judge's audio agent rather than from evidence.
+
+## Amendment of 2026-09-11: no audio-language model
+
+Decision 2's free-text description and the whole audio-model opinion channel
+are withdrawn, and decision 6 (the Qwen2-Audio same-family row) with them. The
+reason is a design rule, not a measurement: every perception tool in the
+harness must be deterministic code (frame sampling, whisper transcription,
+openSMILE functionals turned into phrases by fixed rules). Asking a second
+model, Qwen2.5-Omni-7B in the v1 run, to describe the clip and to vote on its
+valence and arousal put another model's judgment into the evidence record, so
+part of any gain would have been that model's, not the Builder's. The
+observable-cue channel is now exactly the transcript (with language) and the
+prosody phrases; the evidence ids are `v*`, `a*` (transcript sentences, then
+prosody), and `t1`. The emotion lexicon filter, which only existed to scrub
+the describer's text, is removed with it. The v1 results that used the
+describer are kept under `results/archive/v1-omni-describer/`.
 
 ## Consequences
 

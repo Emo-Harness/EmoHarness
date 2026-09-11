@@ -10,11 +10,9 @@ from typing import Final
 from emoharness.common.hashing import sha256_file_cached
 from emoharness.common.logging import get_logger
 from emoharness.data.manifest import Example
-from emoharness.harness.schema import AudioEvidence, AudioOpinion
+from emoharness.harness.schema import AudioEvidence
 from emoharness.perceive.audio import (
-    AudioDescriber,
     Diarizer,
-    FakeDescriber,
     FakeDiarizer,
     FakeProsody,
     FakeTranscriber,
@@ -30,7 +28,6 @@ from emoharness.perceive.cache import (
     PreprocessedClip,
 )
 from emoharness.perceive.descriptors import ReferenceStats, describe_prosody
-from emoharness.perceive.lexicon import banned_words, filter_description
 from emoharness.perceive.video import (
     extract_audio_track,
     extract_frames,
@@ -45,14 +42,16 @@ _LOGGER = get_logger(__name__)
 
 @dataclass(frozen=True)
 class PerceptionTools:
-    """Dependency-injection point: every audio model the pipeline needs, plus config."""
+    """Dependency-injection point: the deterministic audio tools, plus config.
+
+    A transcriber, a prosody feature extractor, and a diarizer; nothing here
+    forms an opinion about the clip (ADR-0004, amended 2026-09-11).
+    """
 
     transcriber: Transcriber
     prosody: ProsodyExtractor
-    describer: AudioDescriber
     diarizer: Diarizer
     reference: ReferenceStats
-    banned: frozenset[str]
 
     @classmethod
     def fakes(
@@ -61,27 +60,21 @@ class PerceptionTools:
         transcript_text: str = '',
         language: str | None = None,
         prosody_features: Mapping[str, float] | None = None,
-        description: str = '',
-        opinion: AudioOpinion | None = None,
         segments: tuple[SpeechSegment, ...] = (),
         reference: ReferenceStats | None = None,
-        banned: frozenset[str] = frozenset(),
     ) -> PerceptionTools:
         """A fully deterministic toolset for tests; every argument has a safe default."""
         return cls(
             transcriber=FakeTranscriber(transcript_text, language),
             prosody=FakeProsody(prosody_features or {}),
-            describer=FakeDescriber(description, opinion or AudioOpinion()),
             diarizer=FakeDiarizer(segments),
             reference=reference or ReferenceStats(mean={}, std={}),
-            banned=banned,
         )
 
 
 @dataclass(frozen=True)
 class _AudioBundle:
     evidence: AudioEvidence
-    opinion: AudioOpinion | None
     word_count: int
 
 
@@ -102,9 +95,7 @@ def preprocess_clip(
     frames_root = cache.frames_dir(media_hash)
     frame_paths = _extract_visual_frames(media_path, duration, config, frames_root)
     judge_paths = _extract_judge_frames(media_path, duration, frames_root)
-    audio = _build_audio_evidence(
-        media_path, cache.audio_path(media_hash), example.label_set, tools
-    )
+    audio = _build_audio_evidence(media_path, cache.audio_path(media_hash), tools)
     clip = PreprocessedClip(
         media_hash=media_hash,
         config_hash=cfg_hash,
@@ -113,7 +104,6 @@ def preprocess_clip(
         judge_frame_paths=judge_paths,
         face_crop_paths=(),
         audio=audio.evidence,
-        audio_opinion=audio.opinion,
         transcript_words=audio.word_count,
     )
     cache.put(clip)
@@ -158,29 +148,20 @@ def _extract_judge_frames(
 
 
 def _build_audio_evidence(
-    media_path: Path,
-    wav_path: Path,
-    label_set: tuple[str, ...],
-    tools: PerceptionTools,
+    media_path: Path, wav_path: Path, tools: PerceptionTools
 ) -> _AudioBundle:
     wav = extract_audio_track(media_path, wav_path)
     if wav is None:
-        return _AudioBundle(AudioEvidence(speech_present=False), None, 0)
+        return _AudioBundle(AudioEvidence(speech_present=False), 0)
     transcript = tools.transcriber.transcribe(wav)
     segments = tools.diarizer.diarize(wav)
     speaker = dominant_speaker(segments)
     subject_text = subject_transcript(transcript, segments, speaker)
     descriptors = describe_prosody(tools.prosody.extract(wav), tools.reference)
-    description = filter_description(
-        tools.describer.describe(wav), banned_words(label_set, tools.banned)
-    )
-    opinion = tools.describer.opine(wav)
-    speech_present = bool(subject_text.strip()) or bool(description.strip())
     evidence = AudioEvidence(
-        speech_present=speech_present,
+        speech_present=bool(subject_text.strip()),
         transcript=subject_text,
         language=transcript.language,
         prosody=descriptors,
-        description=description,
     )
-    return _AudioBundle(evidence, opinion, len(transcript.words))
+    return _AudioBundle(evidence, len(transcript.words))

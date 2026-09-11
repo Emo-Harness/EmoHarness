@@ -103,12 +103,6 @@ class VerificationRouting(BaseModel):
     ranker: str = Field(min_length=1)
 
 
-class AudioRouting(BaseModel):
-    model_config = ConfigDict(frozen=True, extra='forbid')
-
-    use_opinion: bool
-
-
 class RoutingConfig(BaseModel):
     """``routing.yaml``: which stages run and which deterministic checks they use."""
 
@@ -116,7 +110,6 @@ class RoutingConfig(BaseModel):
 
     stages: tuple[str, ...] = Field(min_length=1)
     verification: VerificationRouting
-    audio: AudioRouting
 
 
 class AudioPipelineConfig(BaseModel):

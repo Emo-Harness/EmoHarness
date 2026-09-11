@@ -155,3 +155,9 @@ def make_proposal(
         return BuilderProposal(candidates=patches, summary='round summary')
 
     return _make
+
+
+@pytest.fixture
+def openai_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The test key every OpenAI-backed client reads; never a real one."""
+    monkeypatch.setenv('EMOHARNESS_TEST_OPENAI_KEY', 'sk-test')

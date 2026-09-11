@@ -18,14 +18,13 @@ from typing import Final
 
 from emoharness.common.hashing import sha256_file_cached
 from emoharness.data.manifest import Example
-from emoharness.harness.schema import AudioEvidence, AudioOpinion
+from emoharness.harness.schema import AudioEvidence
 from emoharness.perceive.cache import (
     PreprocessCache,
     PreprocessConfig,
     PreprocessedClip,
 )
 from emoharness.perceive.descriptors import ReferenceStats
-from emoharness.perceive.lexicon import load_lexicon
 from emoharness.perceive.pipeline import PerceptionTools
 
 FAKE_FRAMES: Final = 3
@@ -33,8 +32,8 @@ FAKE_JUDGE_FRAMES: Final = 2
 FRAME_BLOCKS: Final = 8
 FRAME_SIZE: Final = 64
 
-# Deliberately free of emotion words: the observable-cue channel must survive the
-# lexicon filter unchanged (ADR-0004).
+# Deliberately free of emotion words: the transcript is evidence, never a label
+# hint (ADR-0004).
 _SUBJECTS: Final[tuple[str, ...]] = (
     'the speaker',
     'the woman on the left',
@@ -128,14 +127,6 @@ _PROSODY: Final[tuple[str, ...]] = (
     'slow speech',
     'long pauses',
 )
-_SOUNDS: Final[tuple[str, ...]] = (
-    'A door closes nearby.',
-    'Papers rustle close to the microphone.',
-    'Traffic passes outside the window.',
-    'A chair scrapes across the floor.',
-)
-_VALENCE: Final[tuple[str, ...]] = ('negative', 'neutral', 'positive')
-_AROUSAL: Final[tuple[str, ...]] = ('low', 'medium', 'high')
 
 
 def clip_seed(media_hash: str) -> int:
@@ -187,15 +178,6 @@ def fake_audio(example: Example, seed: int) -> AudioEvidence:
         transcript=transcript,
         language=example.language or 'en',
         prosody=tuple(dict.fromkeys(prosody)),
-        description=_SOUNDS[(seed // 13) % len(_SOUNDS)],
-    )
-
-
-def fake_opinion(seed: int) -> AudioOpinion:
-    """The audio-model opinion channel: one voter, never an observation."""
-    return AudioOpinion(
-        valence=_VALENCE[seed % len(_VALENCE)],  # type: ignore[arg-type]
-        arousal=_AROUSAL[(seed // 3) % len(_AROUSAL)],  # type: ignore[arg-type]
     )
 
 
@@ -224,26 +206,17 @@ def fake_preprocess(
         judge_frame_paths=_frames(frames_dir, 'judge', seed + 1, FAKE_JUDGE_FRAMES),
         face_crop_paths=(),
         audio=audio,
-        audio_opinion=fake_opinion(seed),
         transcript_words=len(audio.transcript.split()),
     )
     cache.put(clip)
     return clip
 
 
-def fake_perception_tools(lexicon_path: Path | None = None) -> PerceptionTools:
+def fake_perception_tools() -> PerceptionTools:
     """Deterministic audio tools, for the real pipeline run without models."""
-    banned = (
-        load_lexicon(lexicon_path)
-        if lexicon_path and lexicon_path.is_file()
-        else frozenset()
-    )
     return PerceptionTools.fakes(
         transcript_text=fake_transcript(0),
         language='en',
         prosody_features={},
-        description=_SOUNDS[0],
-        opinion=AudioOpinion(),
         reference=ReferenceStats(mean={}, std={}),
-        banned=banned,
     )

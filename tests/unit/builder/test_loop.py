@@ -14,6 +14,7 @@ from emoharness.builder.loop import (
     Diagnose,
     Evaluate,
     LoopResult,
+    RoundCost,
     RoundRecord,
     run_stage,
     safe_name,
@@ -22,7 +23,9 @@ from emoharness.builder.loop import (
 from emoharness.builder.packet import DiagnosisPacket, build_packet
 from emoharness.builder.patch import read_bundle_files
 from emoharness.builder.schema import BuilderProposal, CandidatePatch, CandidateScores
+from emoharness.builder.verifier import FakeVerifier, Verdict, VerificationReport
 from emoharness.common.errors import LeakageError, ValidationError
+from emoharness.common.ledger import LedgerEntry, record
 
 Proposal = Callable[..., BuilderProposal]
 PROMPT = 'prompts/extract_visual.md'
@@ -334,3 +337,220 @@ def test_the_firewall_also_covers_keyframe_paths(
             forbidden_ids=('mme_er_wild_000001',),
         )
     assert builder.calls == ()
+
+
+# --- the verifier, the load check, and the cost record (ADR-0006 §8) -------------
+
+
+def _vetoing(approved: tuple[str, ...], vetoed: tuple[str, ...]) -> FakeVerifier:
+    """A verifier whose round-0 verdicts are scripted; later rounds approve all."""
+    verdicts = tuple(Verdict(name=name, approved=True) for name in approved) + tuple(
+        Verdict(name=name, approved=False, issues=('2. label forcing',))
+        for name in vetoed
+    )
+    return FakeVerifier(
+        [VerificationReport(verdicts=verdicts, summary='round 0 review')]
+    )
+
+
+def test_a_vetoed_candidate_is_never_written_or_scored(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    out_dir = tmp_path / 'construction'
+    evaluated: list[str] = []
+
+    def evaluate(bundle: Path) -> CandidateScores:
+        evaluated.append(bundle.name)
+        return _evaluate({'good': 0.7, 'forced': 0.9})(bundle)
+
+    verifier = _vetoing(approved=('good',), vetoed=('forced',))
+    result = run_stage(
+        stage=2,
+        replicate=0,
+        bundle_root=bundle_root,
+        out_dir=out_dir,
+        builder=FakeBuilder(
+            [
+                _proposal(
+                    _patch('good'),
+                    _patch('forced', 'routing.yaml'),
+                    _patch('off_limits', 'verification/cross_modal.py'),
+                )
+            ]
+        ),
+        cfg=_config(rounds=1),
+        gate_cfg=GATES,
+        diagnose=_diagnose(),
+        evaluate=evaluate,
+        verifier=verifier,
+    )
+
+    # The verifier only sees candidates that passed the deterministic checks.
+    assert [c.name for c in verifier.requests[0].candidates] == ['good', 'forced']
+    assert evaluated == ['harness', 'good']
+    assert not (out_dir / 'round_00' / 'candidates' / 'forced').exists()
+    assert result.rounds[0].accepted == 'good'
+    assert result.rounds[0].vetoed == ('forced',)
+    assert result.rounds[0].incumbent_recognition == 0.5
+    round_dir = out_dir / 'round_00'
+    document = json.loads((round_dir / 'candidates.json').read_text(encoding='utf-8'))
+    assert document['vetoed'] == [{'name': 'forced', 'issues': ['2. label forcing']}]
+    assert [row['name'] for row in document['rejected']] == ['off_limits']
+    verification = json.loads(
+        (round_dir / 'verification.json').read_text(encoding='utf-8')
+    )
+    assert verification['model_id'] == 'fake-verifier'
+    assert verification['report']['summary'] == 'round 0 review'
+    assert [c['name'] for c in verification['request']['candidates']] == [
+        'good',
+        'forced',
+    ]
+    review = (round_dir / 'review.txt').read_text(encoding='utf-8')
+    assert '### Candidate 2: forced' in review
+    assert 'Prompt revision forced.' in review
+
+
+def test_the_verifier_is_not_called_when_nothing_survives_validation(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    verifier = FakeVerifier()
+    run_stage(
+        stage=2,
+        replicate=0,
+        bundle_root=bundle_root,
+        out_dir=tmp_path / 'construction',
+        builder=FakeBuilder([_proposal(_patch('bad', 'verification/cross_modal.py'))]),
+        cfg=_config(rounds=1),
+        gate_cfg=GATES,
+        diagnose=_diagnose(),
+        evaluate=_evaluate({}),
+        verifier=verifier,
+    )
+    assert verifier.requests == ()
+    assert not (tmp_path / 'construction' / 'round_00' / 'verification.json').exists()
+
+
+def test_the_firewall_covers_the_review_text_too(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    leaking = _patch('good')
+    leaking = leaking.model_copy(update={'rationale': 'fixes mme_er_wild_000002'})
+    with pytest.raises(LeakageError, match='mme_er_wild_000002'):
+        run_stage(
+            stage=2,
+            replicate=0,
+            bundle_root=bundle_root,
+            out_dir=tmp_path / 'construction',
+            builder=FakeBuilder([_proposal(leaking)]),
+            cfg=_config(rounds=1),
+            gate_cfg=GATES,
+            diagnose=_diagnose(),
+            evaluate=_evaluate({}),
+            verifier=FakeVerifier(),
+            forbidden_ids=('mme_er_wild_000002',),
+        )
+
+
+def test_a_candidate_the_harness_cannot_load_is_rejected_after_writing(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    out_dir = tmp_path / 'construction'
+
+    def bundle_check(directory: Path) -> tuple[str, ...]:
+        return ('missing {noun}',) if directory.name == 'broken' else ()
+
+    result = run_stage(
+        stage=2,
+        replicate=0,
+        bundle_root=bundle_root,
+        out_dir=out_dir,
+        builder=FakeBuilder([_proposal(_patch('broken'), _patch('good'))]),
+        cfg=_config(rounds=1),
+        gate_cfg=GATES,
+        diagnose=_diagnose(),
+        evaluate=_evaluate({'good': 0.7, 'broken': 0.9}),
+        bundle_check=bundle_check,
+    )
+
+    assert result.rounds[0].accepted == 'good'
+    assert [c.name for c in result.rounds[0].candidates] == ['good']
+    rejected = json.loads(
+        (out_dir / 'round_00' / 'candidates.json').read_text(encoding='utf-8')
+    )['rejected']
+    assert rejected == [{'name': 'broken', 'violations': ['missing {noun}']}]
+
+
+def test_every_round_records_what_it_cost(bundle_root: Path, tmp_path: Path) -> None:
+    ledger = tmp_path / 'ledger.jsonl'
+    out_dir = tmp_path / 'construction'
+
+    def bill(role: str, cost: float) -> None:
+        record(
+            ledger,
+            LedgerEntry(
+                role=role,
+                model_id='m',
+                experiment='e',
+                input_tokens=10,
+                output_tokens=5,
+                latency_s=0.1,
+                cost_usd=cost,
+            ),
+        )
+
+    def evaluate(bundle: Path) -> CandidateScores:
+        bill('target', 0.0)
+        bill('judge_proxy', 0.25)
+        return _evaluate({'first': 0.6, 'second': 0.4})(bundle)
+
+    class BillingBuilder(FakeBuilder):
+        def propose(self, packet_text: str, image_paths: tuple[str, ...]):
+            bill('builder', 1.0)
+            return super().propose(packet_text, image_paths)
+
+    result = run_stage(
+        stage=2,
+        replicate=0,
+        bundle_root=bundle_root,
+        out_dir=out_dir,
+        builder=BillingBuilder(
+            [_proposal(_patch('first')), _proposal(_patch('second'))]
+        ),
+        cfg=_config(rounds=2, early_stop=5),
+        gate_cfg=GATES,
+        diagnose=_diagnose(),
+        evaluate=evaluate,
+        ledger=ledger,
+    )
+
+    assert result.baseline_cost.total_usd == pytest.approx(0.25)
+    assert result.baseline_cost.by_role['target'].calls == 1
+    first = result.rounds[0].cost
+    assert first.total_usd == pytest.approx(1.25)
+    assert first.by_role['builder'].input_tokens == 10
+    assert first.by_role['judge_proxy'].cost_usd == pytest.approx(0.25)
+    assert result.rounds[1].cost.total_usd == pytest.approx(1.25)
+    assert result.total_cost.total_usd == pytest.approx(0.25 + 1.25 + 1.25)
+    cost = json.loads((out_dir / 'round_01' / 'cost.json').read_text(encoding='utf-8'))
+    assert cost['total_usd'] == pytest.approx(1.25)
+    written = json.loads((out_dir / 'loop_result.json').read_text(encoding='utf-8'))
+    assert written['rounds'][0]['cost']['by_role']['builder']['calls'] == 1
+    assert written['total_cost']['total_usd'] == pytest.approx(2.75)
+
+
+def test_rounds_without_a_ledger_record_an_empty_cost(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    result = run_stage(
+        stage=2,
+        replicate=0,
+        bundle_root=bundle_root,
+        out_dir=tmp_path / 'construction',
+        builder=FakeBuilder([_proposal(_patch('good'))]),
+        cfg=_config(rounds=1),
+        gate_cfg=GATES,
+        diagnose=_diagnose(),
+        evaluate=_evaluate({'good': 0.7}),
+    )
+    assert result.rounds[0].cost == RoundCost.empty()
+    assert result.total_cost.by_role == {}

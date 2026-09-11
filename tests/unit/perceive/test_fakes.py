@@ -45,14 +45,14 @@ class TestFakeTranscriptAndAudio:
     def test_two_clips_do_not_share_a_transcript(self) -> None:
         assert fake_transcript(7) != fake_transcript(8)
 
-    def test_audio_evidence_carries_prosody_and_a_sound(
+    def test_audio_evidence_carries_a_transcript_and_prosody(
         self, benchmark_example: Example
     ) -> None:
         audio = fake_audio(benchmark_example, 11)
 
         assert audio.speech_present is True
+        assert audio.transcript
         assert audio.prosody
-        assert audio.description
 
 
 class TestFakePreprocess:
@@ -113,10 +113,5 @@ class TestFakePerceptionTools:
         wav = tmp_path / 'clip.wav'
 
         assert tools.transcriber.transcribe(wav).text
-        assert tools.describer.describe(wav)
-        assert tools.banned == frozenset()
-
-    def test_a_lexicon_is_loaded_when_one_exists(self, repo_root: Path) -> None:
-        tools = fake_perception_tools(repo_root / 'configs' / 'emotion_lexicon.txt')
-
-        assert tools.banned
+        assert tools.prosody.extract(wav) == {}
+        assert tools.diarizer.diarize(wav) == ()

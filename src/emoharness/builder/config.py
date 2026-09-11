@@ -67,6 +67,20 @@ class GateThresholds(BaseModel):
     )
 
 
+class VerifierConfig(BaseModel):
+    """The per-round reviewer of the Builder's proposals (ADR-0006 §8).
+
+    The verifier is the Builder's own model asked a different question: whether
+    each candidate is a general reading rule or an overfit, a label prior, or a
+    contract break. ``reasoning_effort`` None means the Builder's setting.
+    """
+
+    model_config = ConfigDict(frozen=True, extra='forbid')
+
+    enabled: bool = True
+    reasoning_effort: str | None = None
+
+
 class BuilderPricing(BaseModel):
     """Price list used to fill each Builder call's ledger entry."""
 
@@ -112,6 +126,7 @@ class BuilderConfig(BaseModel):
     early_stop_rounds: int = Field(default=EARLY_STOP_ROUNDS, ge=1)
     packet: PacketLimits = PacketLimits()
     gates: GateThresholds = GateThresholds()
+    verifier: VerifierConfig = VerifierConfig()
     pricing: BuilderPricing = Field(
         default=BuilderPricing(), alias='pricing_usd_per_million'
     )

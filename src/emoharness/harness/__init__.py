@@ -40,7 +40,6 @@ from emoharness.harness.loader import (
 from emoharness.harness.pipeline import HarnessPipeline, PipelineConfig
 from emoharness.harness.schema import (
     AudioEvidence,
-    AudioOpinion,
     EvidenceItem,
     EvidenceRecord,
     HarnessOutput,
@@ -55,7 +54,6 @@ from emoharness.harness.schema import (
 
 __all__ = [
     'AudioEvidence',
-    'AudioOpinion',
     'AudioPipelineConfig',
     'BundleManifest',
     'ChooseLabel',

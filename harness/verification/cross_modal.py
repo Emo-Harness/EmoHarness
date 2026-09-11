@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import Any
 
 SEEN_MODALITIES = ('visual',)
-HEARD_MODALITIES = ('audio', 'audio_opinion')
+HEARD_MODALITIES = ('audio',)
 
 
 def modalities_agree(record: dict[str, Any], hypotheses: dict[str, Any]) -> bool:

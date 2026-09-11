@@ -1,4 +1,4 @@
-# In-distribution effect check, 2026-09-08
+# In-distribution effect check
 
 Purpose: a same-distribution check of the Builder loop with GPT 5.6 Luna as
 Builder and Qwen3-VL-8B-Instruct as Target, comparable in kind to the earlier
@@ -7,6 +7,54 @@ rounds". It follows the original README's split (build 10% / val 10% of the
 three seen task families, test on the rest), **not** the pre-registered
 protocol of ADR-0001/ADR-0003. Numbers from this run are not
 leaderboard-comparable and are labelled in-distribution wherever reported.
+
+Two runs exist. **v2 (2026-09-11, current)** uses deterministic perception
+tools only, a same-model verifier in every Builder round, and per-round cost
+records; its artifacts are under `results/`. **v1 (2026-09-08/09)** used a
+Qwen2.5-Omni-7B audio describer; its artifacts are under
+`results/archive/v1-omni-describer/` and its numbers are kept at the end of
+this document.
+
+## v2: what changed and why (2026-09-11)
+
+1. **No audio-language model.** The v1 harness asked Qwen2.5-Omni-7B for a
+   free-text description of the audio and for a valence/arousal opinion, both
+   of which entered the evidence record. That is a second model's judgment,
+   not a tool, so any gain could have been that model's rather than the
+   Builder's. Perception is now ffmpeg frames, whisper large-v3 transcript and
+   language, and openSMILE eGeMAPS phrases; the evidence ids are `v*`, `a*`
+   (transcript sentences, then prosody phrases), and `t1` (ADR-0004 amendment).
+   The scaffold prompts lost the two sentences about opinion items; nothing
+   else in the Stage 1 bundle changed.
+2. **Verifier per round.** After the deterministic checks, the round's valid
+   candidates go to Luna once more, in a separate role with its own prompt,
+   which sees the current files, the cluster keys and sizes, and each
+   candidate's rationale with a unified diff. It rejects overfitting to the
+   packet's items, label forcing, contract breaks, evidence-discipline
+   violations, out-of-scope edits, and YAML damage. Unapproved candidates are
+   never evaluated; `round_XX/verification.json`, `review.txt`, and the
+   `vetoed` list in `candidates.json` record why (ADR-0006 §8). A written
+   candidate the loader cannot load is recorded as rejected instead of
+   crashing the run.
+3. **Cost per round.** `round_XX/cost.json` and the round records in
+   `loop_result.json` carry calls, tokens, and dollars by role (`builder`,
+   `verifier`, `judge_proxy`, `target`), plus the cost of scoring the parent
+   bundle and the stage total (ADR-0006 §9).
+4. **Cache projection instead of re-transcription.** The preprocessing cache
+   is keyed by the config hash, and the describer block leaving the config
+   changes that hash. Whisper and openSMILE are deterministic on the same
+   `audio.wav`, so `scripts/strip_describer_cache.py` wrote every v1 entry
+   under the new hash with the description and opinion fields dropped and
+   `speech_present` recomputed as "transcript non-empty" (36 of 1,903 clips
+   had been marked speech-present on the strength of the description alone).
+   Frames and audio are byte-identical to v1. Both caches verify
+   (`preprocess.py --verify`: 923/923 external, 1000/1000 subset).
+5. **One machine.** The second box was not available, so machine 1 runs
+   every step; L0 is unchanged (native video, no audio text) and comes from
+   the call cache.
+
+Everything else (splits, subset, gates including the 4.5 mean-calls ceiling,
+Luna at `reasoning_effort: high`, local Recognition only) is as in v1.
 
 ## What runs
 
@@ -66,7 +114,11 @@ bundle in `results/construction/stage2/0/loop_result.json`, and L4 minus L0
   after the fact; replicate 1's round 0 would still have accepted nothing
   under the new ceiling (all four candidates failed regression or Recognition).
 
-## Results (2026-09-09 01:02, local Recognition, 1,000-item subset, 125 per task)
+## v2 results
+
+(filled in when the run finishes)
+
+## v1 results (2026-09-09 01:02, local Recognition, 1,000-item subset, 125 per task; with the Omni describer)
 
 | Row | ER_Lab | ER_Wild | SA | Noise_ER | FG_ER | ML_ER | FG_SA | IR | seen | held-out | overall |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -118,5 +170,6 @@ Builder cannot be settled from the record; the Terra config
   2.9.0+cu128 (the driver is 570 / CUDA 12.8; vLLM 0.28's cu130 torch fails).
 - Triton needs `Python.h`: `libpython3.12-dev` was extracted (no root) to
   `~/.local/python3.12-headers`; the serve scripts export `CPATH` to it.
-- Servers never run together (host RAM): the describer during preprocessing,
-  the Target afterwards. `scripts/run_indist.sh` switches them.
+- v2 serves one model only (the Target); whisper runs in-process on the GPU
+  during preprocessing. v1 additionally served the Omni describer on port
+  8001 and never both at once (host RAM).

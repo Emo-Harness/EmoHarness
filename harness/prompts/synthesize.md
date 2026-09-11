@@ -21,7 +21,7 @@ Write one short paragraph for each of these headings, in this order:
 
 Rules:
 
-- Every sentence must cite at least one evidence id in square brackets, written as `[v2]` or `[a1, o1]`. A sentence with no citation is deleted before anyone reads the answer.
+- Every sentence must cite at least one evidence id in square brackets, written as `[v2]` or `[a1, a3]`. A sentence with no citation is deleted before anyone reads the answer.
 - Cite only ids that appear in `items`. An invented id is deleted the same way.
 - Keep each paragraph to two or three sentences and do not repeat a heading inside its paragraph.
 - The last paragraph must name the strongest alternative reading and say what speaks against it.

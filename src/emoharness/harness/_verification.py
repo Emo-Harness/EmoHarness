@@ -26,7 +26,7 @@ from emoharness.harness.schema import (
 )
 
 _SEEN_MODALITIES: Final[tuple[str, ...]] = ('visual',)
-_HEARD_MODALITIES: Final[tuple[str, ...]] = ('audio', 'audio_opinion')
+_HEARD_MODALITIES: Final[tuple[str, ...]] = ('audio',)
 
 _logger = get_logger(__name__)
 

@@ -1,6 +1,6 @@
 # ADR-0006: Builder loop mechanics
 
-Date: 2026-09-06. Amended 2026-09-07 after the strict review. Status: accepted.
+Date: 2026-09-06. Amended 2026-09-07 after the strict review; amended 2026-09-11 (§8, §9). Status: accepted.
 
 ## Context
 
@@ -20,6 +20,9 @@ ADR-0005 fixed what the Builder may edit and what it optimizes. This ADR fixes h
 5. **Content-addressed cache.** Every Target call is keyed by (model id, decoding parameters, prompt text, input media hashes, extra image hashes). A candidate that changes one prompt reuses every other stage's cached output. The same cache guarantees that every method sees byte-identical inputs.
 6. **Construction replicates (P1).** The Stage 2 loop is run three times from the same Stage 1 scaffold. The paper reports D_val and D_ext-test Rec-S mean and standard deviation across the three. The run that proceeds to Stage 3 and to the benchmark is the **first completed run**, declared before the runs start, never the best-scoring one.
 7. **Provenance.** Every round writes the packet, the raw Builder response, each candidate's scores, and the accepted patch to `results/construction/<stage>/<replicate>/round_XX/`. Accepted harnesses are tagged in git. A test asserts that no benchmark video id appears anywhere under `results/construction/`.
+
+8. **Verifier (added 2026-09-11).** After the deterministic checks of §2 and before any candidate is written, one call to the Builder's own model, in a separate role with its own prompt, reviews the round's valid candidates. It sees the current harness files, the failure clusters by key and size, and each candidate's rationale with a unified diff; it never sees D_val, scores, or keyframes, and it cannot edit. It rejects a candidate that overfits the packet's items, forces or suppresses a label independent of the evidence, breaks the prompt or JSON contract, tells the Target to invent or mis-cite evidence, edits outside its stated scope, or damages the YAML. A candidate it does not approve (including one it forgets to mention) is never evaluated, and its reasons go into `round_XX/verification.json` and the `vetoed` list of `candidates.json`; `review.txt` is what the verifier read. The verifier's calls are billed under the ledger role `verifier`. A written candidate the harness loader rejects (a missing placeholder, an unknown stage) is likewise recorded as rejected rather than crashing the loop.
+9. **Cost per round (added 2026-09-11).** Every round records the ledger rows it appended, grouped by role (`builder`, `verifier`, `judge_proxy`, `target`), as calls, tokens in and out, and dollars, in `round_XX/cost.json` and in the round's record inside `loop_result.json`; the loop result also carries the cost of scoring the parent bundle and the stage total. The round record now also names the incumbent's D_val Recognition it was measured against.
 
 ## Consequences
 

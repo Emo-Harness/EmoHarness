@@ -7,9 +7,11 @@
 #
 # Protocol: build/val carved out of MME-Emotion's seen tasks by
 # examples/split_benchmark_indist.py (already applied: data/manifests/), the
-# Stage 1 scaffold as L3, Stage 2 Builder replicates with GPT 5.6 Luna, and
-# L0 / L3 / L4 / L6 on the 1,000-item subset of the remaining test items,
-# scored locally (no official judge). Every step writes
+# Stage 1 scaffold as L3, Stage 2 Builder replicates with GPT 5.6 Luna (the
+# same model verifying each round's proposals), and L0 / L3 / L4 / L6 on the
+# 1,000-item subset of the remaining test items, scored locally (no official
+# judge). Preprocessing is deterministic tools only (ffmpeg, whisper, openSMILE);
+# no audio-language model is served. Every step writes
 # results/indist/<step>.done on success and logs to logs/indist_<step>.log.
 #
 # Two machines share this checkout, the caches, and the markers over NFS; each
@@ -40,7 +42,6 @@ export EMOHARNESS_WORKERS="${EMOHARNESS_WORKERS:-12}"
 # At most this many video-carrying requests in flight (host RAM, see openai_compat.py).
 export EMOHARNESS_VIDEO_WORKERS="${EMOHARNESS_VIDEO_WORKERS:-3}"
 export VLLM_ENDPOINT="${VLLM_ENDPOINT:-http://127.0.0.1:8000/v1}"
-export AUDIO_DESCRIBER_ENDPOINT="${AUDIO_DESCRIBER_ENDPOINT:-http://127.0.0.1:8001/v1/chat/completions}"
 if [[ "${MACHINE}" != "1" ]]; then
   export EMOHARNESS_LEDGER_NAME="${EMOHARNESS_LEDGER_NAME:-ledger.m${MACHINE}.jsonl}"
 fi
@@ -60,9 +61,9 @@ wait_ready() { # port, seconds
     sleep 10
   done
 }
-start_server() { # describer|student
+start_server() { # student (the only server this protocol runs)
   local kind="$1" port pid
-  case "${kind}" in describer) port=8001 ;; student) port=8000 ;; esac
+  case "${kind}" in student) port=8000 ;; *) log "unknown server ${kind}"; return 1 ;; esac
   if healthy "${port}"; then
     log "${kind} already serving on ${port}"; return 0
   fi
@@ -75,7 +76,7 @@ start_server() { # describer|student
   log "started ${kind} (pid ${pid}); waiting for port ${port}"
   wait_ready "${port}" 1200
 }
-stop_server() { # describer|student
+stop_server() { # student
   local kind="$1" pidfile="${MARK}/serve_${1}.m${MACHINE}.pid"
   if [[ -f "${pidfile}" ]]; then
     pkill -TERM -P "$(cat "${pidfile}")" 2>/dev/null || true
@@ -140,7 +141,7 @@ luna_spend() {
   "${PY}" - <<'EOF'
 from pathlib import Path
 from emoharness.common.ledger import read_entries
-paid = ('builder', 'judge_proxy', 'teacher_direct')
+paid = ('builder', 'verifier', 'judge_proxy', 'teacher_direct')
 total = 0.0
 for ledger in sorted(Path('results').glob('ledger*.jsonl')):
     total += sum(e.cost_usd for e in read_entries(ledger) if e.role in paid)
@@ -167,11 +168,13 @@ run_py() { # run one example under the watchdog's eye
   return "${rc}"
 }
 step_fit_prosody() { run_py examples/fit_prosody_reference.py; }
-step_preprocess_external() { start_server describer; run_py examples/preprocess.py --items external; }
+# Preprocessing needs no server: whisper runs in-process on the GPU (ctranslate2)
+# and openSMILE on the CPU. The student is started afterwards.
+step_preprocess_external() { run_py examples/preprocess.py --items external; }
 step_leakage() { run_py examples/leakage_report.py --force; }
 step_preregister() { run_py examples/preregister.py --size-per-task "${SUBSET_PER_TASK}" --force; }
-step_preprocess_subset() { start_server describer; run_py examples/preprocess.py --items subset; }
-step_switch_to_student() { stop_server describer; start_server student; }
+step_preprocess_subset() { run_py examples/preprocess.py --items subset; }
+step_switch_to_student() { start_server student; }
 step_row_l0() { start_server student; run_py examples/run_ladder.py --rows L0 --items subset --force; }
 step_row_l3() { start_server student; run_py examples/run_ladder.py --rows L3 --items subset --force; }
 step_build_stage2() {
@@ -191,10 +194,13 @@ step_row_l6() { require_key; check_budget; run_py examples/run_ladder.py --rows 
 step_analyze() { run_py examples/analyze.py --resamples 2000 --force; }
 step_stop_student() { stop_server student; }
 
+# One machine can run everything in this order; a second box sharing the
+# checkout takes the steps under "*" (they only need the caches and the
+# markers), and each side skips whatever the other has already marked done.
 case "${MACHINE}" in
   1) DEFAULT_STEPS=(fit_prosody preprocess_external leakage preregister preprocess_subset switch_to_student
-                    row_l0 build_stage2 row_l4 analyze stop_student) ;;
-  *) DEFAULT_STEPS=(row_l3 row_l6 build_stage2_rep1 stop_student) ;;
+                    row_l0 row_l3 build_stage2 row_l4 build_stage2_rep1 build_stage2_rep2 row_l6 analyze stop_student) ;;
+  *) DEFAULT_STEPS=(row_l6 build_stage2_rep2 build_stage2_rep1 stop_student) ;;
 esac
 IFS=',' read -r -a SELECTED <<< "${STEPS:-$(IFS=,; echo "${DEFAULT_STEPS[*]}")}"
 

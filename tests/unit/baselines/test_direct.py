@@ -30,7 +30,6 @@ def _make_inputs(
             transcript=transcript,
             language='en',
             prosody=('raised pitch', 'fast speech rate'),
-            description='a door slams in the background',
         ),
     )
 

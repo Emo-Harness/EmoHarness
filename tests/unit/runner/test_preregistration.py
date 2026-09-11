@@ -37,7 +37,6 @@ class TestArtifactHashes:
             'leakage report',
             'Stage 1 harness bundle',
             'L2 handcrafted prompt',
-            'emotion lexicon',
             'configs/',
         ):
             assert expected in names
@@ -60,7 +59,7 @@ class TestArtifactHashes:
     ) -> None:
         digests = config_hashes(registered.paths.configs)
         assert 'experiments/ladder.yaml' in digests
-        assert 'emotion_lexicon.txt' in digests
+        assert 'preprocess.yaml' in digests
 
 
 class TestDocument:

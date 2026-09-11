@@ -71,7 +71,7 @@ def test_stage_one_bundle_loads(bundle: HarnessBundle) -> None:
     assert bundle.manifest.parent is None
     assert bundle.manifest.builder == 'human'
     assert bundle.routing.stages == STAGES
-    assert bundle.audio_pipeline.channels == ('cues', 'opinion')
+    assert bundle.audio_pipeline.channels == ('transcript', 'prosody')
     assert bundle.sampling.face_crops.enabled is False
 
 
@@ -183,8 +183,7 @@ def test_prompt_with_unknown_placeholder_is_rejected(bundle_dir: Path) -> None:
 def test_routing_with_unknown_stage_is_rejected(bundle_dir: Path) -> None:
     (bundle_dir / 'routing.yaml').write_text(
         'stages: [peek_at_labels]\n'
-        'verification: {agreement_check: cross_modal, ranker: alternative_hypotheses}\n'
-        'audio: {use_opinion: true}\n',
+        'verification: {agreement_check: cross_modal, ranker: alternative_hypotheses}\n',
         encoding='utf-8',
     )
     with pytest.raises(ValidationError, match='unknown stages'):
@@ -194,8 +193,7 @@ def test_routing_with_unknown_stage_is_rejected(bundle_dir: Path) -> None:
 def test_routing_with_unknown_module_is_rejected(bundle_dir: Path) -> None:
     (bundle_dir / 'routing.yaml').write_text(
         'stages: [verify]\n'
-        'verification: {agreement_check: cross_modal, ranker: secret_ranker}\n'
-        'audio: {use_opinion: false}\n',
+        'verification: {agreement_check: cross_modal, ranker: secret_ranker}\n',
         encoding='utf-8',
     )
     with pytest.raises(ValidationError, match='unknown modules'):

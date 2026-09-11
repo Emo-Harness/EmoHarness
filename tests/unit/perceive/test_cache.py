@@ -9,7 +9,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from emoharness.common.config import load_model
 from emoharness.common.errors import ValidationError
-from emoharness.harness.schema import AudioEvidence, AudioOpinion, PerceivedInputs
+from emoharness.harness.schema import AudioEvidence, PerceivedInputs
 from emoharness.perceive.cache import (
     FrameConfig,
     PreprocessCache,
@@ -27,7 +27,6 @@ def _clip(
     judge_frame_paths: tuple[str, ...] = ('j1.jpg',),
     face_crop_paths: tuple[str, ...] = (),
     audio: AudioEvidence | None = None,
-    audio_opinion: AudioOpinion | None = None,
     transcript_words: int = 1,
 ) -> PreprocessedClip:
     return PreprocessedClip(
@@ -40,11 +39,6 @@ def _clip(
         audio=audio
         if audio is not None
         else AudioEvidence(speech_present=True, transcript='hi'),
-        audio_opinion=(
-            audio_opinion
-            if audio_opinion is not None
-            else AudioOpinion(valence='positive')
-        ),
         transcript_words=transcript_words,
     )
 
@@ -60,11 +54,10 @@ def test_preprocess_config_loads_real_config_file(repo_root: Path) -> None:
     assert config.asr.model == 'large-v3'
     assert config.asr.backend == 'faster_whisper'
     assert config.prosody.feature_set == 'eGeMAPSv02'
-    # This run: no diarizer and the 7B Omni describer (see the YAML's comment).
+    # This run: no diarizer, and no audio-language model at all (ADR-0004
+    # amendment of 2026-09-11): every tool in the config is deterministic code.
     assert config.diarization.backend == 'none'
-    assert config.describer.primary.model_id == 'Qwen/Qwen2.5-Omni-7B'
-    assert config.describer.fallback.model_id == 'Qwen/Qwen3-Omni-30B-A3B-Instruct'
-    assert config.describer.fallback.mode == 'audio_only'
+    assert not hasattr(config, 'describer')
     assert config.cache_root == 'data/derived'
 
 
@@ -109,7 +102,6 @@ def test_to_perceived_maps_fields_and_drops_cache_only_fields() -> None:
         judge_frame_paths=('j1.jpg',),
         face_crop_paths=(),
         audio=clip.audio,
-        audio_opinion=clip.audio_opinion,
     )
 
 

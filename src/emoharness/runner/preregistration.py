@@ -115,7 +115,6 @@ def _require_files(paths: ProjectPaths) -> Mapping[str, Path]:
         'external manifest (`data/manifests/external.jsonl`)': paths.external_manifest,
         'external splits (`data/splits/external_splits.json`)': paths.external_splits,
         'leakage report (`data/checksums/leakage_report.json`)': paths.leakage_report,
-        'emotion lexicon (`configs/emotion_lexicon.txt`)': paths.emotion_lexicon,
         'pre-registered subset (`data/splits/subset_1000.json`)': paths.subset,
     }
     missing = tuple(str(path) for path in required.values() if not path.is_file())

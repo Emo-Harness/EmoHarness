@@ -35,5 +35,4 @@ Rules:
 - Keep every label exactly as it is written in the list above.
 - Use only ids that appear in the record; drop any id you cannot find there.
 - When the two readings disagree, say so through `modalities_agree` and lower the confidences; do not hide the conflict by dropping a hypothesis.
-- An opinion item is one voter, not an observation.
 - Output JSON only: no prose before or after it, no code fence, no comments.

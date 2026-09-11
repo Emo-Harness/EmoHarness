@@ -54,6 +54,15 @@ def test_load_model_reads_the_committed_builder_config(
     # Luna list price, measured 2026-09-08: $0.20 in, $1.20 out per million.
     assert config.pricing.input_usd_per_million == 0.2
     assert config.pricing.output_usd_per_million == 1.2
+    # The same model reviews every round's candidates before they are scored.
+    assert config.verifier.enabled is True
+    assert config.verifier.reasoning_effort == 'high'
+
+
+def test_the_verifier_is_on_by_default_and_follows_the_builder_effort() -> None:
+    config = BuilderConfig()
+    assert config.verifier.enabled is True
+    assert config.verifier.reasoning_effort is None
 
 
 def test_load_model_reads_the_alternative_gemini_builder_config(

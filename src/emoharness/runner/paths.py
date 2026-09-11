@@ -188,10 +188,6 @@ class ProjectPaths(BaseModel):
         return self.docs / PREREGISTRATION_FILE
 
     @property
-    def emotion_lexicon(self) -> Path:
-        return self.configs / 'emotion_lexicon.txt'
-
-    @property
     def preprocess_config(self) -> Path:
         return self.configs / 'preprocess.yaml'
 

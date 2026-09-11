@@ -22,6 +22,7 @@ from emoharness.builder.client import Builder
 from emoharness.builder.config import BuilderConfig
 from emoharness.builder.fakes import fake_builder
 from emoharness.builder.gates import GateConfig
+from emoharness.builder.verifier import FakeVerifier, Verifier, verifier_for
 from emoharness.common.config import load_model
 from emoharness.common.errors import ValidationError
 from emoharness.data.manifest import Example
@@ -221,7 +222,7 @@ class RunContext:
     def perception_tools(self) -> PerceptionTools:
         """The audio stack; heavy adapters are only imported for real runs."""
         if self.fake:
-            return fake_perception_tools(self.paths.emotion_lexicon)
+            return fake_perception_tools()
         return real_perception_tools(self.paths, self.preprocess)
 
     def clip_preprocessor(self) -> ClipPreprocessor:
@@ -250,6 +251,14 @@ class RunContext:
         if self.builder.provider == 'gemini':
             return GeminiBuilder(self.builder, self.ledger, self.experiment)
         return OpenAIBuilder(self.builder, self.ledger, self.experiment)
+
+    def builder_verifier(self, stage: int) -> Verifier | None:
+        """The per-round reviewer of proposals: the Builder's model in another role."""
+        if not self.builder.verifier.enabled:
+            return None
+        if self.fake:
+            return FakeVerifier(model_id=f'fake-verifier-stage{stage}')
+        return verifier_for(self.builder, self.ledger, self.experiment)
 
     def gate_config(self) -> GateConfig:
         """Promotion thresholds, taken from the Builder config's gate block."""

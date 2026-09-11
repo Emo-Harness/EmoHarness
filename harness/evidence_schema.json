@@ -2,7 +2,7 @@
   "$defs": {
     "AudioEvidence": {
       "additionalProperties": false,
-      "description": "Observable-cue channel (ADR-0004). Empty transcript means no intelligible speech.",
+      "description": "What deterministic tools heard (ADR-0004, amended 2026-09-11).\n\nThe transcript and language come from whisper, the prosody phrases from\nopenSMILE functionals compared with corpus reference statistics. No model\nopinion enters here. Empty transcript means no intelligible speech.",
       "properties": {
         "speech_present": {
           "title": "Speech Present",
@@ -32,56 +32,12 @@
           },
           "title": "Prosody",
           "type": "array"
-        },
-        "description": {
-          "default": "",
-          "title": "Description",
-          "type": "string"
         }
       },
       "required": [
         "speech_present"
       ],
       "title": "AudioEvidence",
-      "type": "object"
-    },
-    "AudioOpinion": {
-      "additionalProperties": false,
-      "description": "Audio-model opinion channel. One voter, never evidence.",
-      "properties": {
-        "valence": {
-          "default": "unknown",
-          "enum": [
-            "negative",
-            "neutral",
-            "positive",
-            "unknown"
-          ],
-          "title": "Valence",
-          "type": "string"
-        },
-        "arousal": {
-          "default": "unknown",
-          "enum": [
-            "low",
-            "medium",
-            "high",
-            "unknown"
-          ],
-          "title": "Arousal",
-          "type": "string"
-        },
-        "candidates": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "maxItems": 2,
-          "title": "Candidates",
-          "type": "array"
-        }
-      },
-      "title": "AudioOpinion",
       "type": "object"
     },
     "EvidenceItem": {
@@ -97,7 +53,6 @@
           "enum": [
             "visual",
             "audio",
-            "audio_opinion",
             "text"
           ],
           "title": "Modality",
@@ -229,17 +184,6 @@
     },
     "audio": {
       "$ref": "#/$defs/AudioEvidence"
-    },
-    "audio_opinion": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/AudioOpinion"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null
     },
     "text": {
       "$ref": "#/$defs/ParsedPrompt"

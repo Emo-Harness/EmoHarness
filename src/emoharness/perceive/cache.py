@@ -17,7 +17,7 @@ from emoharness.common.errors import ValidationError
 from emoharness.common.hashing import stable_hash
 from emoharness.common.io import read_json, write_json_atomic
 from emoharness.common.logging import get_logger
-from emoharness.harness.schema import AudioEvidence, AudioOpinion, PerceivedInputs
+from emoharness.harness.schema import AudioEvidence, PerceivedInputs
 
 _LOGGER = get_logger(__name__)
 
@@ -60,23 +60,13 @@ class DiarizationConfig(BaseModel):
     subject_rule: str = Field(min_length=1)
 
 
-class DescriberEndpoint(BaseModel):
-    model_config = ConfigDict(frozen=True, extra='forbid', protected_namespaces=())
-
-    model_id: str = Field(min_length=1)
-    mode: str = 'audio_only'
-
-
-class DescriberConfig(BaseModel):
-    model_config = ConfigDict(frozen=True, extra='forbid')
-
-    primary: DescriberEndpoint
-    fallback: DescriberEndpoint
-    lexicon_path: str = Field(min_length=1)
-
-
 class PreprocessConfig(BaseModel):
-    """Mirrors ``configs/preprocess.yaml``; its hash keys the preprocessing cache."""
+    """Mirrors ``configs/preprocess.yaml``; its hash keys the preprocessing cache.
+
+    Every tool here is deterministic code (frame sampling, whisper, openSMILE,
+    diarization). An audio-language model used to add a description and an
+    opinion channel; that was removed on 2026-09-11 (ADR-0004 amendment).
+    """
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -84,7 +74,6 @@ class PreprocessConfig(BaseModel):
     asr: AsrConfig
     prosody: ProsodyConfig
     diarization: DiarizationConfig
-    describer: DescriberConfig
     cache_root: str = Field(min_length=1)
 
     def config_hash(self) -> str:
@@ -104,7 +93,6 @@ class PreprocessedClip(BaseModel):
     judge_frame_paths: tuple[str, ...] = ()
     face_crop_paths: tuple[str, ...] = ()
     audio: AudioEvidence
-    audio_opinion: AudioOpinion | None = None
     transcript_words: int = Field(ge=0)
 
     def to_perceived(self, example_id: str, video_path: str) -> PerceivedInputs:
@@ -117,7 +105,6 @@ class PreprocessedClip(BaseModel):
             judge_frame_paths=self.judge_frame_paths,
             face_crop_paths=self.face_crop_paths,
             audio=self.audio,
-            audio_opinion=self.audio_opinion,
         )
 
 

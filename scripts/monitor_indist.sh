@@ -16,7 +16,7 @@ spend() {
   .venv/bin/python - 2>/dev/null <<'PY' || echo "?"
 from pathlib import Path
 from emoharness.common.ledger import read_entries
-paid = ('builder', 'judge_proxy', 'teacher_direct')
+paid = ('builder', 'verifier', 'judge_proxy', 'teacher_direct')
 total = sum(x.cost_usd for p in Path('results').glob('ledger*.jsonl') for x in read_entries(p) if x.role in paid)
 print(f"{total:.2f}")
 PY
@@ -25,11 +25,13 @@ status_line() {
   local step rounds anon gpu errs oom
   step="$(grep -o '=== [a-z0-9_]* ===' "${RUNLOG}" 2>/dev/null | tail -1 | tr -d '=' | xargs)"
   rounds="$(ls -d results/construction/stage2/*/round_* 2>/dev/null | wc -l)"
+  vetoed="$(cat results/construction/stage2/*/round_*/candidates.json 2>/dev/null | grep -o '"issues"' | wc -l)"
+  accepted="$(cat results/construction/stage2/*/round_*/accepted.json 2>/dev/null | grep -c '"accepted": "' || true)"
   anon="$(awk '$1=="anon"{printf "%.1fG",$2/1e9}' /sys/fs/cgroup/memory.stat)"
   gpu="$(nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv,noheader,nounits 2>/dev/null | awk -F', ' '{printf "%dG/%d%%",$1/1024,$2}')"
   errs="$(grep -c 'Traceback\|ERROR' "logs/indist_${step}.log" 2>/dev/null || echo 0)"
   oom="$(awk '$1=="oom_kill"{print $2}' /sys/fs/cgroup/memory.events 2>/dev/null)"
-  echo "[$(date '+%H:%M') m${MACHINE}] step=${step:-?} rounds=${rounds} anon=${anon} gpu=${gpu} oom_kill=${oom:-?} luna=\$$(spend) errs=${errs} rows=$(ls results/raw_predictions/ 2>/dev/null | tr '\n' ' ')"
+  echo "[$(date '+%H:%M') m${MACHINE}] step=${step:-?} rounds=${rounds} accepted=${accepted} vetoed=${vetoed} anon=${anon} gpu=${gpu} oom_kill=${oom:-?} luna=\$$(spend) errs=${errs} rows=$(ls results/raw_predictions/ 2>/dev/null | tr '\n' ' ')"
 }
 while true; do
   total=$(wc -l < "${RUNLOG}" 2>/dev/null || echo 0)

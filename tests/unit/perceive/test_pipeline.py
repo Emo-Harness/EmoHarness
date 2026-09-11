@@ -11,10 +11,8 @@ from emoharness.common.config import load_model
 from emoharness.common.hashing import sha256_file
 from emoharness.data.manifest import Example
 from emoharness.data.tasks import Split, Task
-from emoharness.harness.schema import AudioOpinion
 from emoharness.perceive import pipeline as pipeline_module
 from emoharness.perceive.audio import (
-    FakeDescriber,
     FakeDiarizer,
     FakeProsody,
     FakeTranscriber,
@@ -84,7 +82,6 @@ def test_perception_tools_fakes_has_safe_defaults() -> None:
     tools = PerceptionTools.fakes()
     assert isinstance(tools, PerceptionTools)
     assert tools.reference == ReferenceStats(mean={}, std={})
-    assert tools.banned == frozenset()
 
 
 def test_preprocess_clip_assembles_audio_evidence_from_fakes(
@@ -98,14 +95,9 @@ def test_preprocess_clip_assembles_audio_evidence_from_fakes(
         transcript_text='hello world',
         language='en',
         prosody_features={'loudness_sma3_amean': 100.0},
-        description='A calm room tone is present. There is an angry undertone here.',
-        opinion=AudioOpinion(
-            valence='negative', arousal='medium', candidates=('anger',)
-        ),
         reference=ReferenceStats(
             mean={'loudness_sma3_amean': 0.0}, std={'loudness_sma3_amean': 1.0}
         ),
-        banned=frozenset({'angry'}),
     )
 
     clip = preprocess_clip(benchmark_example, config, tools, cache)
@@ -117,10 +109,7 @@ def test_preprocess_clip_assembles_audio_evidence_from_fakes(
     assert clip.audio.transcript == 'hello world'
     assert clip.audio.language == 'en'
     assert clip.audio.prosody == ('loud voice',)
-    assert clip.audio.description == 'A calm room tone is present'
-    assert clip.audio_opinion == AudioOpinion(
-        valence='negative', arousal='medium', candidates=('anger',)
-    )
+    assert not hasattr(clip, 'audio_opinion')
     assert clip.transcript_words == 0
     assert counts == {'probe': 1, 'frames': 2, 'audio': 1}
 
@@ -144,10 +133,8 @@ def test_preprocess_clip_restricts_transcript_to_dominant_speaker(
     tools = PerceptionTools(
         transcriber=FakeTranscriber('hi you bye', 'en', words),
         prosody=FakeProsody({}),
-        describer=FakeDescriber('', AudioOpinion()),
         diarizer=FakeDiarizer(segments),
         reference=ReferenceStats(mean={}, std={}),
-        banned=frozenset(),
     )
 
     clip = preprocess_clip(benchmark_example, config, tools, cache)
@@ -170,8 +157,6 @@ def test_preprocess_clip_no_audio_stream_gives_speech_present_false(
     assert clip.audio.speech_present is False
     assert clip.audio.transcript == ''
     assert clip.audio.prosody == ()
-    assert clip.audio.description == ''
-    assert clip.audio_opinion is None
     assert clip.transcript_words == 0
 
 
@@ -182,29 +167,11 @@ def test_preprocess_clip_silent_audio_track_gives_speech_present_false(
     patch_video_io: _PatchVideoIO,
 ) -> None:
     patch_video_io(duration=3.0, has_audio=True)
-    tools = PerceptionTools.fakes(transcript_text='', description='')
+    tools = PerceptionTools.fakes(transcript_text='')
 
     clip = preprocess_clip(benchmark_example, config, tools, cache)
 
     assert clip.audio.speech_present is False
-
-
-def test_preprocess_clip_nonspeech_description_alone_gives_speech_present_true(
-    benchmark_example: Example,
-    config: PreprocessConfig,
-    cache: PreprocessCache,
-    patch_video_io: _PatchVideoIO,
-) -> None:
-    patch_video_io(duration=3.0, has_audio=True)
-    tools = PerceptionTools.fakes(
-        transcript_text='', description='Loud music plays throughout.'
-    )
-
-    clip = preprocess_clip(benchmark_example, config, tools, cache)
-
-    assert clip.audio.speech_present is True
-    assert clip.audio.transcript == ''
-    assert clip.audio.description == 'Loud music plays throughout'
 
 
 def test_preprocess_clip_uses_cache_on_second_call(

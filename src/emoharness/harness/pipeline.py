@@ -170,7 +170,6 @@ class HarnessPipeline:
             visual,
             inputs,
             self._bundle.audio_pipeline.transcript_max_chars,
-            self._bundle.routing.audio.use_opinion,
         )
 
     def _hypotheses(

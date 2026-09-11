@@ -1,25 +1,18 @@
 from __future__ import annotations
 
-import base64
 import importlib
-import json
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
-import httpx
 import pytest
 from pydantic import ValidationError as PydanticValidationError
 
-from emoharness.common.errors import EmoHarnessError, ValidationError
-from emoharness.harness.schema import AudioOpinion
+from emoharness.common.errors import EmoHarnessError
 from emoharness.perceive.audio import (
-    AudioDescriber,
     Diarizer,
-    FakeDescriber,
     FakeDiarizer,
     FakeProsody,
     FakeTranscriber,
-    OpenAICompatDescriber,
     OpenSmileProsody,
     ProsodyExtractor,
     PyannoteDiarizer,
@@ -42,10 +35,6 @@ def _skip_if_installed(module_name: str) -> None:
     pytest.skip(
         f'{module_name} is installed; the missing-dependency path does not apply'
     )
-
-
-def _mock_client(handler: Any) -> httpx.Client:
-    return httpx.Client(transport=httpx.MockTransport(handler))
 
 
 # --- frozen models -----------------------------------------------------------------
@@ -79,7 +68,6 @@ def test_speech_segment_requires_nonempty_speaker() -> None:
 def test_fakes_satisfy_their_protocols() -> None:
     assert isinstance(FakeTranscriber('hi'), Transcriber)
     assert isinstance(FakeProsody({}), ProsodyExtractor)
-    assert isinstance(FakeDescriber('d', AudioOpinion()), AudioDescriber)
     assert isinstance(FakeDiarizer(()), Diarizer)
 
 
@@ -97,14 +85,6 @@ def test_fake_prosody_does_not_alias_internal_state(tmp_path: Path) -> None:
     out = cast('dict[str, float]', fake.extract(wav))
     out['a'] = 99.0
     assert fake.extract(wav) == {'a': 1.0}
-
-
-def test_fake_describer_returns_fixed_values(tmp_path: Path) -> None:
-    opinion = AudioOpinion(valence='positive', arousal='high', candidates=('joy',))
-    fake = FakeDescriber('calm room tone', opinion)
-    wav = tmp_path / 'a.wav'
-    assert fake.describe(wav) == 'calm room tone'
-    assert fake.opine(wav) == opinion
 
 
 def test_fake_diarizer_returns_fixed_segments(tmp_path: Path) -> None:
@@ -204,168 +184,3 @@ def test_pyannote_diarizer_missing_dependency_raises(tmp_path: Path) -> None:
     wav.write_bytes(b'RIFF')
     with pytest.raises(EmoHarnessError, match='pyannote'):
         PyannoteDiarizer('some/model').diarize(wav)
-
-
-# --- OpenAICompatDescriber (httpx.MockTransport; no network) --------------------
-
-
-def test_describe_posts_cue_prompt_and_base64_audio(tmp_path: Path) -> None:
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'fake-wav-bytes')
-    captured: dict[str, Any] = {}
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        captured['body'] = json.loads(request.content)
-        return httpx.Response(
-            200, json={'choices': [{'message': {'content': 'a quiet room tone'}}]}
-        )
-
-    describer = OpenAICompatDescriber(
-        'https://example.test/v1/chat/completions',
-        'test-model',
-        client=_mock_client(handler),
-    )
-    assert describer.describe(wav) == 'a quiet room tone'
-    body = captured['body']
-    assert body['model'] == 'test-model'
-    content = body['messages'][0]['content']
-    assert 'emotion' in content[0]['text'].lower()
-    assert base64.b64decode(content[1]['input_audio']['data']) == b'fake-wav-bytes'
-
-
-def test_describe_closes_a_client_it_created_itself(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """When no client is injected, ``_complete`` builds one and must close it."""
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-    real_client_cls = httpx.Client
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={'choices': [{'message': {'content': 'ok'}}]})
-
-    def fake_client_factory(*args: Any, **kwargs: Any) -> httpx.Client:
-        kwargs['transport'] = httpx.MockTransport(handler)
-        return real_client_cls(*args, **kwargs)
-
-    monkeypatch.setattr(httpx, 'Client', fake_client_factory)
-    describer = OpenAICompatDescriber('https://example.test', 'm')
-    assert describer.describe(wav) == 'ok'
-
-
-def test_opine_parses_json_content_into_audio_opinion(tmp_path: Path) -> None:
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-    payload = {'valence': 'positive', 'arousal': 'high', 'candidates': ['joy', 'pride']}
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(
-            200, json={'choices': [{'message': {'content': json.dumps(payload)}}]}
-        )
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    opinion = describer.opine(wav)
-    assert opinion == AudioOpinion(
-        valence='positive', arousal='high', candidates=('joy', 'pride')
-    )
-
-
-def test_opine_strips_markdown_json_fence(tmp_path: Path) -> None:
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-    fenced = '```json\n{"valence": "negative", "arousal": "low", "candidates": []}\n```'
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={'choices': [{'message': {'content': fenced}}]})
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    opinion = describer.opine(wav)
-    assert (opinion.valence, opinion.arousal, opinion.candidates) == (
-        'negative',
-        'low',
-        (),
-    )
-
-
-def test_describer_raises_emoharness_error_on_http_failure(tmp_path: Path) -> None:
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(500, text='boom')
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    with pytest.raises(EmoHarnessError):
-        describer.describe(wav)
-
-
-def test_describer_raises_validation_error_on_non_json_body(tmp_path: Path) -> None:
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text='not json')
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    with pytest.raises(ValidationError):
-        describer.describe(wav)
-
-
-def test_describer_raises_validation_error_on_unexpected_shape(tmp_path: Path) -> None:
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={'unexpected': True})
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    with pytest.raises(ValidationError):
-        describer.describe(wav)
-
-
-def test_opine_records_unknown_on_non_json_content(tmp_path: Path) -> None:
-    """A prose answer must not abort a corpus: the opinion is one voter, never evidence."""
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        body = {'choices': [{'message': {'content': 'not json'}}]}
-        return httpx.Response(200, json=body)
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    assert describer.opine(wav) == AudioOpinion()
-
-
-def test_opine_coerces_off_schema_fields_to_unknown(tmp_path: Path) -> None:
-    """Qwen2.5-Omni answers 'mixed' valence on some clips; that is unknown, not a crash."""
-    wav = tmp_path / 'a.wav'
-    wav.write_bytes(b'x')
-    payload = {
-        'valence': 'mixed',
-        'arousal': 'high',
-        'candidates': ['sad', 'happy', 'x'],
-    }
-
-    def handler(_request: httpx.Request) -> httpx.Response:
-        return httpx.Response(
-            200, json={'choices': [{'message': {'content': json.dumps(payload)}}]}
-        )
-
-    describer = OpenAICompatDescriber(
-        'https://example.test', 'm', client=_mock_client(handler)
-    )
-    assert describer.opine(wav) == AudioOpinion(
-        valence='unknown', arousal='high', candidates=('sad', 'happy')
-    )

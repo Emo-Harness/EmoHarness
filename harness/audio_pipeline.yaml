@@ -1,8 +1,10 @@
-# Audio channels the harness consumes (ADR-0004). Both are produced by the
-# preprocessing cache; the harness only decides how much of them to show.
-# channels: 'cues' is the observable-cue channel, 'opinion' the audio-model voter.
+# Audio channels the harness consumes (ADR-0004, amended 2026-09-11). Both are
+# produced by deterministic tools in the preprocessing cache: 'transcript' is
+# the whisper transcript with its detected language, 'prosody' the openSMILE
+# eGeMAPS phrases. No audio model's opinion is used. The harness only decides
+# how much of them to show.
 # transcript_max_chars truncates a long transcript before it enters the record.
 channels:
-  - cues
-  - opinion
+  - transcript
+  - prosody
 transcript_max_chars: 2000

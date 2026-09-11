@@ -153,11 +153,6 @@ def _openai_builder(
     )
 
 
-@pytest.fixture
-def openai_key(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv('EMOHARNESS_TEST_OPENAI_KEY', 'sk-test')
-
-
 def test_fake_builder_answers_in_order(make_proposal: Proposal) -> None:
     first, second = make_proposal('a'), make_proposal('b')
     builder = FakeBuilder([first, second])

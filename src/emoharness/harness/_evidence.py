@@ -2,9 +2,9 @@
 
 Implementation detail of the harness; ``HarnessPipeline.run`` is the only caller.
 Ids are assigned here and nowhere else: ``v1..vn`` for what was seen, ``a1..an``
-for what was heard, ``o1`` for the audio-model opinion (ADR-0004: one voter, never
-evidence), and ``t1`` for the wording of the question. Every later stage may only
-cite an id that exists in the record.
+for what was heard (transcript sentences, then prosody phrases), and ``t1`` for
+the wording of the question. Every later stage may only cite an id that exists
+in the record.
 """
 
 from __future__ import annotations
@@ -17,7 +17,6 @@ from emoharness.data.prompt_template import ParsedPrompt
 from emoharness.harness._text import split_sentences
 from emoharness.harness.schema import (
     AudioEvidence,
-    AudioOpinion,
     EvidenceItem,
     EvidenceRecord,
     Modality,
@@ -27,17 +26,11 @@ from emoharness.harness.schema import (
 
 _VISUAL_ID_PREFIX: Final = 'v'
 _AUDIO_ID_PREFIX: Final = 'a'
-_OPINION_ID_PREFIX: Final = 'o'
 _TEXT_ID_PREFIX: Final = 't'
 
 _SPEECH_CUE_PREFIX: Final = 'speech: '
 _PROSODY_CUE_PREFIX: Final = 'prosody: '
-_SOUND_CUE_PREFIX: Final = 'sound: '
 _NO_SPEECH_CUE: Final = 'no intelligible speech in the clip'
-_OPINION_CUE: Final = (
-    'audio-model opinion (not an observation): valence {valence}, arousal {arousal}'
-)
-_OPINION_CANDIDATES: Final = ', suggested {candidates}'
 
 
 def build_record(
@@ -45,20 +38,16 @@ def build_record(
     visual: VisualEvidence,
     inputs: PerceivedInputs,
     transcript_max_chars: int | None = None,
-    use_opinion: bool = True,
 ) -> EvidenceRecord:
     """The full evidence record assembled before any label is requested."""
-    opinion = inputs.audio_opinion if use_opinion else None
     items = (
         _visual_items(visual)
         + _audio_items(inputs.audio, transcript_max_chars)
-        + _opinion_items(opinion)
         + _text_items(parsed.noun)
     )
     return EvidenceRecord(
         visual=visual,
         audio=_truncated_audio(inputs.audio, transcript_max_chars),
-        audio_opinion=opinion,
         text=parsed,
         items=items,
     )
@@ -75,7 +64,7 @@ def _visual_items(visual: VisualEvidence) -> tuple[EvidenceItem, ...]:
 def _audio_items(
     audio: AudioEvidence, transcript_max_chars: int | None = None
 ) -> tuple[EvidenceItem, ...]:
-    """Citable items a1..an from the observable-cue channel."""
+    """Citable items a1..an: transcript sentences, then prosody phrases."""
     transcript = _cut(audio.transcript, transcript_max_chars)
     speech = tuple(_SPEECH_CUE_PREFIX + part for part in split_sentences(transcript))
     if not speech and not audio.speech_present:
@@ -83,20 +72,7 @@ def _audio_items(
     prosody = tuple(
         _PROSODY_CUE_PREFIX + part for part in audio.prosody if part.strip()
     )
-    described = tuple(
-        _SOUND_CUE_PREFIX + part for part in split_sentences(audio.description)
-    )
-    return _numbered(speech + prosody + described, _AUDIO_ID_PREFIX, 'audio')
-
-
-def _opinion_items(opinion: AudioOpinion | None) -> tuple[EvidenceItem, ...]:
-    """The single item o1, or nothing when there is no opinion channel."""
-    if opinion is None:
-        return ()
-    cue = _OPINION_CUE.format(valence=opinion.valence, arousal=opinion.arousal)
-    if opinion.candidates:
-        cue = cue + _OPINION_CANDIDATES.format(candidates=', '.join(opinion.candidates))
-    return _numbered((cue,), _OPINION_ID_PREFIX, 'audio_opinion')
+    return _numbered(speech + prosody, _AUDIO_ID_PREFIX, 'audio')
 
 
 def _text_items(noun: str) -> tuple[EvidenceItem, ...]:

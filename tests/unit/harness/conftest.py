@@ -25,7 +25,6 @@ from emoharness.harness.loader import HarnessBundle, load_bundle, write_bundle_c
 from emoharness.harness.pipeline import HarnessPipeline, PipelineConfig
 from emoharness.harness.schema import (
     AudioEvidence,
-    AudioOpinion,
     HarnessOutput,
     PerceivedInputs,
 )
@@ -189,7 +188,6 @@ def audio() -> AudioEvidence:
         transcript='I am fine.',
         language='en',
         prosody=('trembling voice', 'low energy'),
-        description='A long pause follows.',
     )
 
 
@@ -208,9 +206,6 @@ def make_inputs(tmp_path: Path, audio: AudioEvidence) -> Callable[..., Perceived
             'judge_frame_paths': frames[:2],
             'face_crop_paths': crops,
             'audio': audio,
-            'audio_opinion': AudioOpinion(
-                valence='negative', arousal='low', candidates=('sadness',)
-            ),
         }
         return PerceivedInputs.model_validate(values | overrides)
 

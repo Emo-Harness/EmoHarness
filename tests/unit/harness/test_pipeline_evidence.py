@@ -6,19 +6,13 @@ from collections.abc import Callable
 
 from emoharness.data.manifest import Example
 from emoharness.harness.loader import HarnessBundle
-from emoharness.harness.schema import AudioEvidence, AudioOpinion, PerceivedInputs
+from emoharness.harness.schema import AudioEvidence, PerceivedInputs
 from emoharness.target.fake import FakeTarget
 
 from .conftest import run_once, scripted_responder
 
 _NO_CUE = 'No reliable cue observed.'
 _SAMPLING = 'face_crops:\n  enabled: {crops}\n  max_crops: 2\nextra_images:\n  enabled: {frames}\n'
-_ROUTING = (
-    'stages: [extract_visual, generate_hypotheses, verify, synthesize]\n'
-    'verification:\n  agreement_check: cross_modal\n'
-    '  ranker: alternative_hypotheses\n'
-    'audio:\n  use_opinion: {opinion}\n'
-)
 
 
 def test_a_step_loses_its_unknown_ids_and_its_uncited_sentences(
@@ -93,32 +87,24 @@ def test_face_crops_and_frames_ride_along_only_when_sampling_enables_them(
     )
 
 
-def test_the_opinion_channel_is_a_routing_decision(
-    edited_bundle: Callable[..., HarnessBundle],
+def test_the_record_holds_only_what_tools_observed(
     bundle: HarnessBundle,
     target: FakeTarget,
     benchmark_example: Example,
     inputs: PerceivedInputs,
 ) -> None:
-    with_opinion = run_once(bundle, target, benchmark_example, inputs)
-    assert with_opinion.evidence.audio_opinion is not None
-    opinions = [
-        item for item in with_opinion.evidence.items if item.modality == 'audio_opinion'
-    ]
-    assert [item.id for item in opinions] == ['o1']
-    assert 'not an observation' in opinions[0].cue
-    assert 'suggested sadness' in opinions[0].cue
+    """No opinion channel: every heard item is a transcript sentence or a prosody phrase."""
+    output = run_once(bundle, target, benchmark_example, inputs)
 
-    without = run_once(
-        edited_bundle(
-            'unopinionated', {'routing.yaml': _ROUTING.format(opinion=False)}
-        ),
-        FakeTarget(responder=scripted_responder()),
-        benchmark_example,
-        inputs,
-    )
-    assert without.evidence.audio_opinion is None
-    assert all(item.modality != 'audio_opinion' for item in without.evidence.items)
+    modalities = {item.modality for item in output.evidence.items}
+    assert modalities == {'visual', 'audio', 'text'}
+    heard = [item.cue for item in output.evidence.items if item.modality == 'audio']
+    assert heard == [
+        'speech: I am fine.',
+        'prosody: trembling voice',
+        'prosody: low energy',
+    ]
+    assert not hasattr(output.evidence, 'audio_opinion')
 
 
 def test_a_silent_clip_never_grows_a_transcript(
@@ -127,19 +113,12 @@ def test_a_silent_clip_never_grows_a_transcript(
     benchmark_example: Example,
     make_inputs: Callable[..., PerceivedInputs],
 ) -> None:
-    silent = make_inputs(
-        benchmark_example,
-        audio=AudioEvidence(speech_present=False, description='A door slams.'),
-        audio_opinion=None,
-    )
+    silent = make_inputs(benchmark_example, audio=AudioEvidence(speech_present=False))
 
     output = run_once(bundle, target, benchmark_example, silent)
 
     heard = [item for item in output.evidence.items if item.modality == 'audio']
-    assert [item.cue for item in heard] == [
-        'no intelligible speech in the clip',
-        'sound: A door slams.',
-    ]
+    assert [item.cue for item in heard] == ['no intelligible speech in the clip']
     assert output.evidence.audio.transcript == ''
     rendered = ' '.join(request.prompt for request in target.requests)
     assert 'Speech present: no' in rendered
@@ -154,9 +133,7 @@ def test_a_long_transcript_is_truncated_before_it_is_cited(
 ) -> None:
     bundle = edited_bundle(
         'terse',
-        {
-            'audio_pipeline.yaml': 'channels: [cues, opinion]\ntranscript_max_chars: 40\n'
-        },
+        {'audio_pipeline.yaml': 'channels: [transcript]\ntranscript_max_chars: 40\n'},
     )
     chatty = make_inputs(
         benchmark_example,
@@ -200,10 +177,9 @@ def test_the_question_itself_is_the_last_citable_item(
             video_path=benchmark_example.media_path,
             duration_seconds=1.0,
             audio=AudioEvidence(speech_present=True, transcript='I am fine.'),
-            audio_opinion=AudioOpinion(),
         ),
     )
 
     last = output.evidence.items[-1]
     assert (last.id, last.modality, last.cue) == ('t1', 'text', 'emotion')
-    assert 'suggested' not in output.evidence.items[-2].cue
+    assert output.evidence.items[-2].modality == 'audio'

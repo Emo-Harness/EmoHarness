@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from emoharness.data.prompt_template import ParsedPrompt
 
-Modality = Literal['visual', 'audio', 'audio_opinion', 'text']
+Modality = Literal['visual', 'audio', 'text']
 
 
 class EvidenceItem(BaseModel):
@@ -37,7 +37,12 @@ class VisualEvidence(BaseModel):
 
 
 class AudioEvidence(BaseModel):
-    """Observable-cue channel (ADR-0004). Empty transcript means no intelligible speech."""
+    """What deterministic tools heard (ADR-0004, amended 2026-09-11).
+
+    The transcript and language come from whisper, the prosody phrases from
+    openSMILE functionals compared with corpus reference statistics. No model
+    opinion enters here. Empty transcript means no intelligible speech.
+    """
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -45,17 +50,6 @@ class AudioEvidence(BaseModel):
     transcript: str = ''
     language: str | None = None
     prosody: tuple[str, ...] = ()
-    description: str = ''
-
-
-class AudioOpinion(BaseModel):
-    """Audio-model opinion channel. One voter, never evidence."""
-
-    model_config = ConfigDict(frozen=True, extra='forbid')
-
-    valence: Literal['negative', 'neutral', 'positive', 'unknown'] = 'unknown'
-    arousal: Literal['low', 'medium', 'high', 'unknown'] = 'unknown'
-    candidates: tuple[str, ...] = Field(default=(), max_length=2)
 
 
 class EvidenceRecord(BaseModel):
@@ -65,7 +59,6 @@ class EvidenceRecord(BaseModel):
 
     visual: VisualEvidence
     audio: AudioEvidence
-    audio_opinion: AudioOpinion | None = None
     text: ParsedPrompt
     items: tuple[EvidenceItem, ...] = Field(
         default=(), description='flattened citable cues'
@@ -164,7 +157,6 @@ class PerceivedInputs(BaseModel):
     )
     face_crop_paths: tuple[str, ...] = ()
     audio: AudioEvidence
-    audio_opinion: AudioOpinion | None = None
 
     def audio_text(self) -> str:
         """Observable-cue audio channel rendered as the text block single-call rows append."""
@@ -175,6 +167,4 @@ class PerceivedInputs(BaseModel):
             lines.append(f'Language: {self.audio.language}')
         if self.audio.prosody:
             lines.append('Prosody: ' + '; '.join(self.audio.prosody))
-        if self.audio.description:
-            lines.append(f'Audio description: {self.audio.description}')
         return '\n'.join(lines)

@@ -10,8 +10,7 @@ EVIDENCE RECORD
 
 How to read the record:
 
-- `items` lists every citable observation with its id and its modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard, `o` from a separate audio model, and `t` from the wording of the question.
-- An `audio_opinion` item is an opinion, not an observation. Treat it as one voter that can be wrong, and never cite it as something that was seen or heard.
+- `items` lists every citable observation with its id and its modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard (the transcript, then the voice), and `t` from the wording of the question.
 - An empty transcript means no intelligible speech was recorded. Do not invent words that are not there.
 
 The question asks for the {noun} displayed in the video.

@@ -11,7 +11,6 @@ same :class:`PreprocessCache` entries, which is what makes the ladder's
 
 from __future__ import annotations
 
-import os
 import threading
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
@@ -28,7 +27,6 @@ from emoharness.harness.schema import PerceivedInputs
 from emoharness.perceive.audio import (
     Diarizer,
     NullDiarizer,
-    OpenAICompatDescriber,
     OpenSmileProsody,
     PyannoteDiarizer,
     WhisperTranscriber,
@@ -39,7 +37,6 @@ from emoharness.perceive.cache import (
     PreprocessedClip,
 )
 from emoharness.perceive.descriptors import ReferenceStats, load_reference
-from emoharness.perceive.lexicon import load_lexicon
 from emoharness.perceive.pipeline import PerceptionTools
 from emoharness.runner.paths import ProjectPaths, source_root
 
@@ -49,8 +46,6 @@ ClipPreprocessor = Callable[
     [Example, PreprocessCache, PreprocessConfig], PreprocessedClip
 ]
 
-DESCRIBER_ENDPOINT_ENV: Final = 'AUDIO_DESCRIBER_ENDPOINT'
-DEFAULT_DESCRIBER_ENDPOINT: Final = 'http://127.0.0.1:8001/v1/chat/completions'
 #: ``diarization.backend`` values: the pyannote pipeline, or no diarization.
 PYANNOTE_BACKEND: Final = 'pyannote'
 NO_DIARIZATION_BACKEND: Final = 'none'
@@ -96,17 +91,11 @@ def real_perception_tools(
     paths: ProjectPaths, config: PreprocessConfig
 ) -> PerceptionTools:
     """The real audio stack. Every heavy import happens inside the adapters' calls."""
-    lexicon_path = resolve_input(paths, config.describer.lexicon_path)
-    if not lexicon_path.is_file():
-        raise ValidationError(f'emotion lexicon {lexicon_path} does not exist')
-    endpoint = os.environ.get(DESCRIBER_ENDPOINT_ENV, DEFAULT_DESCRIBER_ENDPOINT)
     return PerceptionTools(
         transcriber=WhisperTranscriber(config.asr.model),
         prosody=OpenSmileProsody(),
-        describer=OpenAICompatDescriber(endpoint, config.describer.primary.model_id),
         diarizer=_diarizer_for(config.diarization.backend),
         reference=_reference_stats(paths, config),
-        banned=load_lexicon(lexicon_path),
     )
 
 

@@ -178,7 +178,6 @@ def test_a_stage_removed_from_routing_is_never_called(
             'routing.yaml': 'stages: [extract_visual, generate_hypotheses, synthesize]\n'
             'verification:\n  agreement_check: cross_modal\n'
             '  ranker: alternative_hypotheses\n'
-            'audio:\n  use_opinion: true\n'
         },
     )
 

@@ -5,9 +5,9 @@
 | [0001](0001-goal-and-evaluation-protocol.md) | Dual goal; construction data from outside the benchmark; what "held-out" excludes; held-out distance table; Rec-S primary |
 | [0002](0002-compute-and-budget.md) | Local vLLM serving; official judge reserved for final runs; cost ledger |
 | [0003](0003-construction-corpus.md) | MELD, CMU-MOSEI, CH-SIMS, IEMOCAP or CREMA-D; 450 build / 450 val / 300 external test; leakage checks against all eight tasks |
-| [0004](0004-audio-evidence-pipeline.md) | Whisper + eGeMAPS + Qwen3-Omni Captioner in two channels; no-speech and multi-speaker handling; official audio clues never read |
+| [0004](0004-audio-evidence-pipeline.md) | Whisper + eGeMAPS as deterministic tools (the audio-LM describer and opinion channel were removed 2026-09-11); no-speech and multi-speaker handling; official audio clues never read |
 | [0005](0005-builder-permissions-and-objective.md) | Staged Builder permissions; minimal Stage 1 scaffold; taxonomy hidden from the Builder; Rec-S primary, Rea-S gate |
-| [0006](0006-builder-loop-mechanics.md) | Controlled JSON patch loop; text-first packets; content-addressed cache; three replicates, first completed run proceeds |
+| [0006](0006-builder-loop-mechanics.md) | Controlled JSON patch loop; text-first packets; same-model verifier per round; per-round cost record; content-addressed cache; three replicates, first completed run proceeds |
 | [0007](0007-proxy-judge.md) | Gemini 3 Flash proxy calibrated against GPT-4o; judge test-retest noise floor; audio-clue-source analysis |
 | [0008](0008-gemini-direct-protocol.md) | Gemini Direct on the subset (P0), matched protocol (P1), full run only with leftover budget (P2) |
 | [0009](0009-experiment-scope-and-judge-allocation.md) | The ladder L0–L6; Builder gain = L5 − L3; P0/P1/P2 rows with a cost model and cut line |

@@ -290,6 +290,15 @@ def base_bundle_for(stage: int, ctx: RunContext) -> Path:
     return ctx.paths.stage_dir(2, STAGE_TWO_PARENT_REPLICATE) / 'final'
 
 
+def bundle_problems(bundle_dir: Path) -> tuple[str, ...]:
+    """Why a written candidate cannot run, as the loader would say it; empty if it loads."""
+    try:
+        load_bundle(bundle_dir)
+    except ValidationError as exc:
+        return (str(exc),)
+    return ()
+
+
 def run_construction(stage: int, replicate: int, ctx: RunContext) -> LoopResult:
     """Run one stage's construction loop and write its provenance."""
     if stage < 2:
@@ -325,6 +334,9 @@ def run_construction(stage: int, replicate: int, ctx: RunContext) -> LoopResult:
         make_evaluate(ctx, data, tracker),
         check_verification_source,
         forbidden_ids(ctx),
+        verifier=ctx.builder_verifier(stage),
+        bundle_check=bundle_problems,
+        ledger=ctx.ledger,
     )
     stamp_manifest(result, load_bundle(base).content_hash(), builder_client.model_id)
     return result

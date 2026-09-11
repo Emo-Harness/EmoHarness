@@ -2,8 +2,6 @@
 # stages must be a subset of the pipeline's known stage names, in order.
 # verification.agreement_check names the module under verification/ that exports
 # modalities_agree; verification.ranker names the one that exports rank.
-# audio.use_opinion decides whether the audio-model opinion enters the evidence
-# record as a citable item (ADR-0004 §2); it is never treated as an observation.
 stages:
   - extract_visual
   - generate_hypotheses
@@ -12,5 +10,3 @@ stages:
 verification:
   agreement_check: cross_modal
   ranker: alternative_hypotheses
-audio:
-  use_opinion: true
