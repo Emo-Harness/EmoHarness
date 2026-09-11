@@ -112,6 +112,11 @@ def group_means(by_task: dict[str, float]) -> dict[str, float]:
     }
 
 
+def _read_json(path: Path) -> Any:
+    with open(path, encoding='utf-8') as fh:
+        return json.load(fh)
+
+
 def _load(path: Path, default: Any = None) -> Any:
     return _read_json(path) if path.is_file() else default
 
