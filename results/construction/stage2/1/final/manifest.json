@@ -1,0 +1,8 @@
+{
+  "version": "stage2-r1",
+  "stage": 2,
+  "parent": "be145ef6ca7dc9ccae6c62530aa9fc157dcf9ecad59db92a4dda56f05f5689a3",
+  "builder": "gpt-5.6-luna",
+  "created": "2026-09-11",
+  "notes": "0 accepted patch(es) over 2 round(s); stopped: early_stop"
+}

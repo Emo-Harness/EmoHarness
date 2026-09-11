@@ -1,0 +1,96 @@
+{
+  "evaluated": [
+    {
+      "name": "Sentiment_polarity_calibration",
+      "patch_name": "Sentiment polarity calibration",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "527f9146e31d5aa3dc18283ac574541471e57337203ec78a149197d70d6297b9",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_00/candidates/Sentiment_polarity_calibration",
+      "scores": {
+        "name": "Sentiment_polarity_calibration",
+        "recognition": 0.4593908629441624,
+        "reasoning": 0.875,
+        "regression_rate": 0.0893854748603352,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 27.70129172633172
+      }
+    },
+    {
+      "name": "Frustration-vs-neutral_calibration",
+      "patch_name": "Frustration-vs-neutral calibration",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "3574b4f9cb8a8ba226e65cd49f865f1a88ba0eee51e0dbc66c6002861a6fff05",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_00/candidates/Frustration-vs-neutral_calibration",
+      "scores": {
+        "name": "Frustration-vs-neutral_calibration",
+        "recognition": 0.467005076142132,
+        "reasoning": 0.88,
+        "regression_rate": 0.05027932960893855,
+        "mean_calls": 4.00761421319797,
+        "p95_latency_s": 28.263370347383912
+      }
+    },
+    {
+      "name": "Subtle_happiness_calibration",
+      "patch_name": "Subtle happiness calibration",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "f02e497d9bcd158eca43ecb846269158e73b883c4c752144ecc412d689d0c5dc",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_00/candidates/Subtle_happiness_calibration",
+      "scores": {
+        "name": "Subtle_happiness_calibration",
+        "recognition": 0.45685279187817257,
+        "reasoning": 0.85625,
+        "regression_rate": 0.0670391061452514,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 27.874178630788826
+      }
+    },
+    {
+      "name": "Negative_sentiment_calibration",
+      "patch_name": "Negative sentiment calibration",
+      "targeted_cluster": "negative | neutral | agree",
+      "patch_hash": "5f7977d62e2a16f507cf9539571f2eb79e7f0d4b75467757286fef35174a28c6",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_00/candidates/Negative_sentiment_calibration",
+      "scores": {
+        "name": "Negative_sentiment_calibration",
+        "recognition": 0.4593908629441624,
+        "reasoning": 0.88125,
+        "regression_rate": 0.11173184357541899,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 28.017929343041033
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "Sentiment_polarity_calibration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0894 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Frustration-vs-neutral_calibration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0503 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Subtle_happiness_calibration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0670 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Negative_sentiment_calibration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1117 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": []
+}

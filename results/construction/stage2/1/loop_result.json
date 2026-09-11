@@ -1,0 +1,131 @@
+{
+  "stage": 2,
+  "replicate": 1,
+  "rounds": [
+    {
+      "round_index": 0,
+      "packet_hash": "cd28f635058310a374823a7a0557e5ed13c10527e7d6f7483263471a6930fede",
+      "incumbent_recognition": 0.4543147208121827,
+      "candidates": [],
+      "vetoed": [],
+      "gate_results": [],
+      "accepted": null,
+      "bundle_hash": "be145ef6ca7dc9ccae6c62530aa9fc157dcf9ecad59db92a4dda56f05f5689a3",
+      "cost": {
+        "by_role": {
+          "builder": {
+            "calls": 1,
+            "input_tokens": 103691,
+            "output_tokens": 6281,
+            "cost_usd": 0.028275400000000003
+          }
+        },
+        "total_usd": 0.028275400000000003
+      }
+    },
+    {
+      "round_index": 1,
+      "packet_hash": "ff15e31e72223a35f56dea3af102e4391ac05604f01cc97b992b777487a8eec3",
+      "incumbent_recognition": 0.4543147208121827,
+      "candidates": [
+        {
+          "name": "Expose_subtle_positive_facial_evidence",
+          "recognition": 0.41624365482233505,
+          "reasoning": 0.835,
+          "regression_rate": 0.2122905027932961,
+          "mean_calls": 4.0152284263959395,
+          "p95_latency_s": 37.672004941734485
+        }
+      ],
+      "vetoed": [
+        "Recognize understated frustration",
+        "Resolve favorable sentiment versus neutral affect",
+        "Resolve critical sentiment versus neutral affect"
+      ],
+      "gate_results": [
+        {
+          "name": "Expose_subtle_positive_facial_evidence",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4162 does not exceed incumbent 0.4543 by more than 0.0000",
+            "reasoning 0.8350 falls below the incumbent floor 0.8450 (2.0 points)",
+            "regression rate 0.2123 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "be145ef6ca7dc9ccae6c62530aa9fc157dcf9ecad59db92a4dda56f05f5689a3",
+      "cost": {
+        "by_role": {
+          "builder": {
+            "calls": 1,
+            "input_tokens": 103691,
+            "output_tokens": 8175,
+            "cost_usd": 0.0305482
+          },
+          "judge_proxy": {
+            "calls": 200,
+            "input_tokens": 369171,
+            "output_tokens": 10600,
+            "cost_usd": 0.0865542
+          },
+          "target": {
+            "calls": 1582,
+            "input_tokens": 3232193,
+            "output_tokens": 334216,
+            "cost_usd": 0.0
+          },
+          "verifier": {
+            "calls": 1,
+            "input_tokens": 10384,
+            "output_tokens": 3410,
+            "cost_usd": 0.0061688
+          }
+        },
+        "total_usd": 0.1232712
+      }
+    }
+  ],
+  "final_bundle": "/home/max7/EmoHarness/results/construction/stage2/1/final",
+  "stopped_reason": "early_stop",
+  "baseline_cost": {
+    "by_role": {
+      "judge_proxy": {
+        "calls": 200,
+        "input_tokens": 367410,
+        "output_tokens": 10600,
+        "cost_usd": 0.086202
+      }
+    },
+    "total_usd": 0.086202
+  },
+  "total_cost": {
+    "by_role": {
+      "builder": {
+        "calls": 2,
+        "input_tokens": 207382,
+        "output_tokens": 14456,
+        "cost_usd": 0.058823600000000004
+      },
+      "judge_proxy": {
+        "calls": 400,
+        "input_tokens": 736581,
+        "output_tokens": 21200,
+        "cost_usd": 0.1727562
+      },
+      "target": {
+        "calls": 1582,
+        "input_tokens": 3232193,
+        "output_tokens": 334216,
+        "cost_usd": 0.0
+      },
+      "verifier": {
+        "calls": 1,
+        "input_tokens": 10384,
+        "output_tokens": 3410,
+        "cost_usd": 0.0061688
+      }
+    },
+    "total_usd": 0.2377486
+  }
+}

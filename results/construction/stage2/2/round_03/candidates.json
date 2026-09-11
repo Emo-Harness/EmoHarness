@@ -1,0 +1,99 @@
+{
+  "evaluated": [
+    {
+      "name": "calibrate_positive_sentiment_against_neutral",
+      "patch_name": "calibrate positive sentiment against neutral",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "704cc76099c08e41912fb725ff16b25a011f503e2e1aae28898f73722d715145",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_03/candidates/calibrate_positive_sentiment_against_neutral",
+      "scores": {
+        "name": "calibrate_positive_sentiment_against_neutral",
+        "recognition": 0.46446700507614214,
+        "reasoning": 0.8925,
+        "regression_rate": 0.10416666666666667,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 28.491312059364287
+      }
+    },
+    {
+      "name": "separate_frustration_from_generic_neutrality",
+      "patch_name": "separate frustration from generic neutrality",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "ae86321cf1e79dc8e107fce2c0257aadc926e31d01efb18451cf496bdb8e143b",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_03/candidates/separate_frustration_from_generic_neutrality",
+      "scores": {
+        "name": "separate_frustration_from_generic_neutrality",
+        "recognition": 0.46446700507614214,
+        "reasoning": 0.875,
+        "regression_rate": 0.13541666666666666,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 27.603027831111106
+      }
+    },
+    {
+      "name": "calibrate_negative_sentiment_against_neutral",
+      "patch_name": "calibrate negative sentiment against neutral",
+      "targeted_cluster": "negative | neutral | agree",
+      "patch_hash": "76018bb1f1c766d088ab50004d5f23d3542d790d6fe8a46158c6d8a575104ff0",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_03/candidates/calibrate_negative_sentiment_against_neutral",
+      "scores": {
+        "name": "calibrate_negative_sentiment_against_neutral",
+        "recognition": 0.4796954314720812,
+        "reasoning": 0.88875,
+        "regression_rate": 0.07291666666666667,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 28.998649525374642
+      }
+    },
+    {
+      "name": "request_finer_facial_affect_observations",
+      "patch_name": "request finer facial affect observations",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "7542e84e14e6ca67a256d8699b1f56896ecb912f7ea0c34339d2b5f3b9d4ed84",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_03/candidates/request_finer_facial_affect_observations",
+      "scores": {
+        "name": "request_finer_facial_affect_observations",
+        "recognition": 0.4720812182741117,
+        "reasoning": 0.875,
+        "regression_rate": 0.140625,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 35.334993670857514
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "calibrate_positive_sentiment_against_neutral",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4645 does not exceed incumbent 0.4746 by more than 0.0000",
+        "regression rate 0.1042 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "separate_frustration_from_generic_neutrality",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4645 does not exceed incumbent 0.4746 by more than 0.0000",
+        "regression rate 0.1354 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "calibrate_negative_sentiment_against_neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0729 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "request_finer_facial_affect_observations",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4721 does not exceed incumbent 0.4746 by more than 0.0000",
+        "regression rate 0.1406 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": []
+}

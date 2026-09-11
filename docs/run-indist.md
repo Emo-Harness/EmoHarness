@@ -114,9 +114,128 @@ bundle in `results/construction/stage2/0/loop_result.json`, and L4 minus L0
   after the fact; replicate 1's round 0 would still have accepted nothing
   under the new ceiling (all four candidates failed regression or Recognition).
 
-## v2 results
+## v2 results (2026-09-11 07:16, local Recognition, 1,000-item subset, 125 per task)
 
-(filled in when the run finishes)
+| Row | ER_Lab | ER_Wild | SA | Noise_ER | FG_ER | ML_ER | FG_SA | IR | seen | held-out | overall |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| L0 Qwen3-VL-8B Direct | 8.0 | 36.8 | 38.4 | 52.8 | 28.8 | 34.7 | 14.4 | 20.0 | 27.7 | 30.2 | 29.2 |
+| L3 Stage-1 scaffold (human) | 28.0 | 37.6 | 63.2 | 52.0 | 26.6 | 49.0 | 23.2 | 47.2 | 42.9 | 39.6 | 40.9 |
+| L4 Stage-2 (Luna Builder, replicate 0) | 28.0 | 37.6 | 63.2 | 52.0 | 26.6 | 49.0 | 23.2 | 47.2 | 42.9 | 39.6 | 40.9 |
+| L6 Luna Direct (frames + audio text) | 28.8 | 43.2 | 64.0 | 63.2 | 33.0 | 50.2 | 31.2 | 37.6 | 45.3 | 43.0 | 43.9 |
+
+Paired stratified bootstrap on the overall score, 2,000 resamples:
+
+| Delta | estimate | 95% CI | p | items better / worse |
+|---|---|---|---|---|
+| L3 - L0 | **+11.6** | [+8.2, +14.9] | <0.001 | 246 / 123 |
+| L4 - L3 | **+0.0** | [+0.0, +0.0] | 1.000 | 0 / 0 |
+| L6 - L0 | +14.7 | [+11.4, +17.6] | <0.001 | 258 / 89 |
+
+**L4 equals L3 exactly**, and not by coincidence: the ladder's Stage-2 row is the
+*first completed* replicate (ADR-0006 §6, declared before the runs), replicate 0
+accepted nothing in either of its two rounds, so its final bundle is the Stage 1
+scaffold byte for byte apart from `manifest.json`. The Builder's measured
+contribution in v2 is therefore zero, not a small number.
+
+Stage-2 construction (Luna Builder and Luna verifier, gates as preregistered
+with the v1 mean-calls ceiling of 4.5):
+
+| Replicate | Rounds | Candidates evaluated | Vetoed | Accepted | D_val start -> end | Luna cost |
+|---|---|---|---|---|---|---|
+| 0 (the declared run) | 2, early stop | 8 | 0 | 0 | 45.43 -> 45.43 | $0.84 |
+| 1 | 2, early stop | 1 | 3 | 0 | 45.43 -> 45.43 | $0.24 |
+| 2 | 4, early stop | 16 | 0 | 1 (round 1, "Conflict-side affect resolution", +2.0, regression 2.8%) | 45.43 -> **47.46** | $1.60 |
+
+The regression gate is what stops almost everything, as in v1: of the 25
+candidates evaluated across the three replicates, 19 raised D_val Recognition
+and 17 of those regressed more than 5% of the items the incumbent already
+solved. The two that passed both gates were both in replicate 2 round 1
+(regression 4.5% and 2.8%); the loop took the higher-Recognition one. Replicate
+2 then spent three more rounds without beating 47.46, and replicate 0, whose
+result the protocol reports, never cleared the bar at all. Spread across
+replicates is therefore the dominant effect: the same Builder, the same packet
+format, and the same gates give 0, 0, and +2.0 points on D_val depending only
+on sampling.
+
+**The one accepted patch does not transfer.** Replicate 2's bundle was scored on
+the same subset as a clearly-labelled side row
+(`results/raw_predictions/L4_replicate2/`, not part of the ladder, a secondary
+measurement of a best-of-three outcome):
+
+| Row | seen | held-out | overall | vs L3 |
+|---|---|---|---|---|
+| L3 Stage-1 scaffold | 42.9 | 39.6 | 40.9 | - |
+| replicate 2 (1 accepted patch, D_val +2.0) | 42.4 | 39.7 | **40.7** | **-0.1** [-1.0, +0.8], p=0.80, 13 better / 15 worse |
+
+So the +2.0 points the patch won on D_val (394 items) are worth -0.1 on the
+1,000 test items, and the 28 items it moves are a coin flip. This is the
+cleanest statement the run produces: the loop's objective can be improved and
+the improvement is selection noise on the construction split, not a capability
+the harness gained. Taking the best of three replicates instead of the declared
+one would therefore not have changed the conclusion either, which is worth
+saying because it is the obvious objection to reporting replicate 0.
+
+### The verifier
+
+Ten verifier calls, 108,663 input and 21,708 output tokens, $0.05 in total: 1.4%
+of the run's Luna spend, about half a cent per round. It vetoed 3 of the 28
+candidates it reviewed, all three in replicate 1 round 1 and all three under
+rule 2 (label forcing), quoting the offending text:
+
+- "treat those as evidence for Frustration when that exact candidate is present"
+  and "do not rank Neutral above it merely because the visible expression is
+  restrained";
+- "Favor the exact positive entry" and "rank it above neutral";
+- "support the exact negative entry" and "rank it above neutral".
+
+Those are exactly the "buy Recognition by asserting a label more readily" moves
+that v1 identified as the reason candidates regress, so the verifier is
+catching the failure mode it was written for. It is not a bottleneck: the gates
+rejected 24 of the 25 candidates it approved. Its one measurable side effect is
+that replicate 1 evaluated 1 candidate instead of 4 and reached its early stop
+sooner.
+
+A defect found and fixed during the run: Luna's first review copied the whole
+heading (`Candidate 2: <name>`) into each verdict's `name`, no verdict matched
+its candidate, and all four candidates of a round were vetoed as "unreviewed";
+two such rounds hit the early-stop rule. Commit `5a498fb` makes the name its own
+line in the request, ignores a leading `Candidate N` when matching, and falls
+back to position when a report carries exactly one verdict per candidate. That
+void replicate cost $0.07 and was deleted before the rerun.
+
+### Cost
+
+| Role | Calls | Input tokens | Output tokens | USD |
+|---|---|---|---|---|
+| builder | 11 | 1,137,757 | 70,421 | 0.31 |
+| verifier | 10 | 108,663 | 21,708 | 0.05 |
+| judge_proxy (Reasoning gate) | 6,800 | 12,495,243 | 360,400 | 2.93 |
+| teacher_direct (L6) | 999 | 2,770,683 | 16,802 | 0.57 |
+| target (student, local) | 37,279 | 50,393,827 | 7,779,351 | 0.00 |
+| **Luna total** | | | | **3.87** |
+
+The Reasoning gate is 76% of the bill and the Builder itself 8%. Wall clock:
+4 h 39 min on one box (02:37 to 07:16), plus 21 minutes of L0/L3 before that.
+
+### v2 against v1
+
+| | v1 (Omni describer, no verifier) | v2 (tools only, verifier) |
+|---|---|---|
+| L0 | 29.2 | 29.2 |
+| L3 | 41.3 | 40.9 |
+| L4 | 41.5 | 40.9 |
+| L6 | 44.4 | 43.9 |
+| L3 - L0 | +12.1 | +11.6 |
+| L4 - L3 | +0.2 (9 better / 7 worse) | +0.0 (0 / 0) |
+| Accepted patches / replicates | 1 / 3 | 1 / 3 (not in the declared replicate) |
+| Luna spend | $5.42 | $3.87 |
+
+Removing the audio-language model cost 0.4 points on the scaffold (41.3 to 40.9)
+and 0.5 on the teacher row, both well inside the ±2.7-point interval on a row's
+overall score. The reading of the experiment does not change: the human
+scaffold is worth about +12 points over Direct and closes roughly 80% of the
+gap to the Luna teacher, and Stage-2 Builder construction adds nothing
+measurable on top of it, with or without a verifier.
 
 ## v1 results (2026-09-09 01:02, local Recognition, 1,000-item subset, 125 per task; with the Omni describer)
 

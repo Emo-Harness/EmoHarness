@@ -1,0 +1,15 @@
+{
+  "evaluated": [],
+  "gates": [],
+  "rejected": [
+    {
+      "name": "sentiment_valence_over_neutral",
+      "violations": [
+        "prompts/generate_hypotheses.md: listed more than once",
+        "prompts/generate_hypotheses.md: listed more than once",
+        "prompts/generate_hypotheses.md: listed more than once"
+      ]
+    }
+  ],
+  "vetoed": []
+}

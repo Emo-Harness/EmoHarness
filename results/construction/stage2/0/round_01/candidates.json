@@ -1,0 +1,97 @@
+{
+  "evaluated": [
+    {
+      "name": "sentiment-valence-over-neutral",
+      "patch_name": "sentiment-valence-over-neutral",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "a80a2994949412c95997ac4e995e39043f08482bf4362facba1b24dc88e00066",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_01/candidates/sentiment-valence-over-neutral",
+      "scores": {
+        "name": "sentiment-valence-over-neutral",
+        "recognition": 0.46954314720812185,
+        "reasoning": 0.8675,
+        "regression_rate": 0.09497206703910614,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 27.79685453363927
+      }
+    },
+    {
+      "name": "frustration-not-neutral",
+      "patch_name": "frustration-not-neutral",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "5357d0a2246268e6c0d0007a4ae73c79023b3159d7d1cfcb06a16478d073d78c",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_01/candidates/frustration-not-neutral",
+      "scores": {
+        "name": "frustration-not-neutral",
+        "recognition": 0.4619289340101523,
+        "reasoning": 0.89375,
+        "regression_rate": 0.13966480446927373,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 29.558923306886577
+      }
+    },
+    {
+      "name": "explicit-smile-beats-neutral",
+      "patch_name": "explicit-smile-beats-neutral",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "71484f50f2bfb7e4413c5a395969daa4db565ca2d36c21d42ccf02f2a7172fe9",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_01/candidates/explicit-smile-beats-neutral",
+      "scores": {
+        "name": "explicit-smile-beats-neutral",
+        "recognition": 0.46954314720812185,
+        "reasoning": 0.88375,
+        "regression_rate": 0.11731843575418995,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 25.782146499725098
+      }
+    },
+    {
+      "name": "negative-valence-over-neutral",
+      "patch_name": "negative-valence-over-neutral",
+      "targeted_cluster": "negative | neutral | agree",
+      "patch_hash": "2083ecc312482f704e2141d1cb6cfc02acb1390e3ad21fae987a138e36243384",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/0/round_01/candidates/negative-valence-over-neutral",
+      "scores": {
+        "name": "negative-valence-over-neutral",
+        "recognition": 0.4517766497461929,
+        "reasoning": 0.8775,
+        "regression_rate": 0.1452513966480447,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 26.744996611587705
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "sentiment-valence-over-neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0950 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "frustration-not-neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1397 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "explicit-smile-beats-neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1173 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "negative-valence-over-neutral",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4518 does not exceed incumbent 0.4543 by more than 0.0000",
+        "regression rate 0.1453 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": []
+}

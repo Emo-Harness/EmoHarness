@@ -1,0 +1,15 @@
+{
+  "accepted": "Conflict-side affect resolution",
+  "targeted_cluster": "negative | neutral | conflict",
+  "rationale": "Improves conflict cases by distinguishing generic transactional audio from direct negative facial or bodily affect, while still allowing explicit negative speech to defeat neutral visuals.",
+  "patch_hash": "c2ea30de3487fb852c4c518f2caac047d4ed1594c39bcab0c9af0a8014591fd4",
+  "bundle": "/home/max7/EmoHarness/results/construction/stage2/2/round_01/candidates/Conflict-side_affect_resolution",
+  "scores": {
+    "name": "Conflict-side_affect_resolution",
+    "recognition": 0.4746192893401015,
+    "reasoning": 0.88125,
+    "regression_rate": 0.027932960893854747,
+    "mean_calls": 4.00507614213198,
+    "p95_latency_s": 30.97214741730132
+  }
+}

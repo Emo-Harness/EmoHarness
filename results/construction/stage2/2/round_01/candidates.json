@@ -1,0 +1,92 @@
+{
+  "evaluated": [
+    {
+      "name": "Valence-aware_sentiment_hypotheses",
+      "patch_name": "Valence-aware sentiment hypotheses",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "2a505e39704c3b9aaf33337554cb9ae94064f61744c1b624f29a27db35055a34",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_01/candidates/Valence-aware_sentiment_hypotheses",
+      "scores": {
+        "name": "Valence-aware_sentiment_hypotheses",
+        "recognition": 0.4720812182741117,
+        "reasoning": 0.85375,
+        "regression_rate": 0.0893854748603352,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 29.870656264422
+      }
+    },
+    {
+      "name": "Subdued-frustration_discrimination",
+      "patch_name": "Subdued-frustration discrimination",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "6af1daf7fdb69bee87b35257948b8b34790ec9690751d2c730c9aa6ff25b2df6",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_01/candidates/Subdued-frustration_discrimination",
+      "scores": {
+        "name": "Subdued-frustration_discrimination",
+        "recognition": 0.467005076142132,
+        "reasoning": 0.88875,
+        "regression_rate": 0.07262569832402235,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 29.50815617071932
+      }
+    },
+    {
+      "name": "Smile-over-neutral_emotion_rubric",
+      "patch_name": "Smile-over-neutral emotion rubric",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "4d6c74178f9c301f19ef3552fa4290ffabf29cf9c0f10f3342faf1d5655ac8d7",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_01/candidates/Smile-over-neutral_emotion_rubric",
+      "scores": {
+        "name": "Smile-over-neutral_emotion_rubric",
+        "recognition": 0.4720812182741117,
+        "reasoning": 0.85875,
+        "regression_rate": 0.0446927374301676,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 29.462891487043827
+      }
+    },
+    {
+      "name": "Conflict-side_affect_resolution",
+      "patch_name": "Conflict-side affect resolution",
+      "targeted_cluster": "negative | neutral | conflict",
+      "patch_hash": "c2ea30de3487fb852c4c518f2caac047d4ed1594c39bcab0c9af0a8014591fd4",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/2/round_01/candidates/Conflict-side_affect_resolution",
+      "scores": {
+        "name": "Conflict-side_affect_resolution",
+        "recognition": 0.4746192893401015,
+        "reasoning": 0.88125,
+        "regression_rate": 0.027932960893854747,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 30.97214741730132
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "Valence-aware_sentiment_hypotheses",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0894 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Subdued-frustration_discrimination",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0726 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Smile-over-neutral_emotion_rubric",
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "name": "Conflict-side_affect_resolution",
+      "passed": true,
+      "reasons": []
+    }
+  ],
+  "rejected": [],
+  "vetoed": []
+}

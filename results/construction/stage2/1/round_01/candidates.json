@@ -1,0 +1,52 @@
+{
+  "evaluated": [
+    {
+      "name": "Expose_subtle_positive_facial_evidence",
+      "patch_name": "Expose subtle positive facial evidence",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "af831f71ee0676df50a99ce494e99537c3a015838f83497d54c19b61e73c2a66",
+      "directory": "/home/max7/EmoHarness/results/construction/stage2/1/round_01/candidates/Expose_subtle_positive_facial_evidence",
+      "scores": {
+        "name": "Expose_subtle_positive_facial_evidence",
+        "recognition": 0.41624365482233505,
+        "reasoning": 0.835,
+        "regression_rate": 0.2122905027932961,
+        "mean_calls": 4.0152284263959395,
+        "p95_latency_s": 37.672004941734485
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "Expose_subtle_positive_facial_evidence",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4162 does not exceed incumbent 0.4543 by more than 0.0000",
+        "reasoning 0.8350 falls below the incumbent floor 0.8450 (2.0 points)",
+        "regression rate 0.2123 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": [
+    {
+      "name": "Recognize understated frustration",
+      "issues": [
+        "Rule 2: \"treat those as evidence for Frustration when that exact candidate is present\" and \"do not rank Neutral above it merely because the visible expression is restrained\" explicitly bias ranking toward a particular label.",
+        "Rule 4: \"cite the relevant audio, text, body, or facial ids\" alongside treating a question as frustration evidence can permit the question-wording item to be used as answer evidence."
+      ]
+    },
+    {
+      "name": "Resolve favorable sentiment versus neutral affect",
+      "issues": [
+        "Rule 2: \"Favor the exact positive entry\" and \"rank it above neutral\" direct the model to prefer a particular label rather than leaving ranking to evidence-based comparison."
+      ]
+    },
+    {
+      "name": "Resolve critical sentiment versus neutral affect",
+      "issues": [
+        "Rule 2: \"support the exact negative entry\" and \"rank it above neutral\" direct the model to prefer a particular label rather than leaving ranking to evidence-based comparison."
+      ]
+    }
+  ]
+}

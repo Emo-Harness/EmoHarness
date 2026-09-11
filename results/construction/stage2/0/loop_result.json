@@ -1,0 +1,252 @@
+{
+  "stage": 2,
+  "replicate": 0,
+  "rounds": [
+    {
+      "round_index": 0,
+      "packet_hash": "cd28f635058310a374823a7a0557e5ed13c10527e7d6f7483263471a6930fede",
+      "incumbent_recognition": 0.4543147208121827,
+      "candidates": [
+        {
+          "name": "sentiment_valence_over_neutral",
+          "recognition": 0.46446700507614214,
+          "reasoning": 0.8725,
+          "regression_rate": 0.08379888268156424,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 27.948395770904607
+        },
+        {
+          "name": "frustration_signal_over_neutral",
+          "recognition": 0.4873096446700508,
+          "reasoning": 0.87,
+          "regression_rate": 0.055865921787709494,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 28.625368842005294
+        },
+        {
+          "name": "smile_beats_neutral",
+          "recognition": 0.4543147208121827,
+          "reasoning": 0.865,
+          "regression_rate": 0.07262569832402235,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 27.15477620303864
+        },
+        {
+          "name": "negative_content_over_neutral",
+          "recognition": 0.467005076142132,
+          "reasoning": 0.87375,
+          "regression_rate": 0.09497206703910614,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 28.32004596006592
+        }
+      ],
+      "vetoed": [],
+      "gate_results": [
+        {
+          "name": "sentiment_valence_over_neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.0838 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "frustration_signal_over_neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.0559 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "smile_beats_neutral",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4543 does not exceed incumbent 0.4543 by more than 0.0000",
+            "regression rate 0.0726 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "negative_content_over_neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.0950 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "be145ef6ca7dc9ccae6c62530aa9fc157dcf9ecad59db92a4dda56f05f5689a3",
+      "cost": {
+        "by_role": {
+          "builder": {
+            "calls": 1,
+            "input_tokens": 103691,
+            "output_tokens": 5239,
+            "cost_usd": 0.027025
+          },
+          "judge_proxy": {
+            "calls": 800,
+            "input_tokens": 1468070,
+            "output_tokens": 42400,
+            "cost_usd": 0.344494
+          },
+          "target": {
+            "calls": 4635,
+            "input_tokens": 5808304,
+            "output_tokens": 949204,
+            "cost_usd": 0.0
+          },
+          "verifier": {
+            "calls": 1,
+            "input_tokens": 10732,
+            "output_tokens": 2790,
+            "cost_usd": 0.0054944
+          }
+        },
+        "total_usd": 0.3770134
+      }
+    },
+    {
+      "round_index": 1,
+      "packet_hash": "ff15e31e72223a35f56dea3af102e4391ac05604f01cc97b992b777487a8eec3",
+      "incumbent_recognition": 0.4543147208121827,
+      "candidates": [
+        {
+          "name": "sentiment-valence-over-neutral",
+          "recognition": 0.46954314720812185,
+          "reasoning": 0.8675,
+          "regression_rate": 0.09497206703910614,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 27.79685453363927
+        },
+        {
+          "name": "frustration-not-neutral",
+          "recognition": 0.4619289340101523,
+          "reasoning": 0.89375,
+          "regression_rate": 0.13966480446927373,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 29.558923306886577
+        },
+        {
+          "name": "explicit-smile-beats-neutral",
+          "recognition": 0.46954314720812185,
+          "reasoning": 0.88375,
+          "regression_rate": 0.11731843575418995,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 25.782146499725098
+        },
+        {
+          "name": "negative-valence-over-neutral",
+          "recognition": 0.4517766497461929,
+          "reasoning": 0.8775,
+          "regression_rate": 0.1452513966480447,
+          "mean_calls": 4.00507614213198,
+          "p95_latency_s": 26.744996611587705
+        }
+      ],
+      "vetoed": [],
+      "gate_results": [
+        {
+          "name": "sentiment-valence-over-neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.0950 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "frustration-not-neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.1397 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "explicit-smile-beats-neutral",
+          "passed": false,
+          "reasons": [
+            "regression rate 0.1173 exceeds 0.0500"
+          ]
+        },
+        {
+          "name": "negative-valence-over-neutral",
+          "passed": false,
+          "reasons": [
+            "recognition 0.4518 does not exceed incumbent 0.4543 by more than 0.0000",
+            "regression rate 0.1453 exceeds 0.0500"
+          ]
+        }
+      ],
+      "accepted": null,
+      "bundle_hash": "be145ef6ca7dc9ccae6c62530aa9fc157dcf9ecad59db92a4dda56f05f5689a3",
+      "cost": {
+        "by_role": {
+          "builder": {
+            "calls": 1,
+            "input_tokens": 103691,
+            "output_tokens": 6175,
+            "cost_usd": 0.0281482
+          },
+          "judge_proxy": {
+            "calls": 800,
+            "input_tokens": 1468673,
+            "output_tokens": 42400,
+            "cost_usd": 0.3446146
+          },
+          "target": {
+            "calls": 4568,
+            "input_tokens": 5635460,
+            "output_tokens": 917932,
+            "cost_usd": 0.0
+          },
+          "verifier": {
+            "calls": 1,
+            "input_tokens": 11033,
+            "output_tokens": 1435,
+            "cost_usd": 0.0039286
+          }
+        },
+        "total_usd": 0.3766914
+      }
+    }
+  ],
+  "final_bundle": "/home/max7/EmoHarness/results/construction/stage2/0/final",
+  "stopped_reason": "early_stop",
+  "baseline_cost": {
+    "by_role": {
+      "judge_proxy": {
+        "calls": 200,
+        "input_tokens": 367410,
+        "output_tokens": 10600,
+        "cost_usd": 0.086202
+      }
+    },
+    "total_usd": 0.086202
+  },
+  "total_cost": {
+    "by_role": {
+      "builder": {
+        "calls": 2,
+        "input_tokens": 207382,
+        "output_tokens": 11414,
+        "cost_usd": 0.055173200000000006
+      },
+      "judge_proxy": {
+        "calls": 1800,
+        "input_tokens": 3304153,
+        "output_tokens": 95400,
+        "cost_usd": 0.7753106000000001
+      },
+      "target": {
+        "calls": 9203,
+        "input_tokens": 11443764,
+        "output_tokens": 1867136,
+        "cost_usd": 0.0
+      },
+      "verifier": {
+        "calls": 2,
+        "input_tokens": 21765,
+        "output_tokens": 4225,
+        "cost_usd": 0.009423
+      }
+    },
+    "total_usd": 0.8399068000000001
+  }
+}

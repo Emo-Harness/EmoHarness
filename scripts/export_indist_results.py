@@ -50,6 +50,14 @@ PREVIOUS_RUNS = {
     },
 }
 ROWS = ('L0', 'L3', 'L4', 'L6')
+#: Rows outside the ladder, measured for a named secondary question. Never a
+#: Stage-2 result: the ladder's L4 is the first completed replicate (ADR-0006 §6).
+SIDE_ROWS = {
+    'L4_replicate2': (
+        'Replicate 2 of 3 (not the declared run): the only Stage-2 bundle in this '
+        'run with an accepted patch, scored on the same subset for reference'
+    ),
+}
 ROW_LABELS = {
     'L0': 'Qwen3-VL-8B Direct (official prompt, native video)',
     'L3': 'Stage 1 scaffold (human-written harness, 4 calls)',
@@ -291,6 +299,48 @@ def row_scores_for(
     return scores
 
 
+def side_rows(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
+    """Named non-ladder rows with their delta against L3, when they were run."""
+    _, base = load_rows()
+    out = {}
+    for row, label in SIDE_ROWS.items():
+        path = RESULTS / f'raw_predictions/{row}/subset.jsonl'
+        if not path.is_file():
+            continue
+        scores = {}
+        with open(path, encoding='utf-8') as fh:
+            lines = fh.readlines()
+        examples = {
+            e.example_id: e
+            for e in read_manifest(ROOT / 'data/manifests/mme_emotion.jsonl')
+        }
+        for line in lines:
+            r = json.loads(line)
+            e = examples[r['example_id']]
+            ls = LabelSet.from_prompt(e.prompt)
+            scores[r['example_id']] = ls.recognition(r['labels'], e.labels)
+        shared = [i for i in ids if i in scores]
+        by_task = macro({i: scores[i] for i in shared}, task_of)
+        against = {i: base['L3'][i]['recognition'] for i in shared}
+        res = paired_bootstrap(
+            against, {i: scores[i] for i in shared}, task_of, RESAMPLES
+        )
+        out[row] = {
+            'label': label,
+            'by_task': by_task,
+            **group_means(by_task),
+            'vs_L3': {
+                'estimate': res.estimate,
+                'ci_low': res.ci_low,
+                'ci_high': res.ci_high,
+                'p_value': res.p_value,
+                'items_better': sum(1 for i in shared if scores[i] > against[i]),
+                'items_worse': sum(1 for i in shared if scores[i] < against[i]),
+            },
+        }
+    return out
+
+
 def previous_runs(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
     """The same row scores, construction trajectory, and cost for each archived run."""
     out = {}
@@ -398,6 +448,7 @@ def main() -> None:
         },
         'construction': construction_summary(),
         'cost': cost_summary(),
+        'side_rows': side_rows(ids, task_of),
         'previous_runs': previous_runs(ids, task_of),
         'leakage': {
             'checked_pairs': leakage.get('checked_pairs'),
@@ -461,6 +512,21 @@ def main() -> None:
     print(archive)
 
 
+def _side_row_lines(summary: dict[str, Any]) -> list[str]:
+    """The headline sentence for each non-ladder row, if any were run."""
+    lines = []
+    for row, s in summary.get('side_rows', {}).items():
+        d = s['vs_L3']
+        lines += [
+            f'{row}: {100 * s["overall"]:.1f} overall, {100 * d["estimate"]:+.1f} against L3'
+            f' [{100 * d["ci_low"]:+.1f}, {100 * d["ci_high"]:+.1f}], p={d["p_value"]:.2f},'
+            f' {d["items_better"]} items better / {d["items_worse"]} worse.',
+            f'  {s["label"]}.',
+            '',
+        ]
+    return lines
+
+
 def _readme(summary: dict[str, Any]) -> str:
     rows = summary['rows']
     h = summary['headline']
@@ -494,9 +560,10 @@ def _readme(summary: dict[str, Any]) -> str:
         f' ({builder_delta["items_better"]} items better, {builder_delta["items_worse"]} worse of {summary["subset"]["size"]};'
         f' 95% CI [{100 * builder_delta["overall"]["ci_low"]:+.1f}, {100 * builder_delta["overall"]["ci_high"]:+.1f}]).',
         f'Teacher gap L6 - L0: {100 * h["teacher_gap_L6_minus_L0"]:+.1f}; the scaffold closes {100 * h["gap_closed_by_scaffold"]:.0f}% of it.',
-        f'Construction: {len(construction)} replicates, {accepted_total} accepted patches, {vetoed_total} candidates vetoed by the verifier;',
+        f'Construction: {len(construction)} replicates, {accepted_total} accepted patch(es), {vetoed_total} candidates vetoed by the verifier;',
         f'Luna spend ${summary["cost"]["luna_total_usd"]:.2f}.',
         '',
+        *_side_row_lines(summary),
         '## Files',
         '',
         '- `summary.json`: everything above plus paired-bootstrap CIs for each delta (overall, seen, held-out, per task),',
@@ -512,6 +579,8 @@ def _readme(summary: dict[str, Any]) -> str:
         '  accepted.json, cost.json, final/ bundle.',
         '- `construction/accepted_patches_replicate{N}.diff`: every accepted patch of a replicate as a diff against the scaffold.',
         '- `summary.json` -> `previous_runs.v1_omni_describer`: the v1 rows, trajectory, and cost recomputed from the archive.',
+        '- `summary.json` -> `side_rows`: non-ladder rows with their delta against L3 (here: replicate 2, the only',
+        '  bundle in this run with an accepted patch). Label these clearly on the page; the Stage-2 number is L4.',
         '- `construction/stage1_scaffold/`: the human-written harness bundle every replicate started from.',
         '- `metrics/`: analyze.py tables (ladder.json/md, per_task.json, multilabel.json, cost.json for machine 1 only).',
         '- `leakage_report.json`, `subset_1000.json`, `docs/run-indist.md` (protocol, deviations, amendments, results).',
