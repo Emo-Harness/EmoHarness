@@ -365,8 +365,8 @@ def _reviewed(
     report = ctx.verifier.review(request)
     approved: list[CandidatePatch] = []
     vetoed: list[tuple[str, tuple[str, ...]]] = []
-    for patch in valid:
-        verdict = report.verdict_for(patch.name)
+    for position, patch in enumerate(valid):
+        verdict = report.verdict_for(patch.name, position, len(valid))
         if verdict.approved:
             approved.append(patch)
             continue

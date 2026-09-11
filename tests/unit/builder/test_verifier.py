@@ -72,7 +72,7 @@ class TestReviewText:
         assert 'happy | neutral | agree: 12 items' in text
         assert '### prompts/routing.yaml' not in text
         assert '### routing.yaml' in text
-        assert '### Candidate 1: verify_more' in text
+        assert '### Candidate 1\n- name: verify_more\n' in text
         assert '+Weigh the voice.' in text
         assert '--- prompts/verify.md (current)' in text
 
@@ -108,6 +108,24 @@ class TestParseReport:
         report = parse_report(json.dumps(_report(('promote-smiles', True, ()))))
         assert report.verdict_for('Promote smiles').approved is True
         assert report.verdict_for('Promote smiles 2').approved is False
+
+    def test_a_heading_number_in_the_name_is_ignored(self) -> None:
+        """Luna copied the whole heading on 2026-09-11 and vetoed a round by accident."""
+        report = parse_report(
+            json.dumps(
+                _report(('Candidate 2: Quiet-frustration recognition', True, ()))
+            )
+        )
+        assert report.verdict_for('Quiet-frustration recognition').approved is True
+
+    def test_one_verdict_per_candidate_falls_back_to_position(self) -> None:
+        report = parse_report(
+            json.dumps(_report(('first one', True, ()), ('second one', False, ('1.',))))
+        )
+        assert report.verdict_for('alpha', position=0, total=2).approved is True
+        assert report.verdict_for('beta', position=1, total=2).approved is False
+        # A verdict count that does not match the candidate count is not trusted.
+        assert report.verdict_for('beta', position=1, total=3).approved is False
 
     def test_a_skipped_candidate_is_not_approved(self) -> None:
         report = parse_report(json.dumps(_report(('a', True, ()))))

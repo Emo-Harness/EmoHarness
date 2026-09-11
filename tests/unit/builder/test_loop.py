@@ -406,7 +406,7 @@ def test_a_vetoed_candidate_is_never_written_or_scored(
         'forced',
     ]
     review = (round_dir / 'review.txt').read_text(encoding='utf-8')
-    assert '### Candidate 2: forced' in review
+    assert '### Candidate 2\n- name: forced\n' in review
     assert 'Prompt revision forced.' in review
 
 

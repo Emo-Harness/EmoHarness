@@ -12,6 +12,7 @@ or keyframes, and it cannot edit anything.
 from __future__ import annotations
 
 import difflib
+import re
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Final, Protocol, runtime_checkable
@@ -80,9 +81,10 @@ even if you doubt it will help.
 Reply with one JSON object and nothing else, of exactly this shape:
   {"verdicts": [{"name": "...", "approved": true, "issues": ["..."],
   "notes": "..."}], "summary": "..."}
-Give exactly one verdict per candidate, with "name" copied verbatim from the
-candidate heading. "issues" lists the numbered rule and the offending text for
-a rejection and stays empty for an approval."""
+Give exactly one verdict per candidate, in the order the candidates are listed,
+with "name" copied verbatim from that candidate's "name:" line (the name only,
+not the heading number). "issues" lists the numbered rule and the offending
+text for a rejection and stays empty for an approval."""
 
 
 class Verdict(BaseModel):
@@ -104,18 +106,30 @@ class VerificationReport(BaseModel):
     verdicts: tuple[Verdict, ...] = ()
     summary: str = ''
 
-    def verdict_for(self, name: str) -> Verdict:
+    def verdict_for(
+        self, name: str, position: int | None = None, total: int | None = None
+    ) -> Verdict:
         """The verdict for ``name``; a candidate the verifier skipped is not approved.
 
-        Names are compared after case-folding and collapsing punctuation, so a
-        verifier that writes ``promote-smiles`` for ``Promote smiles`` still
-        counts; anything looser would let one verdict cover two candidates.
+        Names are compared after case-folding and collapsing punctuation, and a
+        leading heading number ("Candidate 2: ...") is ignored, so a verifier
+        that writes ``promote-smiles`` for ``Promote smiles`` still counts. When
+        no name matches but the verifier answered exactly one verdict per
+        candidate, the verdict at the same position is taken: the prompt asks
+        for them in order. Anything looser would let one verdict cover two
+        candidates.
         """
         wanted = _name_key(name)
         for verdict in self.verdicts:
-            if _name_key(verdict.name) == wanted:
+            key = _name_key(verdict.name)
+            if key == wanted or _ORDINAL.sub('', key) == wanted:
                 return verdict
+        if position is not None and total is not None and total == len(self.verdicts):
+            return self.verdicts[position]
         return Verdict(name=name, approved=False, issues=(_NO_VERDICT,))
+
+
+_ORDINAL: Final = re.compile(r'^candidate\d+')
 
 
 def _name_key(name: str) -> str:
@@ -237,7 +251,8 @@ def _render_candidate(
     index: int, candidate: CandidatePatch, files: Mapping[str, str]
 ) -> str:
     lines = [
-        f'### Candidate {index}: {candidate.name}',
+        f'### Candidate {index}',
+        f'- name: {candidate.name}',
         f'- targeted_cluster: {candidate.targeted_cluster}',
         f'- rationale: {candidate.rationale}',
         f'- files: {", ".join(file.path for file in candidate.files)}',
