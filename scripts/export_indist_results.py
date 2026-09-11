@@ -14,9 +14,11 @@ page's provenance is the same as docs/run-indist.md's.
                           each row's prediction, score, and response text
   harness_outputs/        L3 and L4 per-item harness records (evidence, steps)
   construction/           per replicate: loop_result, each round's proposal,
-                          candidates and scores, gate reasons, accepted patch;
-                          the accepted patch as a unified diff
+                          verifier report, candidates and scores, gate reasons,
+                          cost, accepted patch; the accepted patches as diffs
   metrics/                analyze.py's tables as written
+  previous_runs           (inside summary.json) the same row scores recomputed
+                          from results/archive/<run>/ for a v1-vs-v2 panel
   leakage_report.json, subset_1000.json, docs/run-indist.md, README.md
 """
 
@@ -37,22 +39,33 @@ from emoharness.data.tasks import SEEN_TASKS, Task
 from emoharness.evaluation.bootstrap import paired_bootstrap
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'results' / 'export' / 'emoharness_indist_2026-09-08'
+RUN_TAG = 'v2_2026-09-11'
+OUT = ROOT / 'results' / 'export' / f'emoharness_indist_{RUN_TAG}'
+RESULTS = ROOT / 'results'
+#: Earlier runs whose row scores are recomputed for a side-by-side panel.
+PREVIOUS_RUNS = {
+    'v1_omni_describer': {
+        'dir': ROOT / 'results/archive/v1-omni-describer',
+        'label': 'v1, 2026-09-08/09: with the Qwen2.5-Omni-7B audio describer, no verifier',
+    },
+}
 ROWS = ('L0', 'L3', 'L4', 'L6')
 ROW_LABELS = {
     'L0': 'Qwen3-VL-8B Direct (official prompt, native video)',
     'L3': 'Stage 1 scaffold (human-written harness, 4 calls)',
-    'L4': 'Stage 2 harness (Luna Builder, replicate 0, 1 accepted patch)',
+    'L4': 'Stage 2 harness (Luna Builder + Luna verifier, replicate 0)',
     'L6': 'GPT 5.6 Luna Direct (frames + audio text)',
 }
 DELTAS = (('L0', 'L3'), ('L3', 'L4'), ('L0', 'L4'), ('L0', 'L6'))
 TASKS = [t.value for t in Task]
 SEEN = {t.value for t in SEEN_TASKS}
 RESAMPLES = 5000
-PAID = ('builder', 'judge_proxy', 'teacher_direct')
+PAID = ('builder', 'verifier', 'judge_proxy', 'teacher_direct')
 
 
-def load_rows() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+def load_rows(
+    results: Path = RESULTS,
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     examples = {
         e.example_id: e
         for e in read_manifest(ROOT / 'data/manifests/mme_emotion.jsonl')
@@ -60,7 +73,11 @@ def load_rows() -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     rows: dict[str, dict[str, Any]] = {}
     for row in ROWS:
         rows[row] = {}
-        for line in open(ROOT / f'results/raw_predictions/{row}/subset.jsonl'):
+        with open(
+            results / f'raw_predictions/{row}/subset.jsonl', encoding='utf-8'
+        ) as fh:
+            lines = fh.readlines()
+        for line in lines:
             r = json.loads(line)
             e = examples[r['example_id']]
             ls = LabelSet.from_prompt(e.prompt)
@@ -82,8 +99,7 @@ def macro(
     for k, v in scores.items():
         if only is None or task_of[k] in only:
             per[task_of[k]].append(v)
-    by_task = {t: sum(v) / len(v) for t, v in per.items()}
-    return by_task
+    return {t: sum(v) / len(v) for t, v in per.items()}
 
 
 def group_means(by_task: dict[str, float]) -> dict[str, float]:
@@ -96,24 +112,28 @@ def group_means(by_task: dict[str, float]) -> dict[str, float]:
     }
 
 
-def construction_summary() -> list[dict[str, Any]]:
+def _load(path: Path, default: Any = None) -> Any:
+    return _read_json(path) if path.is_file() else default
+
+
+def construction_summary(results: Path = RESULTS) -> list[dict[str, Any]]:
     out = []
-    for rep_dir in sorted((ROOT / 'results/construction/stage2').glob('[0-9]')):
-        lr = json.load(open(rep_dir / 'loop_result.json'))
+    for rep_dir in sorted((results / 'construction/stage2').glob('[0-9]')):
+        lr = _read_json(rep_dir / 'loop_result.json')
+        records = {r['round_index']: r for r in lr['rounds']}
         rounds = []
-        incumbent = None
         for rd in sorted(rep_dir.glob('round_*')):
-            cand = json.load(open(rd / 'candidates.json'))
-            acc = json.load(open(rd / 'accepted.json'))
-            pkt = json.load(open(rd / 'packet.json'))
+            index = int(rd.name.split('_')[1])
+            record = records.get(index, {})
+            cand = _read_json(rd / 'candidates.json')
+            acc = _read_json(rd / 'accepted.json')
+            pkt = _read_json(rd / 'packet.json')
+            verification = _load(rd / 'verification.json')
             gates = {_norm(g['name']): g for g in cand['gates']}
             evaluated = []
             for c in cand['evaluated']:
                 s = c['scores']
                 g = gates.get(_norm(c['name']))
-                for reason in g['reasons'] if g else ():
-                    if 'does not exceed incumbent' in reason:
-                        incumbent = float(reason.split('incumbent ')[1].split(' ')[0])
                 evaluated.append(
                     {
                         'name': c.get('patch_name', c['name']),
@@ -128,53 +148,115 @@ def construction_summary() -> list[dict[str, Any]]:
                         'gate_reasons': g['reasons'] if g else [],
                     }
                 )
+            proposed = len(_load(rd / 'proposal.json', {}).get('candidates', []))
             rounds.append(
                 {
-                    'round': int(rd.name.split('_')[1]),
+                    'round': index,
                     'build_recognition_incumbent': pkt['build_recognition'],
+                    'val_recognition_incumbent': record.get('incumbent_recognition'),
+                    'proposed': proposed,
+                    'rejected': cand.get('rejected', []),
+                    'vetoed': cand.get('vetoed', []),
+                    'verifier': (
+                        {
+                            'model_id': verification['model_id'],
+                            'summary': verification['report'].get('summary', ''),
+                            'verdicts': verification['report'].get('verdicts', []),
+                        }
+                        if verification
+                        else None
+                    ),
                     'candidates': evaluated,
                     'accepted': acc.get('accepted'),
                     'accepted_rationale': acc.get('rationale'),
+                    'cost': record.get('cost') or _load(rd / 'cost.json'),
                 }
             )
+        first = lr['rounds'][0] if lr['rounds'] else {}
         out.append(
             {
                 'replicate': int(rep_dir.name),
                 'stopped_reason': lr['stopped_reason'],
                 'rounds_run': len(lr['rounds']),
                 'accepted_per_round': [r['accepted'] for r in lr['rounds']],
-                'val_incumbent_start': 0.4772,
+                'vetoed_per_round': [r.get('vetoed', []) for r in lr['rounds']],
+                'val_incumbent_start': (
+                    first.get('incumbent_recognition')
+                    if first.get('incumbent_recognition') is not None
+                    else _incumbent_from_gates(rounds)
+                ),
+                'val_recognition_final': _final_val(lr),
+                'baseline_cost': lr.get('baseline_cost'),
+                'total_cost': lr.get('total_cost'),
                 'rounds': rounds,
-                'final_manifest': json.load(open(rep_dir / 'final/manifest.json')),
+                'final_manifest': _read_json(rep_dir / 'final/manifest.json'),
             }
         )
     return out
+
+
+def _incumbent_from_gates(rounds: list[dict[str, Any]]) -> float | None:
+    """v1 records carry no incumbent score; the first gate reason names it."""
+    for rd in rounds:
+        for c in rd['candidates']:
+            for reason in c['gate_reasons']:
+                if 'does not exceed incumbent' in reason:
+                    return float(reason.split('incumbent ')[1].split(' ')[0])
+    return None
+
+
+def _final_val(loop_result: dict[str, Any]) -> float | None:
+    """D_val Recognition of the last accepted candidate, else the starting incumbent."""
+    value = None
+    for record in loop_result['rounds']:
+        if value is None:
+            value = record.get('incumbent_recognition')
+        if record.get('accepted'):
+            for scores in record['candidates']:
+                if scores['name'] == _norm(record['accepted']):
+                    value = scores['recognition']
+    return value
 
 
 def _norm(name: str) -> str:
     return ''.join(ch if ch.isalnum() or ch in '._-' else '_' for ch in name).strip('.')
 
 
-def accepted_patch_diff() -> str:
-    base = ROOT / 'harness/prompts/verify.md'
-    final = ROOT / 'results/construction/stage2/0/final/prompts/verify.md'
-    return ''.join(
-        difflib.unified_diff(
-            base.read_text().splitlines(True),
-            final.read_text().splitlines(True),
-            fromfile='harness/prompts/verify.md (Stage 1 scaffold)',
-            tofile='stage2/0/final/prompts/verify.md (after the accepted patch)',
+def accepted_patch_diff(replicate: int = 0) -> str:
+    """Every file the replicate's final bundle changed against the scaffold, as one diff."""
+    base_root = ROOT / 'harness'
+    final_root = RESULTS / f'construction/stage2/{replicate}/final'
+    if not final_root.is_dir():
+        return f'(replicate {replicate} has no final bundle)\n'
+    chunks = []
+    for base in sorted(base_root.rglob('*')):
+        if not base.is_file() or '__pycache__' in base.parts:
+            continue
+        rel = base.relative_to(base_root).as_posix()
+        final = final_root / rel
+        if not final.is_file() or rel == 'manifest.json':
+            continue
+        diff = ''.join(
+            difflib.unified_diff(
+                base.read_text().splitlines(True),
+                final.read_text().splitlines(True),
+                fromfile=f'harness/{rel} (Stage 1 scaffold)',
+                tofile=f'stage2/{replicate}/final/{rel} (after the accepted patches)',
+            )
         )
-    )
+        if diff:
+            chunks.append(diff)
+    return ''.join(chunks) if chunks else '(no file differs: nothing was accepted)\n'
 
 
-def cost_summary() -> dict[str, Any]:
+def cost_summary(results: Path = RESULTS) -> dict[str, Any]:
     by_role: dict[str, dict[str, float]] = defaultdict(
         lambda: {'calls': 0, 'cost_usd': 0.0, 'input_tokens': 0, 'output_tokens': 0}
     )
-    for ledger in sorted((ROOT / 'results').glob('ledger*.jsonl')):
-        for line in open(ledger):
-            r = json.loads(line)
+    for ledger in sorted(results.glob('ledger*.jsonl')):
+        with open(ledger, encoding='utf-8') as fh:
+            entries = [json.loads(line) for line in fh if line.strip()]
+        for r in entries:
             b = by_role[r['role']]
             b['calls'] += 1
             b['cost_usd'] += r['cost_usd']
@@ -187,6 +269,41 @@ def cost_summary() -> dict[str, Any]:
     }
 
 
+def row_scores_for(
+    rows: dict[str, dict[str, Any]], ids: list[str], task_of: dict[str, str]
+) -> dict[str, dict[str, Any]]:
+    scores = {}
+    for row in ROWS:
+        rec = {i: rows[row][i]['recognition'] for i in ids}
+        by_task = macro(rec, task_of)
+        scores[row] = {
+            'label': ROW_LABELS[row],
+            'by_task': by_task,
+            **group_means(by_task),
+            'parse_failures': sum(rows[row][i]['parse_failures'] for i in ids),
+            'mean_calls': sum(rows[row][i]['target_calls'] for i in ids) / len(ids),
+        }
+    return scores
+
+
+def previous_runs(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
+    """The same row scores, construction trajectory, and cost for each archived run."""
+    out = {}
+    for name, run in PREVIOUS_RUNS.items():
+        if not (run['dir'] / 'raw_predictions').is_dir():
+            continue
+        _, rows = load_rows(run['dir'])
+        same_ids = [i for i in ids if all(i in rows[r] for r in ROWS)]
+        out[name] = {
+            'label': run['label'],
+            'rows': row_scores_for(rows, same_ids, task_of),
+            'items': len(same_ids),
+            'construction': construction_summary(run['dir']),
+            'cost': cost_summary(run['dir']),
+        }
+    return out
+
+
 def main() -> None:
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -196,19 +313,7 @@ def main() -> None:
     examples, rows = load_rows()
     ids = sorted(rows['L0'])
     task_of = {i: examples[i].task.value for i in ids}
-
-    # per-row scores
-    row_scores = {}
-    for row in ROWS:
-        rec = {i: rows[row][i]['recognition'] for i in ids}
-        by_task = macro(rec, task_of)
-        row_scores[row] = {
-            'label': ROW_LABELS[row],
-            'by_task': by_task,
-            **group_means(by_task),
-            'parse_failures': sum(rows[row][i]['parse_failures'] for i in ids),
-            'mean_calls': sum(rows[row][i]['target_calls'] for i in ids) / len(ids),
-        }
+    row_scores = row_scores_for(rows, ids, task_of)
 
     # paired bootstrap deltas, overall / seen / held-out / per task
     deltas = []
@@ -246,8 +351,8 @@ def main() -> None:
         entry['items_worse'] = sum(1 for i in ids if rb[i] < ra[i])
         deltas.append(entry)
 
-    leakage = json.load(open(ROOT / 'data/checksums/leakage_report.json'))
-    subset = json.load(open(ROOT / 'data/splits/subset_1000.json'))
+    leakage = _read_json(ROOT / 'data/checksums/leakage_report.json')
+    subset = _read_json(ROOT / 'data/splits/subset_1000.json')
     l6, l0, l4 = (
         row_scores['L6']['overall'],
         row_scores['L0']['overall'],
@@ -262,7 +367,10 @@ def main() -> None:
             'evaluation': '1,000-item subset of the remaining 5,577 test items, 125 per task (seed 20260907)',
             'metric': 'Recognition computed locally: exact label match after the official five-synonym normalisation; C/K on FG_ER and ML_ER. No official GPT-4o judge.',
             'student': 'Qwen/Qwen3-VL-8B-Instruct via vLLM 0.11.2, temperature 0, up to 32 frames per clip, sources capped at 640 px wide',
+            'perception': 'deterministic tools only: ffmpeg frames (2 fps, 4-32), faster-whisper large-v3 transcript + language, openSMILE eGeMAPS prosody phrases; no audio-language model (v1 had a Qwen2.5-Omni-7B describer, removed 2026-09-11)',
             'builder': 'gpt-5.6-luna, reasoning_effort high, up to 4 candidates per round, 6 rounds max, early stop after 2 rounds without acceptance',
+            'verifier': "gpt-5.6-luna (same model, separate prompt, reasoning_effort high) reviews each round's valid candidates as rationale + unified diff and vetoes overfitting, label forcing, contract breaks, evidence-discipline violations, out-of-scope edits, YAML damage; vetoed candidates are never evaluated",
+            'cost_per_round': 'every round records calls, tokens, and dollars by role (builder, verifier, judge_proxy, target) in cost.json',
             'gates': 'Recognition must strictly improve on D_val; regression of already-solved D_val items <= 5%; proxy Reasoning (Luna) within 2 points; mean calls <= 4.5 (amended from 4.0, see docs)',
             'teacher_row': 'gpt-5.6-luna answering the official prompt with the cached frames and audio text',
             'notes_doc': 'docs/run-indist.md',
@@ -285,6 +393,7 @@ def main() -> None:
         },
         'construction': construction_summary(),
         'cost': cost_summary(),
+        'previous_runs': previous_runs(ids, task_of),
         'leakage': {
             'checked_pairs': leakage.get('checked_pairs'),
             'flags': leakage.get('flags'),
@@ -296,9 +405,10 @@ def main() -> None:
             'size_per_task': subset.get('size_per_task'),
         },
     }
-    json.dump(summary, open(OUT / 'summary.json', 'w'), indent=2)
+    with open(OUT / 'summary.json', 'w', encoding='utf-8') as fh:
+        json.dump(summary, fh, indent=2)
 
-    with open(OUT / 'items.jsonl', 'w') as fh:
+    with open(OUT / 'items.jsonl', 'w', encoding='utf-8') as fh:
         for i in ids:
             e = examples[i]
             fh.write(
@@ -323,14 +433,14 @@ def main() -> None:
             ROOT / f'results/raw_predictions/{row}/subset.outputs.jsonl',
             OUT / 'harness_outputs' / f'{row}.jsonl',
         )
-    for rep_dir in sorted((ROOT / 'results/construction/stage2').glob('[0-9]')):
+    for rep_dir in sorted((RESULTS / 'construction/stage2').glob('[0-9]')):
         dest = OUT / 'construction' / f'replicate_{rep_dir.name}'
         shutil.copytree(rep_dir, dest, ignore=shutil.ignore_patterns('candidates'))
-    (OUT / 'construction' / 'accepted_patch_replicate0.diff').write_text(
-        accepted_patch_diff()
-    )
+        (
+            OUT / 'construction' / f'accepted_patches_replicate{rep_dir.name}.diff'
+        ).write_text(accepted_patch_diff(int(rep_dir.name)))
     shutil.copytree(ROOT / 'harness', OUT / 'construction' / 'stage1_scaffold')
-    for f in (ROOT / 'results/metrics').glob('*'):
+    for f in (RESULTS / 'metrics').glob('*'):
         shutil.copyfile(f, OUT / 'metrics' / f.name)
     shutil.copyfile(
         ROOT / 'data/checksums/leakage_report.json', OUT / 'leakage_report.json'
@@ -349,11 +459,19 @@ def main() -> None:
 def _readme(summary: dict[str, Any]) -> str:
     rows = summary['rows']
     h = summary['headline']
+    construction = summary['construction']
+    accepted_total = sum(
+        sum(1 for a in rep['accepted_per_round'] if a) for rep in construction
+    )
+    vetoed_total = sum(
+        sum(len(v) for v in rep['vetoed_per_round']) for rep in construction
+    )
     lines = [
-        '# EmoHarness in-distribution effect check, 2026-09-08/09',
+        f'# EmoHarness in-distribution effect check, {RUN_TAG}',
         '',
-        'Student Qwen3-VL-8B-Instruct, Builder GPT 5.6 Luna, MME-Emotion. Local Recognition on a',
-        '1,000-item subset (125 per task). No benchmark media is included in this package.',
+        'Student Qwen3-VL-8B-Instruct, Builder and verifier GPT 5.6 Luna, MME-Emotion. Local',
+        'Recognition on a 1,000-item subset (125 per task). Perception is deterministic tools only',
+        '(no audio-language model). No benchmark media is included in this package.',
         '',
         '| Row | seen | held-out | overall |',
         '|---|---|---|---|',
@@ -362,11 +480,17 @@ def _readme(summary: dict[str, Any]) -> str:
         lines.append(
             f'| {row} {s["label"]} | {100 * s["seen"]:.1f} | {100 * s["held_out"]:.1f} | {100 * s["overall"]:.1f} |'
         )
+    builder_delta = next(
+        d for d in summary['deltas'] if (d['from'], d['to']) == ('L3', 'L4')
+    )
     lines += [
         '',
         f'Harness gain L3 - L0: {100 * h["harness_gain_L3_minus_L0"]:+.1f}. Builder gain L4 - L3: {100 * h["builder_gain_L4_minus_L3"]:+.1f}'
-        ' (net 2 items of 1,000; inside the paired bootstrap interval; read as no measurable improvement).',
+        f' ({builder_delta["items_better"]} items better, {builder_delta["items_worse"]} worse of {summary["subset"]["size"]};'
+        f' 95% CI [{100 * builder_delta["overall"]["ci_low"]:+.1f}, {100 * builder_delta["overall"]["ci_high"]:+.1f}]).',
         f'Teacher gap L6 - L0: {100 * h["teacher_gap_L6_minus_L0"]:+.1f}; the scaffold closes {100 * h["gap_closed_by_scaffold"]:.0f}% of it.',
+        f'Construction: {len(construction)} replicates, {accepted_total} accepted patches, {vetoed_total} candidates vetoed by the verifier;',
+        f'Luna spend ${summary["cost"]["luna_total_usd"]:.2f}.',
         '',
         '## Files',
         '',
@@ -377,9 +501,12 @@ def _readme(summary: dict[str, Any]) -> str:
         '  Recognition, parse failures, call count, latency, and full response text (for before/after examples).',
         "- `harness_outputs/L3.jsonl`, `L4.jsonl`: the harness's per-item evidence record, hypotheses, verification,",
         '  five steps, and stage traces.',
-        '- `construction/replicate_{0,1,2}/`: loop_result.json, per round packet.json/packet.txt (what the Builder saw),',
-        '  proposal.json (what it answered), candidates.json (scores and gates), accepted.json, final/ bundle.',
-        '- `construction/accepted_patch_replicate0.diff`: the one accepted patch, as a diff of prompts/verify.md.',
+        '- `construction/replicate_{0,1,2}/`: loop_result.json (rounds with incumbent score, vetoed names, cost by role),',
+        '  per round packet.json/packet.txt (what the Builder saw), proposal.json (what it answered), review.txt and',
+        '  verification.json (what the verifier saw and ruled), candidates.json (scores, gates, rejected, vetoed),',
+        '  accepted.json, cost.json, final/ bundle.',
+        '- `construction/accepted_patches_replicate{N}.diff`: every accepted patch of a replicate as a diff against the scaffold.',
+        '- `summary.json` -> `previous_runs.v1_omni_describer`: the v1 rows, trajectory, and cost recomputed from the archive.',
         '- `construction/stage1_scaffold/`: the human-written harness bundle every replicate started from.',
         '- `metrics/`: analyze.py tables (ladder.json/md, per_task.json, multilabel.json, cost.json for machine 1 only).',
         '- `leakage_report.json`, `subset_1000.json`, `docs/run-indist.md` (protocol, deviations, amendments, results).',
@@ -389,8 +516,10 @@ def _readme(summary: dict[str, Any]) -> str:
         "- In-distribution protocol (build/val from the benchmark's own seen tasks), not the preregistered one; not",
         '  leaderboard-comparable; Recognition is computed locally, no official judge.',
         "- 95% intervals on a row's overall score are about +/-2.7 points; per-task numbers (125 items) are descriptive.",
-        '- The one post-hoc change: the mean-calls gate ceiling 4.0 -> 4.5 (a retry-counting defect; it changed no',
-        '  accept/reject outcome). Other gates are as preregistered.',
+        '- The one post-hoc change (made during v1, kept): the mean-calls gate ceiling 4.0 -> 4.5 (a retry-counting',
+        '  defect). Other gates are as preregistered.',
+        '- v2 differs from v1 in the perception layer (no audio-language model) and in the verifier step, so the two',
+        '  runs are compared on the same subset but not with identical inputs to the harness.',
     ]
     return '\n'.join(lines) + '\n'
 
