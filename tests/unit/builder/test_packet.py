@@ -211,3 +211,55 @@ def test_round_robin_continues_when_a_cluster_runs_out(
         'a1',
         'a2',
     ]
+
+
+# --- the Stage 3 note about the verification functions (ADR-0006 §11) -----------
+
+
+def _files_with_verification() -> dict[str, str]:
+    return {
+        'prompts/verify.md': 'Re-examine the reading.\n',
+        'routing.yaml': 'stages: [verify]\n',
+        'verification/cross_modal.py': 'def modalities_agree(a, b):\n    return True\n',
+        'verification/alternative_hypotheses.py': 'def rank(a, b):\n    return []\n',
+    }
+
+
+def _rendered(stage: int) -> str:
+    packet = build_packet(
+        stage=stage,
+        round_index=0,
+        bundle_files=_files_with_verification(),
+        build_recognition=0.4,
+        records=(),
+        limits=PacketLimits(max_keyframe_samples=0),
+    )
+    return render_packet_text(packet, 100_000)
+
+
+def test_stage_three_is_told_what_the_verification_functions_do() -> None:
+    """Stage 3's first replicate never touched them, so the packet now says what they are."""
+    text = _rendered(3)
+
+    assert '## The two verification functions' in text
+    assert 'modalities_agree(record, hypotheses)' in text
+    assert 'rank(record, hypotheses)' in text
+    # The contract the static allowlist enforces, so a candidate is not wasted on it.
+    assert '__future__' in text
+    assert '20,000 bytes' in text
+
+
+def test_stage_two_packets_are_unchanged() -> None:
+    """The Stage 2 runs of 2026-09-11 must stay reproducible."""
+    text = _rendered(2)
+
+    assert '## The two verification functions' not in text
+    assert 'verification/' not in text.split('## Current harness files')[0]
+
+
+def test_the_note_does_not_name_a_direction_to_take() -> None:
+    """Describing the seam is ours; deciding what to change is the Builder's."""
+    text = _rendered(3).split('## The two verification functions')[1]
+
+    for word in ('should', 'prefer', 'instead of', 'try ', 'we suggest', 'better'):
+        assert word not in text.lower(), word

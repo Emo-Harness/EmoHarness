@@ -28,6 +28,8 @@ from emoharness.common.constants import MAX_CANDIDATES_PER_ROUND
 from emoharness.common.errors import LeakageError
 from emoharness.common.text import truncate
 
+#: Directory the Stage 3 verification functions live in, relative to the bundle.
+VERIFICATION_DIR: Final = 'verification'
 CHARS_PER_TOKEN: Final = 4
 TRUNCATION_MARKER: Final = ' ...[truncated]'
 _FULL: Final[None] = None
@@ -72,7 +74,8 @@ Rules:
 - Propose at most {max_candidates} candidates; each is evaluated on its own.
 - You may replace only the paths listed under "Editable paths" below. A candidate that
   touches any other path is rejected before it is evaluated.
-- The five-step answer format and the code that emits the final answer are fixed."""
+- The five-step answer format and the output controller that emits the final
+  answer are fixed. Anything listed under "Editable paths" is not."""
 
 
 class DiagnosisPacket(BaseModel):
@@ -186,17 +189,18 @@ def _render(
 def _render_instructions(packet: DiagnosisPacket) -> str:
     editable = '\n'.join(f'- {path}' for path in packet.editable_paths)
     accuracy = f'{packet.build_recognition:.4f}'
-    return '\n'.join(
-        (
-            _INSTRUCTIONS.replace(_CANDIDATE_SLOT, str(packet.max_candidates)),
-            '',
-            f'Stage: {packet.stage}. Round: {packet.round_index}.',
-            f'Current construction-set accuracy: {accuracy}.',
-            '',
-            'Editable paths:',
-            editable if editable else '- (none at this stage)',
-        )
-    )
+    blocks = [
+        _INSTRUCTIONS.replace(_CANDIDATE_SLOT, str(packet.max_candidates)),
+        '',
+        f'Stage: {packet.stage}. Round: {packet.round_index}.',
+        f'Current construction-set accuracy: {accuracy}.',
+        '',
+        'Editable paths:',
+        editable if editable else '- (none at this stage)',
+    ]
+    if any(path.startswith(f'{VERIFICATION_DIR}/') for path in packet.editable_paths):
+        blocks += ['', _VERIFICATION_NOTE.rstrip()]
+    return '\n'.join(blocks)
 
 
 def _render_files(packet: DiagnosisPacket) -> str:
@@ -263,6 +267,37 @@ def _render_sample(
             lines.append(f'- {name}: {rendered}')
     return '\n'.join(lines)
 
+
+#: Appended to the instructions only when a ``verification/*.py`` path is
+#: editable, i.e. at Stage 3. Stage 3's first replicate (2026-09-12) proposed 31
+#: candidates and edited a prompt every time, never once the two functions the
+#: stage had unlocked, so the packet was not telling it what they are. This
+#: block describes their contract and their effect and stops there: which rule
+#: to change is the Builder's to decide, and naming a direction here would be
+#: doing its work for it (ADR-0006 §11).
+_VERIFICATION_NOTE: Final = """## The two verification functions
+
+Both are pure Python, read as text and run on the stage's JSON, so editing them
+changes how a decision is made rather than what the model is asked. They issue
+no model calls.
+
+- `verification/cross_modal.py` exports `modalities_agree(record, hypotheses)
+  -> bool`. It decides whether what was seen and what was heard point at the
+  same label. Its answer becomes `modalities_agree` in the verification record,
+  which the synthesis step is shown.
+- `verification/alternative_hypotheses.py` exports `rank(record, hypotheses)
+  -> list`. It orders the hypotheses; the output controller emits its labels
+  from the front of that order, so this function decides the answer whenever
+  two readings are close.
+
+A replacement must pass a static check: no imports beyond `__future__` and
+`typing`, no attribute access, no loop other than `for`, no comprehension other
+than the ones already there, calls only to Python builtins from a closed list
+(`len`, `sorted`, `sum`, `max`, `min`, `str`, `int`, `float`, `bool`, `list`,
+`dict`, `set`, `abs`, `all`, `any`, `enumerate`, `range`, `round`) or to
+functions you define in the same file, at most 20,000 bytes, and no branch keyed
+on a particular label string. Keep the exported name and signature.
+"""
 
 #: What counts as one identifier in a packet: an id is present only when it
 #: appears as a whole token, so ``mme_er_wild_226`` is not "in" ``mme_er_wild_2260``.

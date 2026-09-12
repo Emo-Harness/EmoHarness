@@ -1,6 +1,6 @@
 # ADR-0006: Builder loop mechanics
 
-Date: 2026-09-06. Amended 2026-09-07 after the strict review; amended 2026-09-11 (§8, §9) and 2026-09-12 (§10). Status: accepted.
+Date: 2026-09-06. Amended 2026-09-07 after the strict review; amended 2026-09-11 (§8, §9) and 2026-09-12 (§10, §11). Status: accepted.
 
 ## Context
 
@@ -37,6 +37,21 @@ ADR-0005 fixed what the Builder may edit and what it optimizes. This ADR fixes h
     experiment vacuous), and the Builder still never sees D_val, so it decides
     from the D_build failures it is already shown. The flag defaults to off so
     the Stage 2 runs of 2026-09-11 stay reproducible.
+
+11. **The packet says what the Stage 3 seams are (added 2026-09-12).** Stage 3's
+    first replicate proposed 31 candidates over 8 rounds and edited a prompt
+    every single time, never once the two verification functions the stage had
+    unlocked, even though the packet listed them as editable. The packet was
+    naming paths without saying what they do, and its one mention of code read
+    as a prohibition ("the code that emits the final answer is fixed"). The
+    instructions now carry, only when a `verification/*.py` path is editable, a
+    block giving each function's exported name, signature, effect on the
+    decision, and the static-allowlist contract a replacement must satisfy. It
+    describes the seam and stops there: naming a rule to change would be doing
+    the Builder's work and would make a later code edit our idea rather than
+    its. Stage 2 packets are unchanged, so the 2026-09-11 runs stay
+    reproducible, and replicate 0 of Stage 3 stays the uninformed condition for
+    comparison.
 
 ## Consequences
 
