@@ -554,3 +554,87 @@ def test_rounds_without_a_ledger_record_an_empty_cost(
     )
     assert result.rounds[0].cost == RoundCost.empty()
     assert result.total_cost.by_role == {}
+
+
+# --- who ends the stage (ADR-0006 §10) ------------------------------------------
+
+
+def _stopping_builder(*flags: bool) -> FakeBuilder:
+    """One proposal per flag; the flag is that round's ``continue_search``."""
+    return FakeBuilder(
+        [
+            BuilderProposal(
+                candidates=(_patch(f'round{index}'),),
+                summary=f'round {index}',
+                continue_search=flag,
+                stop_reason='' if flag else 'nothing left to try',
+            )
+            for index, flag in enumerate(flags)
+        ]
+    )
+
+
+def _run(builder: FakeBuilder, cfg: BuilderConfig, out_dir: Path, bundle: Path):
+    return run_stage(
+        stage=2,
+        replicate=0,
+        bundle_root=bundle,
+        out_dir=out_dir,
+        builder=builder,
+        cfg=cfg,
+        gate_cfg=GATES,
+        diagnose=_diagnose(),
+        evaluate=_evaluate({}),
+    )
+
+
+def test_the_builder_ends_the_stage_when_it_says_so(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    cfg = _config(rounds=8).model_copy(update={'autonomous_stop': True})
+    result = _run(
+        _stopping_builder(True, True, False), cfg, tmp_path / 'c', bundle_root
+    )
+
+    assert result.stopped_reason == 'builder_stopped'
+    assert len(result.rounds) == 3
+    assert [r.builder_continue for r in result.rounds] == [True, True, False]
+    assert result.rounds[-1].builder_stop_reason == 'nothing left to try'
+
+
+def test_the_round_cap_still_binds_a_builder_that_never_stops(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    cfg = _config(rounds=3).model_copy(update={'autonomous_stop': True})
+    result = _run(_stopping_builder(True, True, True), cfg, tmp_path / 'c', bundle_root)
+
+    assert result.stopped_reason == 'max_rounds'
+    assert len(result.rounds) == 3
+
+
+def test_autonomous_stop_overrides_the_no_acceptance_streak(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    """Nothing is ever promoted here, which alone would stop the old loop at 2."""
+    cfg = _config(rounds=4, early_stop=2).model_copy(update={'autonomous_stop': True})
+    result = _run(
+        _stopping_builder(True, True, True, True), cfg, tmp_path / 'c', bundle_root
+    )
+
+    assert [r.accepted for r in result.rounds] == [None, None, None, None]
+    assert result.stopped_reason == 'max_rounds'
+
+
+def test_without_the_switch_the_streak_still_ends_the_stage(
+    bundle_root: Path, tmp_path: Path
+) -> None:
+    """The Stage 2 runs of 2026-09-11 must stay reproducible."""
+    result = _run(
+        _stopping_builder(True, True, True, True),
+        _config(rounds=4, early_stop=2),
+        tmp_path / 'c',
+        bundle_root,
+    )
+
+    assert result.stopped_reason == 'early_stop'
+    assert len(result.rounds) == 2

@@ -11,7 +11,13 @@ temperature: 0.0
 reasoning_effort: high
 max_candidates_per_round: 4
 max_rounds_per_stage: 8
+# early_stop_rounds only applies when autonomous_stop is false. Stage 2 ran
+# under it (2026-09-11) and all three replicates hit it after 2 to 4 rounds;
+# from 2026-09-12 the Builder ends the stage itself by answering
+# continue_search: false, so "knowing when to stop" is measured rather than
+# decided for it (ADR-0006 §10). The round cap and the gates are unchanged.
 early_stop_rounds: 2
+autonomous_stop: true
 # 20 samples x 4 frames = 80 keyframes per packet (~30k image tokens at 640 px)
 packet: {max_failures_per_cluster: 5, max_keyframe_samples: 20, max_frames_per_sample: 4, target_input_tokens: 100000}
 # max_mean_calls 4.5: ADR-0011 expects 4 calls per item with one retry per stage

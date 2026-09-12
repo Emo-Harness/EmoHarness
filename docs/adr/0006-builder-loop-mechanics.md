@@ -1,6 +1,6 @@
 # ADR-0006: Builder loop mechanics
 
-Date: 2026-09-06. Amended 2026-09-07 after the strict review; amended 2026-09-11 (§8, §9). Status: accepted.
+Date: 2026-09-06. Amended 2026-09-07 after the strict review; amended 2026-09-11 (§8, §9) and 2026-09-12 (§10). Status: accepted.
 
 ## Context
 
@@ -23,6 +23,20 @@ ADR-0005 fixed what the Builder may edit and what it optimizes. This ADR fixes h
 
 8. **Verifier (added 2026-09-11).** After the deterministic checks of §2 and before any candidate is written, one call to the Builder's own model, in a separate role with its own prompt, reviews the round's valid candidates. It sees the current harness files, the failure clusters by key and size, and each candidate's rationale with a unified diff; it never sees D_val, scores, or keyframes, and it cannot edit. It rejects a candidate that overfits the packet's items, forces or suppresses a label independent of the evidence, breaks the prompt or JSON contract, tells the Target to invent or mis-cite evidence, edits outside its stated scope, or damages the YAML. A candidate it does not approve (including one it forgets to mention) is never evaluated, and its reasons go into `round_XX/verification.json` and the `vetoed` list of `candidates.json`; `review.txt` is what the verifier read. The verifier's calls are billed under the ledger role `verifier`. A written candidate the harness loader rejects (a missing placeholder, an unknown stage) is likewise recorded as rejected rather than crashing the loop.
 9. **Cost per round (added 2026-09-11).** Every round records the ledger rows it appended, grouped by role (`builder`, `verifier`, `judge_proxy`, `target`), as calls, tokens in and out, and dollars, in `round_XX/cost.json` and in the round's record inside `loop_result.json`; the loop result also carries the cost of scoring the parent bundle and the stage total. The round record now also names the incumbent's D_val Recognition it was measured against.
+
+10. **Who ends a stage (added 2026-09-12).** Decision 1 keeps the loop in our
+    code, and decision 4 gave it a fixed round budget with an early stop after
+    2 rounds without a promotion. That budget decided for the Builder something
+    the AI4AI claim is partly about: knowing when a line of work is exhausted.
+    All three Stage 2 replicates hit the early stop, two of them after only 2
+    rounds, so the rule bound in practice. From now on the Builder answers
+    `continue_search` (and a one-sentence `stop_reason`) with every proposal and
+    the stage ends when it answers false, under `BuilderConfig.autonomous_stop`.
+    Three things do not change: the round cap still bounds cost, the acceptance
+    gates stay ours (a Builder that judged its own patches would make the
+    experiment vacuous), and the Builder still never sees D_val, so it decides
+    from the D_build failures it is already shown. The flag defaults to off so
+    the Stage 2 runs of 2026-09-11 stay reproducible.
 
 ## Consequences
 

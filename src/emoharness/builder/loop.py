@@ -65,6 +65,8 @@ COST_FILE: Final = 'cost.json'
 LOOP_RESULT_FILE: Final = 'loop_result.json'
 STOP_EARLY: Final = 'early_stop'
 STOP_MAX_ROUNDS: Final = 'max_rounds'
+#: The Builder answered continue_search: false (ADR-0006 §10).
+STOP_BUILDER: Final = 'builder_stopped'
 _SAFE_CHARS: Final = frozenset(
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-'
 )
@@ -117,6 +119,11 @@ class RoundRecord(BaseModel):
     gate_results: tuple[GateResult, ...] = ()
     accepted: str | None = None
     bundle_hash: str
+    builder_continue: bool | None = Field(
+        default=None,
+        description="the Builder's own continue_search answer for this round",
+    )
+    builder_stop_reason: str = ''
     cost: RoundCost = Field(default_factory=RoundCost.empty)
 
 
@@ -188,6 +195,8 @@ class _State:
     scores: CandidateScores
     streak: int
     rounds: tuple[RoundRecord, ...]
+    #: The Builder's latest continue_search answer; None before the first round.
+    builder_continue: bool | None = None
 
 
 def run_stage(
@@ -260,8 +269,25 @@ def _ledger_length(ledger: Path | None) -> int:
 
 
 def _run_rounds(state: _State, ctx: _Context) -> tuple[_State, str]:
+    """Round after round until something says stop; the round cap always does.
+
+    Who may say stop depends on ``autonomous_stop``. With it set the Builder
+    ends the stage itself, which is the part of "can a model build a harness"
+    that a fixed round budget answers for it (ADR-0006 §10); the acceptance
+    gates stay ours either way. With it unset the loop stops after
+    ``early_stop_rounds`` rounds in which no candidate was promoted.
+    """
     for round_index in range(ctx.cfg.max_rounds_per_stage):
         state = _run_round(round_index, state, ctx)
+        if ctx.cfg.autonomous_stop:
+            if state.builder_continue is False:
+                _LOGGER.info(
+                    'stage %s: the Builder stopped after round %s',
+                    ctx.stage,
+                    round_index,
+                )
+                return state, STOP_BUILDER
+            continue
         if state.streak >= ctx.cfg.early_stop_rounds:
             _LOGGER.info(
                 'stage %s stopped early after round %s', ctx.stage, round_index
@@ -314,6 +340,8 @@ def _advance(round_index: int, state: _State, outcome: _Outcome) -> _State:
         gate_results=outcome.gate_results,
         accepted=accepted.patch.name if accepted else None,
         bundle_hash=directory_hash(bundle),
+        builder_continue=outcome.proposal.continue_search,
+        builder_stop_reason=outcome.proposal.stop_reason,
         cost=outcome.cost,
     )
     return replace(
@@ -322,6 +350,7 @@ def _advance(round_index: int, state: _State, outcome: _Outcome) -> _State:
         scores=accepted.scores if accepted else state.scores,
         streak=0 if accepted else state.streak + 1,
         rounds=(*state.rounds, record),
+        builder_continue=outcome.proposal.continue_search,
     )
 
 

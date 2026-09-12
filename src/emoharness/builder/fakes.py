@@ -41,6 +41,10 @@ def fake_builder(stage: int, rounds: int = MAX_ROUNDS_PER_STAGE) -> FakeBuilder:
     proposals = tuple(
         BuilderProposal(
             summary=f'stage {stage} round {index}',
+            # The last canned round declines to continue, so a --fake stage
+            # exercises the autonomous-stop path as well as the round cap.
+            continue_search=index + 1 < rounds,
+            stop_reason='' if index + 1 < rounds else 'no directions left',
             candidates=(
                 CandidatePatch(
                     name=f'stage{stage}_round{index}_visual',

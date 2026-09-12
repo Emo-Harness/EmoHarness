@@ -34,6 +34,14 @@ class BuilderProposal(BaseModel):
         min_length=1, max_length=MAX_CANDIDATES_PER_ROUND
     )
     summary: str = ''
+    continue_search: bool = Field(
+        default=True,
+        description='whether the Builder has further directions worth a round; '
+        'honoured only when BuilderConfig.autonomous_stop is set (ADR-0006 §10)',
+    )
+    stop_reason: str = Field(
+        default='', description='why the Builder would stop, in its own words'
+    )
 
 
 class CandidateScores(BaseModel):

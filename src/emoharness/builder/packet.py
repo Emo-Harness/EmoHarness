@@ -56,8 +56,15 @@ Your objective, in priority order:
 
 Rules:
 - Reply with one JSON object and nothing else, of exactly this shape:
-  {"summary": "...", "candidates": [{"name": "...", "targeted_cluster": "...",
+  {"summary": "...", "continue_search": true, "stop_reason": "",
+  "candidates": [{"name": "...", "targeted_cluster": "...",
   "rationale": "...", "files": [{"path": "...", "content": "..."}]}]}
+- "continue_search" is yours to decide: answer false, with a one-sentence
+  "stop_reason", when another round would only repeat directions you have
+  already tried and you would rather stop than propose filler. Answer true
+  when you still have an untried direction. You are not told which of your
+  earlier candidates were kept; judge from the harness files you are shown
+  now and from the failures that remain.
 - Every "content" is the complete new text of that file. Diffs and partial files are
   rejected. A file you do not list stays as it is.
 - Each candidate targets exactly one cluster and repeats that cluster's key verbatim

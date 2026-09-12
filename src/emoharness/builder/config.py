@@ -124,6 +124,13 @@ class BuilderConfig(BaseModel):
     )
     max_rounds_per_stage: int = Field(default=MAX_ROUNDS_PER_STAGE, ge=1)
     early_stop_rounds: int = Field(default=EARLY_STOP_ROUNDS, ge=1)
+    autonomous_stop: bool = Field(
+        default=False,
+        description='let the Builder end the stage by answering '
+        'continue_search: false, instead of stopping it after '
+        'early_stop_rounds rounds without an acceptance (ADR-0006 §10). The '
+        'round cap still applies, and the gates stay ours either way.',
+    )
     packet: PacketLimits = PacketLimits()
     gates: GateThresholds = GateThresholds()
     verifier: VerifierConfig = VerifierConfig()
