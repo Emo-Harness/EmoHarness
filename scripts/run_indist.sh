@@ -205,6 +205,14 @@ step_build_stage3() {
   run_py examples/build_harness.py --stage 3 --replicate 0 --force
 }
 step_row_l5() { start_server student; check_budget; run_py examples/run_ladder.py --rows L5 --items subset --force; }
+# Replicate 1 is the informed condition for ADR-0006 §11: the same stage, the
+# same gates, the same Builder, with a packet that now says what the two
+# verification functions do. Replicate 0 ran without that block, so the pair
+# measures whether "unlocked but never used" was a wording problem.
+step_build_stage3_rep1() {
+  require_key; start_server student; check_budget
+  run_py examples/build_harness.py --stage 3 --replicate 1 --force
+}
 step_row_l6() { require_key; check_budget; run_py examples/run_ladder.py --rows L6 --items subset --force; }
 step_analyze() { run_py examples/analyze.py --resamples 2000 --force; }
 step_stop_student() { stop_server student; }
