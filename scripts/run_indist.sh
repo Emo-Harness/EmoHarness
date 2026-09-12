@@ -38,9 +38,12 @@ load_key_file() { if [[ -f "${KEY_FILE}" ]]; then set -a; source "${KEY_FILE}"; 
 load_key_file
 NV="${ROOT}/.venv/lib/python3.12/site-packages/nvidia"
 export LD_LIBRARY_PATH="${NV}/cublas/lib:${NV}/cudnn/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
-export EMOHARNESS_WORKERS="${EMOHARNESS_WORKERS:-12}"
+export EMOHARNESS_WORKERS="${EMOHARNESS_WORKERS:-16}"
 # At most this many video-carrying requests in flight (host RAM, see openai_compat.py).
-export EMOHARNESS_VIDEO_WORKERS="${EMOHARNESS_VIDEO_WORKERS:-3}"
+# Eight, not three: the box moved on 2026-09-12 to 10 CPU / 32 GB / H200-144GB
+# and the old cap left the GPU at 2% KV utilisation (see scripts/run_students.sh).
+export EMOHARNESS_VIDEO_WORKERS="${EMOHARNESS_VIDEO_WORKERS:-8}"
+export VLLM_MM_CACHE_GB="${VLLM_MM_CACHE_GB:-4}"
 export VLLM_ENDPOINT="${VLLM_ENDPOINT:-http://127.0.0.1:8000/v1}"
 if [[ "${MACHINE}" != "1" ]]; then
   export EMOHARNESS_LEDGER_NAME="${EMOHARNESS_LEDGER_NAME:-ledger.m${MACHINE}.jsonl}"
@@ -48,7 +51,8 @@ fi
 ROUNDS="${EMOHARNESS_ROUNDS:-6}"
 SUBSET_PER_TASK="${EMOHARNESS_SUBSET_PER_TASK:-125}"
 LUNA_BUDGET_USD="${EMOHARNESS_LUNA_BUDGET_USD:-40}"
-MEM_LIMIT_MB="${EMOHARNESS_MEM_LIMIT_MB:-6800}"
+# 84% of the 32 GB cgroup, as 6800 was of the old 8 GB.
+MEM_LIMIT_MB="${EMOHARNESS_MEM_LIMIT_MB:-27000}"
 
 log() { printf '%s [m%s] %s\n' "$(date '+%F %T')" "${MACHINE}" "$*"; }
 
@@ -190,6 +194,17 @@ step_build_stage2_rep2() {
   run_py examples/build_harness.py --stage 2 --replicate 2 --rounds "${ROUNDS}" --force
 }
 step_row_l4() { start_server student; check_budget; run_py examples/run_ladder.py --rows L4 --items subset --force; }
+# Stage 3 unlocks the verification functions (ADR-0005): the Builder may rewrite
+# harness/verification/*.py, checked against the static allowlist before any
+# candidate is written. Those functions run locally on the stage JSON, so a
+# candidate that only edits them reuses every cached Target call. Its base is the
+# first completed Stage 2 replicate (ADR-0006 §6), and the Builder now ends the
+# stage itself (ADR-0006 §10).
+step_build_stage3() {
+  require_key; start_server student; check_budget
+  run_py examples/build_harness.py --stage 3 --replicate 0 --force
+}
+step_row_l5() { start_server student; check_budget; run_py examples/run_ladder.py --rows L5 --items subset --force; }
 step_row_l6() { require_key; check_budget; run_py examples/run_ladder.py --rows L6 --items subset --force; }
 step_analyze() { run_py examples/analyze.py --resamples 2000 --force; }
 step_stop_student() { stop_server student; }
