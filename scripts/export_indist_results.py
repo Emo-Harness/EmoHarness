@@ -30,6 +30,7 @@ import shutil
 import tarfile
 from collections import defaultdict
 from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -50,6 +51,24 @@ PREVIOUS_RUNS = {
     },
 }
 ROWS = ('L0', 'L3', 'L4', 'L6')
+#: Every ladder row measured on the 8B student, in ADR-0009's order. The four
+#: above carry the headline claims; these add the decomposition (2026-09-12).
+LADDER_ROWS = ('L0', 'L1', 'L2', 'best_of_4', 'L3', 'L4', 'L6')
+#: The size sweep: one results tree per student, each with its own ladder.
+STUDENTS = {
+    'qwen3vl-2b': ('Qwen3-VL-2B-Instruct', ROOT / 'results/students/qwen3vl-2b'),
+    'qwen3vl-4b': ('Qwen3-VL-4B-Instruct', ROOT / 'results/students/qwen3vl-4b'),
+    'qwen3vl-8b': ('Qwen3-VL-8B-Instruct', RESULTS),
+}
+#: Adjacent differences ADR-0009 names, plus the equal-call control.
+LAYERS = (
+    ('L0', 'L1', 'modality'),
+    ('L1', 'L2', 'format'),
+    ('L2', 'L3', 'scaffold'),
+    ('L2', 'best_of_4', 'resampling_at_equal_calls'),
+    ('best_of_4', 'L3', 'structure_vs_resampling'),
+    ('L0', 'L3', 'modality_format_scaffold'),
+)
 #: Rows outside the ladder, measured for a named secondary question. Never a
 #: Stage-2 result: the ladder's L4 is the first completed replicate (ADR-0006 §6).
 SIDE_ROWS = {
@@ -299,6 +318,67 @@ def row_scores_for(
     return scores
 
 
+@lru_cache(maxsize=1)
+def _examples() -> dict[str, Any]:
+    """The benchmark manifest, keyed by example id; read once per process."""
+    return {
+        e.example_id: e
+        for e in read_manifest(ROOT / 'data/manifests/mme_emotion.jsonl')
+    }
+
+
+def _row_scores(path: Path, ids: list[str]) -> dict[str, float]:
+    """Per-item Recognition for one row file, restricted to ``ids``."""
+    examples = _examples()
+    scores = {}
+    with open(path, encoding='utf-8') as fh:
+        for line in fh:
+            r = json.loads(line)
+            e = examples[r['example_id']]
+            scores[r['example_id']] = LabelSet.from_prompt(e.prompt).recognition(
+                r['labels'], e.labels
+            )
+    return {i: scores[i] for i in ids if i in scores}
+
+
+def size_sweep(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
+    """Each student's ladder and every adjacent difference (ADR-0009).
+
+    The 8B's rows live in the main tree; 2B and 4B in their own, written with
+    EMOHARNESS_RESULTS_DIR while sharing every cache.
+    """
+    out: dict[str, Any] = {}
+    for key, (model_id, tree) in STUDENTS.items():
+        rows = {}
+        for row in LADDER_ROWS:
+            path = tree / f'raw_predictions/{row}/subset.jsonl'
+            if path.is_file():
+                rows[row] = _row_scores(path, ids)
+        if not rows:
+            continue
+        ladder = {}
+        for row, scores in rows.items():
+            by_task = macro(scores, task_of)
+            ladder[row] = {'by_task': by_task, **group_means(by_task)}
+        layers = {}
+        for a, b, name in LAYERS:
+            if a not in rows or b not in rows:
+                continue
+            res = paired_bootstrap(rows[a], rows[b], task_of, RESAMPLES)
+            layers[name] = {
+                'from': a,
+                'to': b,
+                'estimate': res.estimate,
+                'ci_low': res.ci_low,
+                'ci_high': res.ci_high,
+                'p_value': res.p_value,
+                'items_better': sum(1 for i in ids if rows[b][i] > rows[a][i]),
+                'items_worse': sum(1 for i in ids if rows[b][i] < rows[a][i]),
+            }
+        out[key] = {'model_id': model_id, 'rows': ladder, 'layers': layers}
+    return out
+
+
 def side_rows(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
     """Named non-ladder rows with their delta against L3, when they were run."""
     _, base = load_rows()
@@ -449,6 +529,7 @@ def main() -> None:
         'construction': construction_summary(),
         'cost': cost_summary(),
         'side_rows': side_rows(ids, task_of),
+        'size_sweep': size_sweep(ids, task_of),
         'previous_runs': previous_runs(ids, task_of),
         'leakage': {
             'checked_pairs': leakage.get('checked_pairs'),
@@ -581,6 +662,9 @@ def _readme(summary: dict[str, Any]) -> str:
         '- `summary.json` -> `previous_runs.v1_omni_describer`: the v1 rows, trajectory, and cost recomputed from the archive.',
         '- `summary.json` -> `side_rows`: non-ladder rows with their delta against L3 (here: replicate 2, the only',
         '  bundle in this run with an accepted patch). Label these clearly on the page; the Stage-2 number is L4.',
+        '- `summary.json` -> `size_sweep`: the full L0/L1/L2/best-of-4/L3 ladder for Qwen3-VL 2B, 4B and 8B, with each',
+        '  adjacent difference (modality, format, scaffold, resampling, structure-vs-resampling) and its CI. This is',
+        '  where the decomposition of the headline gain lives; the 8B entry repeats the main rows for convenience.',
         '- `construction/stage1_scaffold/`: the human-written harness bundle every replicate started from.',
         '- `metrics/`: analyze.py tables (ladder.json/md, per_task.json, multilabel.json, cost.json for machine 1 only).',
         '- `leakage_report.json`, `subset_1000.json`, `docs/run-indist.md` (protocol, deviations, amendments, results).',

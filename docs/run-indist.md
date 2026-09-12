@@ -237,6 +237,88 @@ scaffold is worth about +12 points over Direct and closes roughly 80% of the
 gap to the Luna teacher, and Stage-2 Builder construction adds nothing
 measurable on top of it, with or without a verifier.
 
+## Ladder decomposition and the student size sweep (2026-09-12)
+
+The v2 run above measured only L0 and L3, so its "+11.6 harness gain" pooled
+three ingredients ADR-0009 defines separately and had no equal-compute control.
+This pass fills every hole: L1, L2 and best-of-4 on the 8B student, and the whole
+single-student ladder on Qwen3-VL-2B and 4B. No paid API; every row is the same
+1,000-item subset, the same preprocessing cache, and the same frozen Stage 1
+bundle. Rows for 2B and 4B live under `results/students/qwen3vl-{2b,4b}/`
+(`EMOHARNESS_RESULTS_DIR`); their Target-call keys already carry the model id, so
+all three share one cache.
+
+Overall local Recognition:
+
+| Student | L0 | L1 | L2 | best-of-4 | L3 |
+|---|---|---|---|---|---|
+| Qwen3-VL-2B | 28.4 | 33.7 | 32.9 | 33.9 | **31.8** |
+| Qwen3-VL-4B | 30.0 | 38.0 | 34.4 | 35.9 | **38.9** |
+| Qwen3-VL-8B | 29.2 | 40.2 | 36.9 | 37.5 | **40.9** |
+
+Paired stratified bootstrap, 3,000 resamples, bold where p < 0.05:
+
+| Layer | 2B | 4B | 8B |
+|---|---|---|---|
+| L1 − L0, modality | **+5.3** [+2.5, +8.2] | **+8.0** [+5.0, +10.8] | **+11.0** [+8.0, +13.8] |
+| L2 − L1, format | −0.8 (p=0.52) | **−3.5** [−6.1, −1.0] | **−3.3** [−5.8, −0.8] |
+| L3 − L2, scaffold | −1.1 (p=0.43) | **+4.5** [+1.8, +7.3] | **+4.0** [+1.2, +6.8] |
+| best-of-4 − L2, resampling at equal calls | +1.0 (p=0.41) | +1.5 (p=0.16) | +0.6 (p=0.58) |
+| L3 − best-of-4, structure vs resampling | −2.0 (p=0.16) | **+3.0** [+0.3, +5.8] | **+3.4** [+0.6, +6.1] |
+| L3 − L0, all three | **+3.5** [+0.4, +6.4] | **+8.9** [+5.6, +12.0] | **+11.6** [+8.3, +14.8] |
+
+Five things this settles.
+
+1. **Most of the "harness gain" is the transcript.** For the 8B, +11.0 of the
+   +11.6 is L1 − L0: appending the whisper transcript, its language, and the
+   openSMILE prosody phrases to the official prompt, still one call, still
+   native video. The Target has no audio input, so this is the harness handing
+   a deaf model what it could not hear. It is not a reasoning scaffold.
+2. **The human-written five-step format is a significant negative**, −3.3 on the
+   8B and −3.5 on the 4B, two independent models agreeing. It costs most on the
+   multi-label tasks (8B ML_ER 40.6 → 30.7, FG_ER 21.1 → 14.9): the checklist
+   walks the model through cues one at a time and it then commits to fewer
+   labels. L2's prompt is frozen at pre-registration and was not edited.
+3. **Four calls spent on structure beat four calls spent on resampling**, but
+   only above a capacity threshold. best-of-4 over L2 is worth nothing anywhere
+   (+0.6 to +1.5, never significant), while L3 beats it by +3.4 on the 8B and
+   +3.0 on the 4B. This is the one clean positive result for the scaffold: the
+   gain is from structure, not from the extra compute.
+4. **The scaffold has a capacity threshold between 2B and 4B.** L3 − L2 is
+   −1.1 on the 2B (no effect), then +4.5 and +4.0. Below the threshold the
+   scaffold is a net burden: the 2B's L3 (31.8) is *worse* than its best-of-4
+   (33.9) and its FG_ER falls from 14 at L0 to 7 at L3. The modality layer, by
+   contrast, rises smoothly (+5.3, +8.0, +11.0) with no threshold.
+5. **Direct scores do not rank these models; harness gains do.** L0 is 28.4,
+   30.0 and 29.2 across a fourfold parameter range, while L3 − L0 is +3.5, +8.9
+   and +11.6. On this benchmark a Direct number says little about a model; what
+   separates them is how well they exploit a harness.
+
+This also disposes of the headroom explanation for the Builder's zero. The 2B
+sits 12.1 points below the Luna teacher row, four times the 8B's 3.0, and still
+cannot use the human scaffold at all. Room is not what the Builder lacked;
+Stage-2 edits prompts and YAML, and the 2B's limit is that it cannot follow a
+structured evidence protocol, which no prompt edit reaches.
+
+### Deviations recorded for this pass
+
+- L2's checklist still asks for non-speech sounds (laughter, sighs, music). The
+  v2 amendment removed the audio describer and the Target has no audio input, so
+  that bullet is unsatisfiable; it was left alone because L2 is frozen at
+  pre-registration, and it biases L2 downward. best-of-4 shares L2's prompt and
+  therefore the same bias, so L3 − best-of-4 is the unbiased comparison.
+- Serving moved mid-pass. Rows up to the 8B's L2 ran on an A100-80GB in a
+  2 CPU / 8 GB cgroup; from the 8B's best-of-4 onward on an H200-144GB in a
+  10 CPU / 32 GB cgroup. Throughput went from 21 to 105 Target calls per minute
+  because the old box's video-decode semaphore, set to 2 to survive its 8 GB
+  limit, left the GPU at 2% KV utilisation and 85% of each call's 36 s in a
+  queue. Decoding parameters, prompts, media and the call cache are unchanged,
+  and cached responses carry across, so the move changes timing only.
+- The serving multimodal processor cache was switched on (1 GB, later 4 GB)
+  because best-of-4 sends one clip four times and decoding it four times was
+  what pushed host memory past the watchdog. It is a serving cache over a
+  deterministic processor: identical inputs, identical outputs.
+
 ## v1 results (2026-09-09 01:02, local Recognition, 1,000-item subset, 125 per task; with the Omni describer)
 
 | Row | ER_Lab | ER_Wild | SA | Noise_ER | FG_ER | ML_ER | FG_SA | IR | seen | held-out | overall |

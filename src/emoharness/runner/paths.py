@@ -29,6 +29,12 @@ LEDGER_FILE: Final = 'ledger.jsonl'
 #: A second machine sharing the run root writes its own ledger file (NFS appends
 #: from two hosts can interleave); ``read_all_ledgers`` merges them.
 LEDGER_NAME_ENV: Final = 'EMOHARNESS_LEDGER_NAME'
+RESULTS_DIR: Final = 'results'
+#: A run whose results must not land beside the main ones (a second student
+#: model, say) sets this to a root-relative directory such as
+#: ``results/students/qwen3vl-2b``. The ``data/`` tree, and therefore every
+#: cache, stays shared; Target-call keys already include the model id.
+RESULTS_DIR_ENV: Final = 'EMOHARNESS_RESULTS_DIR'
 FREEZE_FILE: Final = 'freeze.json'
 PREREGISTRATION_FILE: Final = 'preregistration.md'
 BUILDER_CONFIG_FILE: Final = 'teacher_gpt_5_6_luna.yaml'
@@ -39,6 +45,22 @@ TEACHER_CONFIG_FILE: Final = 'teacher_gpt_5_6_luna.yaml'
 CALL_CACHE_DIR: Final = 'calls'
 CALIBRATION_DIR: Final = 'calibration'
 FAKE_DIR: Final = 'fake'
+
+
+def results_dir(base: Path) -> Path:
+    """Where this run writes its results: ``<base>/results`` unless overridden.
+
+    The override is root-relative on purpose: an absolute path or a ``..``
+    segment would put artifacts outside the run root, where nothing else looks
+    for them.
+    """
+    name = os.environ.get(RESULTS_DIR_ENV, RESULTS_DIR).strip() or RESULTS_DIR
+    candidate = Path(name)
+    if candidate.is_absolute() or '..' in candidate.parts:
+        raise ValidationError(
+            f'{RESULTS_DIR_ENV} must be a root-relative directory, got {name!r}'
+        )
+    return base / candidate
 
 
 def source_root() -> Path:
@@ -80,7 +102,7 @@ class ProjectPaths(BaseModel):
         base = Path(root).expanduser().resolve()
         checkout = (source or source_root()).resolve()
         data = base / 'data'
-        results = base / 'results'
+        results = results_dir(base)
         return cls(
             root=base,
             configs=_prefer(base / 'configs', checkout / 'configs'),

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Serve the frozen Target (Qwen3-VL-8B-Instruct) with vLLM on port 8000.
-# Sized for one A100-80GB in a 2-CPU / 8 GB-RAM cgroup: no CPU swap space, no
-# host-side multimodal processor cache, a modest batch, and native video in.
+# Sized for one H200-144GB in a 10-CPU / 32 GB-RAM cgroup (moved 2026-09-12
+# from an A100-80GB on 2 CPU / 8 GB): no CPU swap space, native video in, and a
+# batch of 32 because the old ceiling of 12 was never reached -- the client's
+# video semaphore kept only one or two requests on the GPU at a time.
 # Override the model with EMOHARNESS_STUDENT_MODEL, the port with VLLM_PORT.
 set -euo pipefail
 VENV="${EMOHARNESS_VLLM_VENV:-${HOME}/.venvs/emoharness-vllm011}"
@@ -12,6 +14,11 @@ PORT="${VLLM_PORT:-8000}"
 # libpython3.12-dev headers extracted under ~/.local (see docs/run-indist.md).
 HDR="${EMOHARNESS_PY_HEADERS:-${HOME}/.local/python3.12-headers/usr/include}"
 export CPATH="${HDR}/python3.12:${HDR}${CPATH:+:${CPATH}}"
+# The multimodal processor cache is off by default: it buys nothing when every
+# request carries a different clip, and host RAM is the scarce resource. Set
+# VLLM_MM_CACHE_GB for a row that sends the same clip several times in a row --
+# best-of-n resamples one clip n times, and decoding it n times is what pushed
+# anon memory past the watchdog on 2026-09-12 while single-call rows were fine.
 # Bounded glibc arenas: the frontend decodes videos on many threads and would
 # otherwise fragment its heap into gigabytes it never returns.
 export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-2}"
@@ -26,9 +33,9 @@ echo "gpu free ${FREE_MIB}/${TOTAL_MIB} MiB -> gpu-memory-utilization ${AUTO_UTI
 exec "${VENV}/bin/vllm" serve "${MODEL}" \
   --dtype bfloat16 \
   --max-model-len "${VLLM_MAX_MODEL_LEN:-16384}" \
-  --max-num-seqs "${VLLM_MAX_NUM_SEQS:-12}" \
+  --max-num-seqs "${VLLM_MAX_NUM_SEQS:-32}" \
   --swap-space 0 \
-  --mm-processor-cache-gb 0 \
+  --mm-processor-cache-gb "${VLLM_MM_CACHE_GB:-0}" \
   --limit-mm-per-prompt '{"image":32,"video":1}' \
   --media-io-kwargs '{"video":{"num_frames":32}}' \
   --enable-prefix-caching \
