@@ -1,0 +1,80 @@
+{
+  "evaluated": [
+    {
+      "name": "richer_affect_observation",
+      "patch_name": "richer_affect_observation",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "aa500e8f1fa2fe8fcedd40dcc8ce85d0c2b6aefac3282e2bf4e9740314c9f5cb",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_00/candidates/richer_affect_observation",
+      "scores": {
+        "name": "richer_affect_observation",
+        "recognition": 0.43147208121827413,
+        "reasoning": 0.85125,
+        "regression_rate": 0.1452513966480447,
+        "mean_calls": 4.0,
+        "p95_latency_s": 18.915459130611275
+      }
+    },
+    {
+      "name": "activation_and_positive_emotion_calibration",
+      "patch_name": "activation_and_positive_emotion_calibration",
+      "targeted_cluster": "Excited | Happiness | agree",
+      "patch_hash": "809b839fb63e28eb8a6fa4a4d9a477e9adc2d585181b73def23fe9fba6444da1",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_00/candidates/activation_and_positive_emotion_calibration",
+      "scores": {
+        "name": "activation_and_positive_emotion_calibration",
+        "recognition": 0.467005076142132,
+        "reasoning": 0.8575,
+        "regression_rate": 0.0893854748603352,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 21.67046936190456
+      }
+    },
+    {
+      "name": "direct_cue_conflict_resolution",
+      "patch_name": "direct_cue_conflict_resolution",
+      "targeted_cluster": "negative | neutral | conflict",
+      "patch_hash": "84f938e67dde4c7d4f8d0a209dab8076f22652115937475802179b237d97a07d",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_00/candidates/direct_cue_conflict_resolution",
+      "scores": {
+        "name": "direct_cue_conflict_resolution",
+        "recognition": 0.46446700507614214,
+        "reasoning": 0.88,
+        "regression_rate": 0.00558659217877095,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 26.199132022773856
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "richer_affect_observation",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4315 does not exceed incumbent 0.4543 by more than 0.0000",
+        "regression rate 0.1453 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "activation_and_positive_emotion_calibration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0894 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "direct_cue_conflict_resolution",
+      "passed": true,
+      "reasons": []
+    }
+  ],
+  "rejected": [],
+  "vetoed": [
+    {
+      "name": "sentiment_valence_without_neutral_default",
+      "issues": [
+        "4. Evidence discipline: \"Do not use the question wording as support for an emotion unless the wording itself is relevant evidence.\" This permits treating the question wording as evidence for the answer."
+      ]
+    }
+  ]
+}

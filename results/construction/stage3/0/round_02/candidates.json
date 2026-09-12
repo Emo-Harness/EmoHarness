@@ -1,0 +1,79 @@
+{
+  "evaluated": [
+    {
+      "name": "sentiment_valence_calibration",
+      "patch_name": "sentiment_valence_calibration",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "5ff8659766e73b19e7b724778e8bd2f2343128d94fe00d0c1f53ec61f13350f3",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_02/candidates/sentiment_valence_calibration",
+      "scores": {
+        "name": "sentiment_valence_calibration",
+        "recognition": 0.467005076142132,
+        "reasoning": 0.86625,
+        "regression_rate": 0.12849162011173185,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 20.42181988954545
+      }
+    },
+    {
+      "name": "conflict_resolution_by_affective_strength",
+      "patch_name": "conflict_resolution_by_affective_strength",
+      "targeted_cluster": "negative | neutral | conflict",
+      "patch_hash": "49b3107c766273ec43a266a08ea5740fbb569702be4267843410466c16b90741",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_02/candidates/conflict_resolution_by_affective_strength",
+      "scores": {
+        "name": "conflict_resolution_by_affective_strength",
+        "recognition": 0.46954314720812185,
+        "reasoning": 0.87,
+        "regression_rate": 0.0446927374301676,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 27.055758031771987
+      }
+    },
+    {
+      "name": "negative_sentiment_not_neutral",
+      "patch_name": "negative_sentiment_not_neutral",
+      "targeted_cluster": "negative | neutral | agree",
+      "patch_hash": "fcc81cfa95e6fbbad9620f223bb8c489b6f9743260c8009193d63e688ef72ca3",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_02/candidates/negative_sentiment_not_neutral",
+      "scores": {
+        "name": "negative_sentiment_not_neutral",
+        "recognition": 0.4619289340101523,
+        "reasoning": 0.8575,
+        "regression_rate": 0.1787709497206704,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 20.742030000220986
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "sentiment_valence_calibration",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1285 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "conflict_resolution_by_affective_strength",
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "name": "negative_sentiment_not_neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.1788 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": [
+    {
+      "name": "affective_visual_cue_expansion",
+      "issues": [
+        "4. The visual-only stage is told to record “whether the gaze is warm” and to “distinguish a genuinely neutral face,” which asks for affective conclusions rather than strictly observed visual cues."
+      ]
+    }
+  ]
+}

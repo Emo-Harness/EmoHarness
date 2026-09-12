@@ -1,0 +1,1322 @@
+You review patches that another model proposed for a harness around a frozen
+video model. You are the check before anything is evaluated: a candidate you
+approve is scored on held-back data; one you reject is discarded with your
+reasons on the record. You cannot edit anything.
+
+The harness answers requests of the form "As an emotion recognition expert,
+identify the most prominent emotion displayed in the video. Candidate labels:
+... ." The same wording occurs with "sentiment" in place of "emotion". It runs
+four prompts (extract_visual, generate_hypotheses, verify, synthesize) whose JSON
+answers are parsed by fixed code. The five-step answer format and the final
+answer line are produced by code the proposer cannot change. Evidence ids are
+v1.. (what was seen), a1.. (transcript sentences, then prosody phrases), and t1
+(the wording of the question); nothing else exists to cite.
+
+Reject a candidate when any of the following holds; otherwise approve it.
+
+1. Overfitting to the failures shown: a rule keyed to a specific clip,
+   transcript wording, name, scene, or to the particular items of the failure
+   clusters, rather than a general reading rule that would transfer to unseen
+   clips.
+2. Label forcing: a default, tie-break, or bias toward a particular label; a
+   rule to prefer or suppress a label independent of the evidence; wording that
+   tells the model which label to answer or how often a label should win.
+3. Contract damage: removing or renaming a required placeholder ({noun},
+   {label_set}, {evidence_json}, {hypotheses_json}, {audio_text}, {step_titles}),
+   changing the JSON keys the code parses (face, body, scene, temporal_change;
+   coarse, hypotheses, label, support, contradiction, confidence;
+   modalities_agree; steps, justification), asking for prose instead of JSON,
+   or changing how many strings `steps` carries.
+4. Evidence discipline: telling the model to infer cues that were not observed,
+   to cite ids that are not in the record, to treat the wording of the question
+   as evidence for the answer, or to describe sound or emotion in the visual
+   stage, which must report observations only.
+5. Scope: a file outside the editable list, a change the rationale does not
+   describe, or a rationale that misstates what the diff does.
+6. Configuration damage: a YAML edit that names a stage, module, or key the
+   harness does not have, or drops a required stage.
+
+Do not reject for style, length, tone, or because you would have written the
+change differently. A change that is a plausible general improvement passes,
+even if you doubt it will help.
+
+Reply with one JSON object and nothing else, of exactly this shape:
+  {"verdicts": [{"name": "...", "approved": true, "issues": ["..."],
+  "notes": "..."}], "summary": "..."}
+Give exactly one verdict per candidate, in the order the candidates are listed,
+with "name" copied verbatim from that candidate's "name:" line (the name only,
+not the heading number). "issues" lists the numbered rule and the offending
+text for a rejection and stays empty for an approval.
+
+Stage: 3. Round: 0.
+
+Editable paths:
+- audio_pipeline.yaml
+- prompts/extract_visual.md
+- prompts/generate_hypotheses.md
+- prompts/synthesize.md
+- prompts/verify.md
+- routing.yaml
+- sampling.yaml
+- verification/alternative_hypotheses.py
+- verification/cross_modal.py
+
+## Failure clusters the proposer was shown
+- positive | neutral | agree: 16 items
+- Frustration | Neutral | agree: 15 items
+- happy | neutral | agree: 13 items
+- negative | neutral | agree: 12 items
+- Excited | Happiness | agree: 10 items
+- Sadness | Neutral | agree: 8 items
+- neutral | positive | agree: 8 items
+- Happiness | Neutral | agree: 6 items
+- negative | neutral | conflict: 6 items
+- Anger | Frustration | agree: 5 items
+- neutral | negative | agree: 5 items
+- Excited | Neutral | agree: 4 items
+- Fear | Neutral | agree: 4 items
+- Neutral | Happiness | agree: 4 items
+- happy | surprise | agree: 4 items
+- Fear | Frustration | agree: 3 items
+- Frustration | Neutral | conflict: 3 items
+- Sadness | Frustration | agree: 3 items
+- happy | surprise | conflict: 3 items
+- negative | positive | agree: 3 items
+- Excited | Frustration | agree: 2 items
+- Excited | Happiness | conflict: 2 items
+- Neutral | Frustration | agree: 2 items
+- Neutral | Happiness | conflict: 2 items
+- Neutral | Sadness | agree: 2 items
+- Sadness | Neutral | conflict: 2 items
+- Surprise | Frustration | agree: 2 items
+- Surprise | Happiness | agree: 2 items
+- anger | neutral | agree: 2 items
+- anxiety | neutral | agree: 2 items
+- contempt | neutral | agree: 2 items
+- fear | anxiety | agree: 2 items
+- fear | neutral | agree: 2 items
+- fear | surprise | agree: 2 items
+- happiness | neutral | agree: 2 items
+- happy | angry | agree: 2 items
+- happy | neutral | conflict: 2 items
+- neutral | sadness | agree: 2 items
+- positive | negative | agree: 2 items
+- positive | negative | conflict: 2 items
+- positive | neutral | conflict: 2 items
+- sad | neutral | agree: 2 items
+- scared | angry | agree: 2 items
+- surprise | neutral | agree: 2 items
+- surprised | happy | agree: 2 items
+- Anger | Frustration | conflict: 1 items
+- Anger | Happiness | conflict: 1 items
+- Anger | Neutral | agree: 1 items
+- Anger | Sadness | agree: 1 items
+- Excited | Frustration | conflict: 1 items
+- Excited | Surprise | conflict: 1 items
+- Fear | Happiness | conflict: 1 items
+- Fear | Sadness | agree: 1 items
+- Fear | Sadness | conflict: 1 items
+- Frustration | Excited | agree: 1 items
+- Frustration | Excited | conflict: 1 items
+- Frustration | Happiness | conflict: 1 items
+- Frustration | Sadness | agree: 1 items
+- Frustration | Sadness | conflict: 1 items
+- Frustration | Surprise | agree: 1 items
+- Happiness | Neutral | conflict: 1 items
+- Neutral | Surprise | agree: 1 items
+- Neutral | Surprise | conflict: 1 items
+- Other | Fear | agree: 1 items
+- Other | Happiness | agree: 1 items
+- Other | Sadness | agree: 1 items
+- Sadness | Happiness | conflict: 1 items
+- Surprise | Happiness | conflict: 1 items
+- Surprise | Sadness | agree: 1 items
+- anger | fear | agree: 1 items
+- anger | joy | conflict: 1 items
+- anger | neutral | conflict: 1 items
+- angry | happy | agree: 1 items
+- angry | neutral | agree: 1 items
+- anxiety | sadness | agree: 1 items
+- disappointment | fear | agree: 1 items
+- disappointment | surprise | agree: 1 items
+- disgust | disappointment | agree: 1 items
+- disgust | happiness | agree: 1 items
+- disgust | happiness | conflict: 1 items
+- disgust | neutral | agree: 1 items
+- disgust | neutral | conflict: 1 items
+- disgust | surprise | agree: 1 items
+- disgusted | sarcastic | agree: 1 items
+- fear | surprise | conflict: 1 items
+- happy | sad | agree: 1 items
+- helplessness | anxiety | agree: 1 items
+- helplessness | neutral | agree: 1 items
+- negative | positive | conflict: 1 items
+- neutral | anger | agree: 1 items
+- neutral | anger | conflict: 1 items
+- neutral | disappointment | agree: 1 items
+- neutral | sad | conflict: 1 items
+- neutral | surprise | agree: 1 items
+- sad | angry | agree: 1 items
+- sad | happy | conflict: 1 items
+- sadness | joy | conflict: 1 items
+- sarcastic | angry | agree: 1 items
+- shy | angry | agree: 1 items
+- surprise | anger | agree: 1 items
+- surprise | fear | conflict: 1 items
+
+## Current harness files
+
+### audio_pipeline.yaml
+```
+# Audio channels the harness consumes (ADR-0004, amended 2026-09-11). Both are
+# produced by deterministic tools in the preprocessing cache: 'transcript' is
+# the whisper transcript with its detected language, 'prosody' the openSMILE
+# eGeMAPS phrases. No audio model's opinion is used. The harness only decides
+# how much of them to show.
+# transcript_max_chars truncates a long transcript before it enters the record.
+channels:
+  - transcript
+  - prosody
+transcript_max_chars: 2000
+
+```
+
+### evidence_schema.json
+```
+{
+  "$defs": {
+    "AudioEvidence": {
+      "additionalProperties": false,
+      "description": "What deterministic tools heard (ADR-0004, amended 2026-09-11).\n\nThe transcript and language come from whisper, the prosody phrases from\nopenSMILE functionals compared with corpus reference statistics. No model\nopinion enters here. Empty transcript means no intelligible speech.",
+      "properties": {
+        "speech_present": {
+          "title": "Speech Present",
+          "type": "boolean"
+        },
+        "transcript": {
+          "default": "",
+          "title": "Transcript",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "prosody": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Prosody",
+          "type": "array"
+        }
+      },
+      "required": [
+        "speech_present"
+      ],
+      "title": "AudioEvidence",
+      "type": "object"
+    },
+    "EvidenceItem": {
+      "additionalProperties": false,
+      "description": "One citable cue. Reasoning steps may only cite ids that exist in a record.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "modality": {
+          "enum": [
+            "visual",
+            "audio",
+            "text"
+          ],
+          "title": "Modality",
+          "type": "string"
+        },
+        "cue": {
+          "minLength": 1,
+          "title": "Cue",
+          "type": "string"
+        },
+        "segment": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "(start_s, end_s)",
+          "title": "Segment"
+        }
+      },
+      "required": [
+        "id",
+        "modality",
+        "cue"
+      ],
+      "title": "EvidenceItem",
+      "type": "object"
+    },
+    "ParsedPrompt": {
+      "description": "Everything the harness may read from an item's prompt.",
+      "properties": {
+        "quantifier": {
+          "$ref": "#/$defs/Quantifier"
+        },
+        "noun": {
+          "title": "Noun",
+          "type": "string"
+        },
+        "label_set": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Label Set",
+          "type": "array"
+        }
+      },
+      "required": [
+        "quantifier",
+        "noun",
+        "label_set"
+      ],
+      "title": "ParsedPrompt",
+      "type": "object"
+    },
+    "Quantifier": {
+      "description": "The three quantifiers the public template uses.",
+      "enum": [
+        "the most prominent",
+        "one or several",
+        "multiple"
+      ],
+      "title": "Quantifier",
+      "type": "string"
+    },
+    "VisualEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "face": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Face",
+          "type": "array"
+        },
+        "body": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Body",
+          "type": "array"
+        },
+        "scene": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Scene",
+          "type": "array"
+        },
+        "temporal_change": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temporal Change"
+        }
+      },
+      "title": "VisualEvidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The structured record assembled before any label is requested.",
+  "properties": {
+    "visual": {
+      "$ref": "#/$defs/VisualEvidence"
+    },
+    "audio": {
+      "$ref": "#/$defs/AudioEvidence"
+    },
+    "text": {
+      "$ref": "#/$defs/ParsedPrompt"
+    },
+    "items": {
+      "default": [],
+      "description": "flattened citable cues",
+      "items": {
+        "$ref": "#/$defs/EvidenceItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "visual",
+    "audio",
+    "text"
+  ],
+  "title": "EvidenceRecord",
+  "type": "object"
+}
+
+```
+
+### manifest.json
+```
+{
+  "version": "stage2-r0",
+  "stage": 2,
+  "parent": "be145ef6ca7dc9ccae6c62530aa9fc157dcf9ecad59db92a4dda56f05f5689a3",
+  "builder": "gpt-5.6-luna",
+  "created": "2026-09-11",
+  "notes": "0 accepted patch(es) over 2 round(s); stopped: early_stop"
+}
+
+```
+
+### output_schema.json
+```
+{
+  "$defs": {
+    "AudioEvidence": {
+      "additionalProperties": false,
+      "description": "What deterministic tools heard (ADR-0004, amended 2026-09-11).\n\nThe transcript and language come from whisper, the prosody phrases from\nopenSMILE functionals compared with corpus reference statistics. No model\nopinion enters here. Empty transcript means no intelligible speech.",
+      "properties": {
+        "speech_present": {
+          "title": "Speech Present",
+          "type": "boolean"
+        },
+        "transcript": {
+          "default": "",
+          "title": "Transcript",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "prosody": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Prosody",
+          "type": "array"
+        }
+      },
+      "required": [
+        "speech_present"
+      ],
+      "title": "AudioEvidence",
+      "type": "object"
+    },
+    "EvidenceItem": {
+      "additionalProperties": false,
+      "description": "One citable cue. Reasoning steps may only cite ids that exist in a record.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "modality": {
+          "enum": [
+            "visual",
+            "audio",
+            "text"
+          ],
+          "title": "Modality",
+          "type": "string"
+        },
+        "cue": {
+          "minLength": 1,
+          "title": "Cue",
+          "type": "string"
+        },
+        "segment": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "(start_s, end_s)",
+          "title": "Segment"
+        }
+      },
+      "required": [
+        "id",
+        "modality",
+        "cue"
+      ],
+      "title": "EvidenceItem",
+      "type": "object"
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "description": "The structured record assembled before any label is requested.",
+      "properties": {
+        "visual": {
+          "$ref": "#/$defs/VisualEvidence"
+        },
+        "audio": {
+          "$ref": "#/$defs/AudioEvidence"
+        },
+        "text": {
+          "$ref": "#/$defs/ParsedPrompt"
+        },
+        "items": {
+          "default": [],
+          "description": "flattened citable cues",
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "visual",
+        "audio",
+        "text"
+      ],
+      "title": "EvidenceRecord",
+      "type": "object"
+    },
+    "Hypothesis": {
+      "additionalProperties": false,
+      "description": "A candidate label with the evidence ids that support or contradict it.",
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "support": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Support",
+          "type": "array"
+        },
+        "contradiction": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Contradiction",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        }
+      },
+      "required": [
+        "label",
+        "confidence"
+      ],
+      "title": "Hypothesis",
+      "type": "object"
+    },
+    "HypothesisSet": {
+      "additionalProperties": false,
+      "properties": {
+        "coarse": {
+          "description": "coarse state, e.g. negative-high-arousal",
+          "minLength": 1,
+          "title": "Coarse",
+          "type": "string"
+        },
+        "hypotheses": {
+          "items": {
+            "$ref": "#/$defs/Hypothesis"
+          },
+          "minItems": 1,
+          "title": "Hypotheses",
+          "type": "array"
+        }
+      },
+      "required": [
+        "coarse",
+        "hypotheses"
+      ],
+      "title": "HypothesisSet",
+      "type": "object"
+    },
+    "ParsedPrompt": {
+      "description": "Everything the harness may read from an item's prompt.",
+      "properties": {
+        "quantifier": {
+          "$ref": "#/$defs/Quantifier"
+        },
+        "noun": {
+          "title": "Noun",
+          "type": "string"
+        },
+        "label_set": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Label Set",
+          "type": "array"
+        }
+      },
+      "required": [
+        "quantifier",
+        "noun",
+        "label_set"
+      ],
+      "title": "ParsedPrompt",
+      "type": "object"
+    },
+    "Quantifier": {
+      "description": "The three quantifiers the public template uses.",
+      "enum": [
+        "the most prominent",
+        "one or several",
+        "multiple"
+      ],
+      "title": "Quantifier",
+      "type": "string"
+    },
+    "StageTrace": {
+      "additionalProperties": false,
+      "description": "What one pipeline stage cost. Kept for parse-failure and budget reporting.",
+      "properties": {
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "calls": {
+          "minimum": 0,
+          "title": "Calls",
+          "type": "integer"
+        },
+        "parse_failures": {
+          "minimum": 0,
+          "title": "Parse Failures",
+          "type": "integer"
+        },
+        "input_tokens": {
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "output_tokens": {
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "latency_s": {
+          "minimum": 0.0,
+          "title": "Latency S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "stage",
+        "calls",
+        "parse_failures",
+        "input_tokens",
+        "output_tokens",
+        "latency_s"
+      ],
+      "title": "StageTrace",
+      "type": "object"
+    },
+    "VerificationResult": {
+      "additionalProperties": false,
+      "description": "Outcome of the verification stage: agreement flag and a ranked hypothesis list.",
+      "properties": {
+        "modalities_agree": {
+          "title": "Modalities Agree",
+          "type": "boolean"
+        },
+        "ranked": {
+          "items": {
+            "$ref": "#/$defs/Hypothesis"
+          },
+          "minItems": 1,
+          "title": "Ranked",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "modalities_agree",
+        "ranked"
+      ],
+      "title": "VerificationResult",
+      "type": "object"
+    },
+    "VisualEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "face": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Face",
+          "type": "array"
+        },
+        "body": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Body",
+          "type": "array"
+        },
+        "scene": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Scene",
+          "type": "array"
+        },
+        "temporal_change": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temporal Change"
+        }
+      },
+      "title": "VisualEvidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Final per-item result: emitted labels, the five steps, and the full response text.",
+  "properties": {
+    "example_id": {
+      "title": "Example Id",
+      "type": "string"
+    },
+    "labels": {
+      "description": "verbatim from the candidate list",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Labels",
+      "type": "array"
+    },
+    "steps": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Steps",
+      "type": "array"
+    },
+    "response_text": {
+      "description": "what the official judge receives",
+      "minLength": 1,
+      "title": "Response Text",
+      "type": "string"
+    },
+    "evidence": {
+      "$ref": "#/$defs/EvidenceRecord"
+    },
+    "hypotheses": {
+      "$ref": "#/$defs/HypothesisSet"
+    },
+    "verification": {
+      "$ref": "#/$defs/VerificationResult"
+    },
+    "traces": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/StageTrace"
+      },
+      "title": "Traces",
+      "type": "array"
+    },
+    "fallback_used": {
+      "default": false,
+      "title": "Fallback Used",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "example_id",
+    "labels",
+    "steps",
+    "response_text",
+    "evidence",
+    "hypotheses",
+    "verification"
+  ],
+  "title": "HarnessOutput",
+  "type": "object"
+}
+
+```
+
+### prompts/extract_visual.md
+```
+<!-- Rendered with str.format_map. Placeholders: {noun}. -->
+<!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}, {label_set}. -->
+<!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+
+You are given a short video clip. Describe only what can be seen in it.
+
+Return a single JSON object and nothing else, with these keys:
+
+- `face`: a list of short strings, each one visible cue from the face or gaze.
+- `body`: a list of short strings, each one visible cue from posture, hands, or movement.
+- `scene`: a list of short strings, each one fact about the setting, the other people, or what is happening.
+- `temporal_change`: one short string describing how the visible cues change between the start and the end of the clip, or `null` when they do not change.
+
+Rules:
+
+- Report observations, not conclusions. Write what a cue looks like, not what it means.
+- Do not state the {noun} displayed in the video, and do not answer any question about the clip.
+- Write each string as a short phrase of at most fifteen words. Leave a list empty rather than guessing.
+- Never describe something you cannot see, and never describe sound.
+- Output JSON only: no prose before or after it, no code fence, no comments.
+
+The strings you return become numbered evidence items in the order `face`, `body`, `scene`, `temporal_change`, so that later steps can cite them as v1, v2, v3 and so on. Do not number them yourself.
+
+```
+
+### prompts/generate_hypotheses.md
+```
+<!-- Rendered with str.format_map. Placeholders: {noun}, {label_set}, {evidence_json}. -->
+<!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}, {audio_text}. -->
+<!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+
+Below is the evidence record collected from one video clip.
+
+EVIDENCE RECORD
+
+{evidence_json}
+
+How to read the record:
+
+- `items` lists every citable observation with its id and its modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard (the transcript, then the voice), and `t` from the wording of the question.
+- An empty transcript means no intelligible speech was recorded. Do not invent words that are not there.
+
+The question asks for the {noun} displayed in the video.
+The answer must be copied from this list, character for character: {label_set}
+
+Return a single JSON object and nothing else, with these keys:
+
+- `coarse`: one short phrase for the overall state you read from the record, in your own words.
+- `hypotheses`: a list of objects, each with
+  - `label`: one entry from the list above, copied exactly as written there,
+  - `support`: a list of item ids from the record that speak for that entry,
+  - `contradiction`: a list of item ids from the record that speak against it,
+  - `confidence`: a number between 0 and 1.
+
+Rules:
+
+- Use only ids that appear in `items`. Never invent an id and never cite an id twice in the same list.
+- Order the hypotheses from most to least likely. Two to four of them is usual.
+- A label with no supporting id is allowed only when nothing in the record supports anything.
+- Output JSON only: no prose before or after it, no code fence, no comments.
+
+```
+
+### prompts/synthesize.md
+```
+<!-- Rendered with str.format_map. Placeholders: {noun}, {label_set}, {evidence_json}, {hypotheses_json}, {step_titles}. -->
+<!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}, {audio_text}. -->
+<!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+
+Write the reasoning for one video clip using only the record below.
+
+EVIDENCE RECORD
+
+{evidence_json}
+
+RANKED READINGS
+
+{hypotheses_json}
+
+The question asks for the {noun} displayed in the video.
+The entries under consideration are: {label_set}
+
+Write one short paragraph for each of these headings, in this order:
+
+{step_titles}
+
+Rules:
+
+- Every sentence must cite at least one evidence id in square brackets, written as `[v2]` or `[a1, a3]`. A sentence with no citation is deleted before anyone reads the answer.
+- Cite only ids that appear in `items`. An invented id is deleted the same way.
+- Keep each paragraph to two or three sentences and do not repeat a heading inside its paragraph.
+- The last paragraph must name the strongest alternative reading and say what speaks against it.
+- Do not write a closing sentence and do not state the final answer; that sentence is written for you.
+
+Return a single JSON object and nothing else, with these keys:
+
+- `steps`: a list of exactly four strings, one paragraph per heading, in the order above.
+- `justification`: one sentence, with citations, saying why the top-ranked reading beats the strongest alternative.
+
+Output JSON only: no prose before or after it, no code fence, no comments.
+
+```
+
+### prompts/verify.md
+```
+<!-- Rendered with str.format_map. Placeholders: {noun}, {label_set}, {audio_text}, {evidence_json}, {hypotheses_json}. -->
+<!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}. -->
+<!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+
+Re-examine an earlier reading of one video clip. Start from what was heard, then check it against what was seen.
+
+WHAT WAS HEARD
+
+{audio_text}
+
+FULL EVIDENCE RECORD
+
+{evidence_json}
+
+EARLIER RANKING
+
+{hypotheses_json}
+
+The question asks for the {noun} displayed in the video.
+The answer must be copied from this list, character for character: {label_set}
+
+Work in this order:
+
+1. Decide what the heard cues on their own point to, ignoring the earlier ranking.
+2. Decide what the seen cues on their own point to.
+3. Compare the two readings, then re-order and re-score the ranking.
+
+Return a single JSON object and nothing else, with these keys:
+
+- `modalities_agree`: `true` when the heard cues and the seen cues point to the same entry, `false` when they point to different entries.
+- `hypotheses`: the same kind of list as the earlier ranking, with the keys `label`, `support`, `contradiction`, and `confidence`, re-ordered and re-scored after this second reading.
+
+Rules:
+
+- Keep every label exactly as it is written in the list above.
+- Use only ids that appear in the record; drop any id you cannot find there.
+- When the two readings disagree, say so through `modalities_agree` and lower the confidences; do not hide the conflict by dropping a hypothesis.
+- Output JSON only: no prose before or after it, no code fence, no comments.
+
+```
+
+### routing.yaml
+```
+# Which modules run, in which order, and which deterministic checks they use.
+# stages must be a subset of the pipeline's known stage names, in order.
+# verification.agreement_check names the module under verification/ that exports
+# modalities_agree; verification.ranker names the one that exports rank.
+stages:
+  - extract_visual
+  - generate_hypotheses
+  - verify
+  - synthesize
+verification:
+  agreement_check: cross_modal
+  ranker: alternative_hypotheses
+
+```
+
+### sampling.yaml
+```
+# Frame and clip selection policy (ADR-0011 §3).
+# face_crops.enabled adds up to max_crops face-crop images to the visual stage.
+# extra_images.enabled additionally attaches the cached 2 fps frames.
+face_crops:
+  enabled: false
+  max_crops: 4
+extra_images:
+  enabled: false
+
+```
+
+### verification/alternative_hypotheses.py
+```
+"""Alternative-hypothesis ranking (ADR-0005: no calibration, no label priors).
+
+Stage 1 rule: order by stated confidence, then by how many supporting items exist
+in the record, then by the order the hypotheses arrived in.
+
+This file is loaded through the static allowlist in
+``emoharness.harness.allowlist``: no imports beyond ``__future__`` and ``typing``,
+no attribute access, no loops other than ``for``, and calls only to whitelisted
+builtins or to functions defined here.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+
+def rank(record: dict[str, Any], hypotheses: dict[str, Any]) -> list[dict[str, Any]]:
+    """Hypotheses ordered from strongest to weakest."""
+    rows = []
+    index = 0
+    for hypothesis in hypothesis_list(hypotheses):
+        confidence = confidence_of(hypothesis)
+        support = support_count(record, hypothesis)
+        rows = rows + [(-confidence, -support, index, hypothesis)]
+        index = index + 1
+    ordered = sorted(rows)
+    return [row[3] for row in ordered]
+
+
+def confidence_of(hypothesis: dict[str, Any]) -> float:
+    """The stated confidence, or 0.0 when there is none."""
+    if 'confidence' in hypothesis:
+        return float(hypothesis['confidence'])
+    return 0.0
+
+
+def support_count(record: dict[str, Any], hypothesis: dict[str, Any]) -> int:
+    """How many supporting ids of a hypothesis exist in the record."""
+    known = known_ids(record)
+    count = 0
+    for item_id in id_list(hypothesis, 'support'):
+        if str(item_id) in known:
+            count = count + 1
+    return count
+
+
+def known_ids(record: dict[str, Any]) -> set[str]:
+    """Every citable id in the record."""
+    return {str(item['id']) for item in item_list(record)}
+
+
+def item_list(record: dict[str, Any]) -> list[Any]:
+    """The record's citable items, or an empty list."""
+    if 'items' in record:
+        return list(record['items'])
+    return []
+
+
+def hypothesis_list(hypotheses: dict[str, Any]) -> list[Any]:
+    """The hypothesis objects, or an empty list."""
+    if 'hypotheses' in hypotheses:
+        return list(hypotheses['hypotheses'])
+    return []
+
+
+def id_list(hypothesis: dict[str, Any], key: str) -> list[Any]:
+    """One id list of a hypothesis, or an empty list."""
+    if key in hypothesis:
+        return list(hypothesis[key])
+    return []
+
+```
+
+### verification/cross_modal.py
+```
+"""Cross-modal agreement flag (ADR-0005: one deterministic check, no resolution rule).
+
+Stage 1 rule: the label best supported by seen items must equal the label best
+supported by heard items. When one side supports nothing, there is nothing to
+disagree with and the flag stays true.
+
+This file is loaded through the static allowlist in
+``emoharness.harness.allowlist``: no imports beyond ``__future__`` and ``typing``,
+no attribute access, no loops other than ``for``, and calls only to whitelisted
+builtins or to functions defined here.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+SEEN_MODALITIES = ('visual',)
+HEARD_MODALITIES = ('audio',)
+
+
+def modalities_agree(record: dict[str, Any], hypotheses: dict[str, Any]) -> bool:
+    """True when the seen cues and the heard cues favour the same label."""
+    seen = top_label(record, hypotheses, SEEN_MODALITIES)
+    heard = top_label(record, hypotheses, HEARD_MODALITIES)
+    if seen == '' or heard == '':
+        return True
+    return seen == heard
+
+
+def top_label(
+    record: dict[str, Any],
+    hypotheses: dict[str, Any],
+    modalities: tuple[str, ...],
+) -> str:
+    """The label with the most supporting items in ``modalities``; '' when none."""
+    rows = []
+    index = 0
+    for hypothesis in hypothesis_list(hypotheses):
+        count = support_count(record, hypothesis, modalities)
+        rows = rows + [(count, -index, str(hypothesis['label']))]
+        index = index + 1
+    ordered = sorted(rows, reverse=True)
+    if len(ordered) == 0:
+        return ''
+    if ordered[0][0] == 0:
+        return ''
+    return str(ordered[0][2])
+
+
+def support_count(
+    record: dict[str, Any],
+    hypothesis: dict[str, Any],
+    modalities: tuple[str, ...],
+) -> int:
+    """How many of a hypothesis' supporting ids exist and sit in ``modalities``."""
+    count = 0
+    for item_id in id_list(hypothesis, 'support'):
+        if modality_of(record, str(item_id)) in modalities:
+            count = count + 1
+    return count
+
+
+def modality_of(record: dict[str, Any], item_id: str) -> str:
+    """The modality of one evidence item, or '' when the id is unknown."""
+    for item in item_list(record):
+        if str(item['id']) == item_id:
+            return str(item['modality'])
+    return ''
+
+
+def item_list(record: dict[str, Any]) -> list[Any]:
+    """The record's citable items, or an empty list."""
+    if 'items' in record:
+        return list(record['items'])
+    return []
+
+
+def hypothesis_list(hypotheses: dict[str, Any]) -> list[Any]:
+    """The hypothesis objects, or an empty list."""
+    if 'hypotheses' in hypotheses:
+        return list(hypotheses['hypotheses'])
+    return []
+
+
+def id_list(hypothesis: dict[str, Any], key: str) -> list[Any]:
+    """One id list of a hypothesis, or an empty list."""
+    if key in hypothesis:
+        return list(hypothesis[key])
+    return []
+
+```
+
+## Candidates
+
+### Candidate 1
+- name: sentiment_valence_without_neutral_default
+- targeted_cluster: positive | neutral | agree
+- rationale: The hypotheses stage repeatedly defaults to neutral for sentiment clips even when the transcript conveys approval, encouragement, interest, or other positive stance. This revision makes sentiment valence explicit, separates topic from speaker stance, and requires considering positive and negative alternatives instead of emitting an unsupported neutral-only hypothesis.
+- files: prompts/generate_hypotheses.md
+#### diff of prompts/generate_hypotheses.md
+```
+--- prompts/generate_hypotheses.md (current)
++++ prompts/generate_hypotheses.md (proposed)
+@@ -10,11 +10,16 @@
+ 
+ How to read the record:
+ 
+-- `items` lists every citable observation with its id and its modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard (the transcript, then the voice), and `t` from the wording of the question.
+-- An empty transcript means no intelligible speech was recorded. Do not invent words that are not there.
++- `items` lists every citable observation with its id and modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard (the transcript, then the voice), and `t` from the wording of the question.
++- An empty transcript means no intelligible speech was recorded. Do not invent words or a translation that is not present.
++- Visual descriptions are observations. Do not treat ordinary clothing, setting, or camera position as emotional evidence.
+ 
+ The question asks for the {noun} displayed in the video.
+ The answer must be copied from this list, character for character: {label_set}
++
++First identify whether this is an emotion question or a sentiment question. For an emotion question, judge the affect visibly or vocally displayed by the person, not the topic being discussed. For a sentiment question, judge the expressed attitude or valence of the speech and interaction: encouragement, approval, gratitude, enjoyment, enthusiasm, or warm engagement can support a positive entry; criticism, rejection, complaint, distress, or hostility can support a negative entry. A factual topic is not automatically negative, and a calm delivery is not automatically neutral.
++
++Use the whole clip rather than one isolated cue. Give substantial weight to facial expression, gaze, posture, gestures, vocal prosody, and `temporal_change`. For sentiment, also use the meaning of the transcript when it clearly expresses an attitude. Do not make `neutral` the default merely because the person is seated, speaking calmly, or the transcript is descriptive. Neutral is appropriate when the record genuinely lacks a discernible affective stance, not simply when the evidence is subtle.
+ 
+ Return a single JSON object and nothing else, with these keys:
+ 
+@@ -28,6 +33,9 @@
+ Rules:
+ 
+ - Use only ids that appear in `items`. Never invent an id and never cite an id twice in the same list.
+-- Order the hypotheses from most to least likely. Two to four of them is usual.
+-- A label with no supporting id is allowed only when nothing in the record supports anything.
++- Order the hypotheses from most to least likely. Include the strongest plausible alternative when the evidence is subtle or mixed; do not omit a candidate solely because the cue is mild.
++- Support must be tied to actual cues. Do not use the question wording as support for an emotion unless the wording itself is relevant evidence.
++- Do not infer an emotion from the subject matter alone when the question asks for displayed emotion.
++- Keep each label exactly as written in the candidate list, including capitalization and spelling.
+ - Output JSON only: no prose before or after it, no code fence, no comments.
++
+```
+
+### Candidate 2
+- name: richer_affect_observation
+- targeted_cluster: happy | neutral | agree
+- rationale: Many errors arise because the visual stage supplies generic posture and scene facts while omitting subtle smiles, brow changes, gaze, and start-to-end expression changes. The revised observation prompt requests those diagnostic physical cues without asking the visual model to output a label.
+- files: prompts/extract_visual.md
+#### diff of prompts/extract_visual.md
+```
+--- prompts/extract_visual.md (current)
++++ prompts/extract_visual.md (proposed)
+@@ -15,8 +15,12 @@
+ 
+ - Report observations, not conclusions. Write what a cue looks like, not what it means.
+ - Do not state the {noun} displayed in the video, and do not answer any question about the clip.
++- Inspect the face across the clip, not just one frame. When visible, record affect-relevant physical details such as a smile or frown, raised or furrowed brows, widened or narrowed eyes, gaze direction, mouth opening, lip tension, head position, and whether the expression changes.
++- Also record visible affect-relevant body details such as leaning, withdrawal, open or clenched hands, repetitive movement, stillness, expansive gestures, or a change in posture. Describe the movement itself rather than calling it happy, sad, angry, or surprised.
++- A small or partial cue is worth recording when it is genuinely visible, but do not turn ordinary appearance, clothing, lighting, or a plain background into emotional evidence.
+ - Write each string as a short phrase of at most fifteen words. Leave a list empty rather than guessing.
+ - Never describe something you cannot see, and never describe sound.
+ - Output JSON only: no prose before or after it, no code fence, no comments.
+ 
+ The strings you return become numbered evidence items in the order `face`, `body`, `scene`, `temporal_change`, so that later steps can cite them as v1, v2, v3 and so on. Do not number them yourself.
++
+```
+
+### Candidate 3
+- name: activation_and_positive_emotion_calibration
+- targeted_cluster: Excited | Happiness | agree
+- rationale: The current hypotheses often treats every positive cue as Happiness and overlooks the distinction between sustained pleasant affect and high-arousal excitement. This revision explicitly uses prosody, gesture energy, temporal change, and wording to separate those readings while retaining Happiness when activation evidence is absent.
+- files: prompts/generate_hypotheses.md
+#### diff of prompts/generate_hypotheses.md
+```
+--- prompts/generate_hypotheses.md (current)
++++ prompts/generate_hypotheses.md (proposed)
+@@ -10,11 +10,18 @@
+ 
+ How to read the record:
+ 
+-- `items` lists every citable observation with its id and its modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard (the transcript, then the voice), and `t` from the wording of the question.
++- `items` lists every citable observation with its id and modality. An id starting with `v` came from what was seen, one starting with `a` from what was heard (the transcript, then the voice), and `t` from the wording of the question.
+ - An empty transcript means no intelligible speech was recorded. Do not invent words that are not there.
++- Cues describe observable behavior; infer the displayed affect from their combination rather than from one generic action.
+ 
+ The question asks for the {noun} displayed in the video.
+ The answer must be copied from this list, character for character: {label_set}
++
++Determine whether the task asks for an emotion or a sentiment. For an emotion task, prioritize the person's displayed face, body, voice, and change over time. Do not classify the topic of a sentence as the displayed emotion. For a sentiment task, use the speaker's expressed attitude and valence as well as delivery.
++
++When the candidate list contains both a general positive state and a high-arousal positive state, distinguish them carefully. Sustained smiling, relaxed pleasant engagement, and approving content support the general positive state. Excited or energized affect is better supported by a combination of animated gestures, rapid or forceful delivery, high or variable pitch, loudness, widened eyes, open mouth, emphatic repetition, obvious escalation, or explicit anticipation. A single smile or a single open mouth is not enough to call something excited. Conversely, do not downgrade clear energetic, escalating evidence merely because the person is also smiling. Apply the same evidence-based care to all other candidate labels and use the closest exact candidate wording.
++
++Do not default to neutral when a real facial, vocal, or temporal affective cue is present. Do not let a long list of irrelevant scene or appearance facts outweigh a small number of direct affect cues. If the record is genuinely ambiguous, include the strongest alternative with honest confidence and cite the cues that separate them.
+ 
+ Return a single JSON object and nothing else, with these keys:
+ 
+@@ -30,4 +37,6 @@
+ - Use only ids that appear in `items`. Never invent an id and never cite an id twice in the same list.
+ - Order the hypotheses from most to least likely. Two to four of them is usual.
+ - A label with no supporting id is allowed only when nothing in the record supports anything.
++- Keep every label exactly as written in the candidate list, including capitalization and spelling.
+ - Output JSON only: no prose before or after it, no code fence, no comments.
++
+```
+
+### Candidate 4
+- name: direct_cue_conflict_resolution
+- targeted_cluster: negative | neutral | conflict
+- rationale: On disagreement cases the verifier frequently preserves a generic neutral reading despite direct negative facial or speech cues. This revision makes the modality comparison explicit, distinguishes direct affect from generic scene evidence, and prevents majority support or an automatic neutral fallback from deciding conflicts.
+- files: prompts/verify.md
+#### diff of prompts/verify.md
+```
+--- prompts/verify.md (current)
++++ prompts/verify.md (proposed)
+@@ -2,7 +2,7 @@
+ <!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}. -->
+ <!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+ 
+-Re-examine an earlier reading of one video clip. Start from what was heard, then check it against what was seen.
++Re-examine an earlier reading of one video clip. Separate direct affective evidence from incidental content, then compare what was heard with what was seen.
+ 
+ WHAT WAS HEARD
+ 
+@@ -21,9 +21,11 @@
+ 
+ Work in this order:
+ 
+-1. Decide what the heard cues on their own point to, ignoring the earlier ranking.
+-2. Decide what the seen cues on their own point to.
+-3. Compare the two readings, then re-order and re-score the ranking.
++1. Read the heard cues on their own. Use transcript meaning only when it expresses an attitude, appraisal, complaint, approval, threat, distress, or other affective stance; do not treat an unrelated factual topic as emotional evidence. Also use prosody such as pitch, loudness, speed, pauses, and vocal variation.
++2. Read the seen cues on their own. Give priority to direct facial and bodily affect cues, expression changes, gaze, posture, gestures, and the temporal change. Do not let clothing, setting, ordinary sitting, or generic mouth movement outweigh direct expression cues.
++3. Decide what each modality points to, using the candidate labels exactly as written. For an emotion question, identify the affect visibly or vocally displayed rather than the subject matter. For a sentiment question, include the expressed stance and valence of the interaction.
++4. Compare the two readings. When they disagree, retain the meaningful alternatives, mark `modalities_agree` false, and lower confidence rather than automatically selecting neutral, the modality with more generic evidence, or the first earlier hypothesis. Resolve close cases using cue directness, specificity, persistence across time, and cross-modal corroboration.
++5. Re-order and re-score the hypotheses after this second reading. A hypothesis should be supported by actual ids and should not receive credit merely because it was ranked first earlier.
+ 
+ Return a single JSON object and nothing else, with these keys:
+ 
+@@ -34,5 +36,8 @@
+ 
+ - Keep every label exactly as it is written in the list above.
+ - Use only ids that appear in the record; drop any id you cannot find there.
++- Do not invent a translation, event, facial expression, or emotional cue.
+ - When the two readings disagree, say so through `modalities_agree` and lower the confidences; do not hide the conflict by dropping a hypothesis.
++- Keep support and contradiction lists free of duplicate ids.
+ - Output JSON only: no prose before or after it, no code fence, no comments.
++
+```

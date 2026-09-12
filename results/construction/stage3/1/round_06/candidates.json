@@ -1,0 +1,66 @@
+{
+  "evaluated": [
+    {
+      "name": "Direct-affect_hypothesis_generation",
+      "patch_name": "Direct-affect hypothesis generation",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "cb0a405a707ed01d609aeb53bad8ba4f9ccd1b07527015df275fd3a587ca9b27",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_06/candidates/Direct-affect_hypothesis_generation",
+      "scores": {
+        "name": "Direct-affect_hypothesis_generation",
+        "recognition": 0.4746192893401015,
+        "reasoning": 0.87875,
+        "regression_rate": 0.11979166666666667,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 19.94778688617517
+      }
+    },
+    {
+      "name": "Focused_facial_crops",
+      "patch_name": "Focused facial crops",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "14cb5151da42ef82493b54fb55832f0010cd97aa4cbd12164aee4fdb24d12616",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_06/candidates/Focused_facial_crops",
+      "scores": {
+        "name": "Focused_facial_crops",
+        "recognition": 0.47715736040609136,
+        "reasoning": 0.8625,
+        "regression_rate": 0.020833333333333332,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 25.163730389007867
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "Direct-affect_hypothesis_generation",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4746 does not exceed incumbent 0.4772 by more than 0.0000",
+        "regression rate 0.1198 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "Focused_facial_crops",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4772 does not exceed incumbent 0.4772 by more than 0.0000"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": [
+    {
+      "name": "Arousal-aware verification",
+      "issues": [
+        "2. Label forcing: \"If high-arousal evidence is absent, keep a happiness reading ahead of excitement\" explicitly imposes a label-specific tie-break."
+      ]
+    },
+    {
+      "name": "Evidence-quality ranking",
+      "issues": [
+        "4. Evidence discipline: `if modality == 'text': return 0.2` gives support citing text evidence—including t1, the wording of the question—a positive contribution to the ranking, treating the question wording as answer evidence."
+      ]
+    }
+  ]
+}

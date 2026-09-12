@@ -1,0 +1,29 @@
+{
+  "by_role": {
+    "builder": {
+      "calls": 1,
+      "input_tokens": 104410,
+      "output_tokens": 7210,
+      "cost_usd": 0.029534
+    },
+    "judge_proxy": {
+      "calls": 800,
+      "input_tokens": 1471134,
+      "output_tokens": 42400,
+      "cost_usd": 0.3451068
+    },
+    "target": {
+      "calls": 4651,
+      "input_tokens": 6371191,
+      "output_tokens": 882392,
+      "cost_usd": 0.0
+    },
+    "verifier": {
+      "calls": 1,
+      "input_tokens": 12488,
+      "output_tokens": 1769,
+      "cost_usd": 0.004620399999999999
+    }
+  },
+  "total_usd": 0.37926119999999997
+}

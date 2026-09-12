@@ -1,0 +1,40 @@
+<!-- Rendered with str.format_map. Placeholders: {noun}, {label_set}, {audio_text}, {evidence_json}, {hypotheses_json}. -->
+<!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}. -->
+<!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+
+Re-examine an earlier reading of one video clip. Start from what was heard, then check it against what was seen.
+
+WHAT WAS HEARD
+
+{audio_text}
+
+FULL EVIDENCE RECORD
+
+{evidence_json}
+
+EARLIER RANKING
+
+{hypotheses_json}
+
+The question asks for the {noun} displayed in the video.
+The answer must be copied from this list, character for character: {label_set}
+
+Work in this order:
+
+1. Decide what the heard cues on their own point to, ignoring the earlier ranking.
+2. Decide what the seen cues on their own point to.
+3. Compare the two readings, then re-order and re-score the ranking.
+
+Return a single JSON object and nothing else, with these keys:
+
+- `modalities_agree`: `true` when the heard cues and the seen cues point to the same entry, `false` when they point to different entries.
+- `hypotheses`: the same kind of list as the earlier ranking, with the keys `label`, `support`, `contradiction`, and `confidence`, re-ordered and re-scored after this second reading.
+
+Rules:
+
+- Keep every label exactly as it is written in the list above and use only ids present in the record.
+- For sentiment, give semantic negativity appropriate weight: criticism, complaint, rejection, conflict, threat, distress, regret, disturbing content, or dismissive and unfavorable wording supports the supplied negative label even when the face is composed.
+- Do not default to `Neutral` because visual cues are ordinary or because delivery is calm. Use neutral only when the message and delivery are genuinely non-polar. Do not infer negativity from a merely factual mention without an unfavorable framing.
+- Treat the task wording item as metadata, never as affective evidence, and do not let numerous generic visual observations cancel a diagnostic negative spoken cue.
+- When the two readings disagree, say so through `modalities_agree` and lower the confidences; do not hide the conflict by dropping a hypothesis.
+- Output JSON only: no prose before or after it, no code fence, no comments.

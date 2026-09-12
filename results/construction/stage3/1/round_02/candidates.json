@@ -1,0 +1,98 @@
+{
+  "evaluated": [
+    {
+      "name": "affect-first-visual-evidence",
+      "patch_name": "affect-first-visual-evidence",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "fc918a770c21ec5490d14091adf9c4bb944c6116da3c80f6fc86fbb026dd3647",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_02/candidates/affect-first-visual-evidence",
+      "scores": {
+        "name": "affect-first-visual-evidence",
+        "recognition": 0.4746192893401015,
+        "reasoning": 0.84625,
+        "regression_rate": 0.12169312169312169,
+        "mean_calls": 4.00253807106599,
+        "p95_latency_s": 17.00520287058316
+      }
+    },
+    {
+      "name": "stance-aware-positive-sentiment",
+      "patch_name": "stance-aware-positive-sentiment",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "64276561522c0245c414ecc4376fb47fba106322661a6f119197f521d40fb00c",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_02/candidates/stance-aware-positive-sentiment",
+      "scores": {
+        "name": "stance-aware-positive-sentiment",
+        "recognition": 0.4593908629441624,
+        "reasoning": 0.8625,
+        "regression_rate": 0.1164021164021164,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 21.90259926490253
+      }
+    },
+    {
+      "name": "frustration-cue-reassessment",
+      "patch_name": "frustration-cue-reassessment",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "bc64f0b79010c04a11ea7f680218926f85367a0b6e9fd7566797722fb4863336",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_02/candidates/frustration-cue-reassessment",
+      "scores": {
+        "name": "frustration-cue-reassessment",
+        "recognition": 0.467005076142132,
+        "reasoning": 0.86375,
+        "regression_rate": 0.037037037037037035,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 26.15656107070392
+      }
+    },
+    {
+      "name": "stance-aware-negative-sentiment",
+      "patch_name": "stance-aware-negative-sentiment",
+      "targeted_cluster": "negative | neutral | agree",
+      "patch_hash": "7dea67283b38e29813733d50a4cfd254a9946cfb49a2400820926633f10b4345",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/1/round_02/candidates/stance-aware-negative-sentiment",
+      "scores": {
+        "name": "stance-aware-negative-sentiment",
+        "recognition": 0.4746192893401015,
+        "reasoning": 0.85875,
+        "regression_rate": 0.08994708994708994,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 20.88692634633044
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "affect-first-visual-evidence",
+      "passed": false,
+      "reasons": [
+        "reasoning 0.8462 falls below the incumbent floor 0.8500 (2.0 points)",
+        "regression rate 0.1217 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "stance-aware-positive-sentiment",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4594 does not exceed incumbent 0.4721 by more than 0.0000",
+        "regression rate 0.1164 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "frustration-cue-reassessment",
+      "passed": false,
+      "reasons": [
+        "recognition 0.4670 does not exceed incumbent 0.4721 by more than 0.0000"
+      ]
+    },
+    {
+      "name": "stance-aware-negative-sentiment",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0899 exceeds 0.0500"
+      ]
+    }
+  ],
+  "rejected": [],
+  "vetoed": []
+}

@@ -1,0 +1,15 @@
+{
+  "accepted": "explicit_stance_conflict_adjudication",
+  "targeted_cluster": "negative | neutral | conflict",
+  "rationale": "Strengthens the second-pass decision for sentiment items where the visual demeanor and spoken content disagree, giving explicit appraisal and direct affect priority over incidental scene counts.",
+  "patch_hash": "942eed8a826f53cc21fdf9c1f190ceb114381f060a800bd063317116e4d46e4b",
+  "bundle": "/home/max7/EmoHarness/results/construction/stage3/1/round_03/candidates/explicit_stance_conflict_adjudication",
+  "scores": {
+    "name": "explicit_stance_conflict_adjudication",
+    "recognition": 0.4746192893401015,
+    "reasoning": 0.86125,
+    "regression_rate": 0.026455026455026454,
+    "mean_calls": 4.00507614213198,
+    "p95_latency_s": 25.024444287503172
+  }
+}

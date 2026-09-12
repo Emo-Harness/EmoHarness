@@ -1,0 +1,15 @@
+{
+  "accepted": "Stance-valence calibration",
+  "targeted_cluster": "negative | neutral | agree",
+  "rationale": "Makes the sentiment path distinguish factual subject matter from criticism, complaint, dismissal, or unfavorable appraisal, so negative stance is not erased by neutral-looking visuals.",
+  "patch_hash": "9f894f0581ff699bdfa9c8c5363d9b867232bdd96bd269451c37dddd3d6d5a45",
+  "bundle": "/home/max7/EmoHarness/results/construction/stage3/1/round_01/candidates/Stance-valence_calibration",
+  "scores": {
+    "name": "Stance-valence_calibration",
+    "recognition": 0.4720812182741117,
+    "reasoning": 0.87,
+    "regression_rate": 0.016304347826086956,
+    "mean_calls": 4.00507614213198,
+    "p95_latency_s": 25.635508772532933
+  }
+}

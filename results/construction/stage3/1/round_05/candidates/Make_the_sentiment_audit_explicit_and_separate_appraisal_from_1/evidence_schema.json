@@ -1,0 +1,208 @@
+{
+  "$defs": {
+    "AudioEvidence": {
+      "additionalProperties": false,
+      "description": "What deterministic tools heard (ADR-0004, amended 2026-09-11).\n\nThe transcript and language come from whisper, the prosody phrases from\nopenSMILE functionals compared with corpus reference statistics. No model\nopinion enters here. Empty transcript means no intelligible speech.",
+      "properties": {
+        "speech_present": {
+          "title": "Speech Present",
+          "type": "boolean"
+        },
+        "transcript": {
+          "default": "",
+          "title": "Transcript",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "prosody": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Prosody",
+          "type": "array"
+        }
+      },
+      "required": [
+        "speech_present"
+      ],
+      "title": "AudioEvidence",
+      "type": "object"
+    },
+    "EvidenceItem": {
+      "additionalProperties": false,
+      "description": "One citable cue. Reasoning steps may only cite ids that exist in a record.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "modality": {
+          "enum": [
+            "visual",
+            "audio",
+            "text"
+          ],
+          "title": "Modality",
+          "type": "string"
+        },
+        "cue": {
+          "minLength": 1,
+          "title": "Cue",
+          "type": "string"
+        },
+        "segment": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "(start_s, end_s)",
+          "title": "Segment"
+        }
+      },
+      "required": [
+        "id",
+        "modality",
+        "cue"
+      ],
+      "title": "EvidenceItem",
+      "type": "object"
+    },
+    "ParsedPrompt": {
+      "description": "Everything the harness may read from an item's prompt.",
+      "properties": {
+        "quantifier": {
+          "$ref": "#/$defs/Quantifier"
+        },
+        "noun": {
+          "title": "Noun",
+          "type": "string"
+        },
+        "label_set": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Label Set",
+          "type": "array"
+        }
+      },
+      "required": [
+        "quantifier",
+        "noun",
+        "label_set"
+      ],
+      "title": "ParsedPrompt",
+      "type": "object"
+    },
+    "Quantifier": {
+      "description": "The three quantifiers the public template uses.",
+      "enum": [
+        "the most prominent",
+        "one or several",
+        "multiple"
+      ],
+      "title": "Quantifier",
+      "type": "string"
+    },
+    "VisualEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "face": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Face",
+          "type": "array"
+        },
+        "body": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Body",
+          "type": "array"
+        },
+        "scene": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Scene",
+          "type": "array"
+        },
+        "temporal_change": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temporal Change"
+        }
+      },
+      "title": "VisualEvidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The structured record assembled before any label is requested.",
+  "properties": {
+    "visual": {
+      "$ref": "#/$defs/VisualEvidence"
+    },
+    "audio": {
+      "$ref": "#/$defs/AudioEvidence"
+    },
+    "text": {
+      "$ref": "#/$defs/ParsedPrompt"
+    },
+    "items": {
+      "default": [],
+      "description": "flattened citable cues",
+      "items": {
+        "$ref": "#/$defs/EvidenceItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "visual",
+    "audio",
+    "text"
+  ],
+  "title": "EvidenceRecord",
+  "type": "object"
+}

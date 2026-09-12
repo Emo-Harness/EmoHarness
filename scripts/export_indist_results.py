@@ -53,7 +53,7 @@ PREVIOUS_RUNS = {
 ROWS = ('L0', 'L3', 'L4', 'L6')
 #: Every ladder row measured on the 8B student, in ADR-0009's order. The four
 #: above carry the headline claims; these add the decomposition (2026-09-12).
-LADDER_ROWS = ('L0', 'L1', 'L2', 'best_of_4', 'L3', 'L4', 'L6')
+LADDER_ROWS = ('L0', 'L1', 'L2', 'best_of_4', 'L3', 'L4', 'L5', 'L6')
 #: The size sweep: one results tree per student, each with its own ladder.
 STUDENTS = {
     'qwen3vl-2b': ('Qwen3-VL-2B-Instruct', ROOT / 'results/students/qwen3vl-2b'),
@@ -76,6 +76,13 @@ SIDE_ROWS = {
         'Replicate 2 of 3 (not the declared run): the only Stage-2 bundle in this '
         'run with an accepted patch, scored on the same subset for reference'
     ),
+}
+#: Stage 3 ran twice, differing only in whether the packet described the two
+#: verification functions (ADR-0006 §11). Replicate 0's L5 is the ladder row;
+#: replicate 1 writes its own tree so the pair can be compared.
+STAGE3_REPLICATES = {
+    0: ('seams not described', RESULTS),
+    1: ('seams described', ROOT / 'results/replicates/stage3-rep1'),
 }
 ROW_LABELS = {
     'L0': 'Qwen3-VL-8B Direct (official prompt, native video)',
@@ -379,6 +386,59 @@ def size_sweep(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
     return out
 
 
+def stage3_pair(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
+    """Both Stage 3 replicates: what each edited, and whether D_val transferred.
+
+    The pair is the whole point of the pass: identical stage, gates, Builder and
+    round cap, differing only in whether the packet said what the two
+    verification functions do.
+    """
+    base = _row_scores(RESULTS / 'raw_predictions/L3/subset.jsonl', ids)
+    out: dict[str, Any] = {}
+    for replicate, (label, tree) in STAGE3_REPLICATES.items():
+        loop = ROOT / f'results/construction/stage3/{replicate}/loop_result.json'
+        row = tree / 'raw_predictions/L5/subset.jsonl'
+        if not loop.is_file() or not row.is_file():
+            continue
+        lr = _read_json(loop)
+        edits: dict[str, int] = defaultdict(int)
+        candidates = 0
+        for rd in sorted(loop.parent.glob('round_*/proposal.json')):
+            for candidate in _read_json(rd).get('candidates', []):
+                candidates += 1
+                for file in candidate['files']:
+                    edits[file['path']] += 1
+        scores = _row_scores(row, ids)
+        by_task = macro(scores, task_of)
+        res = paired_bootstrap(base, scores, task_of, RESAMPLES)
+        incumbent = [r['incumbent_recognition'] for r in lr['rounds']]
+        out[f'replicate_{replicate}'] = {
+            'label': label,
+            'rounds': len(lr['rounds']),
+            'candidates': candidates,
+            'accepted': [r['accepted'] for r in lr['rounds'] if r['accepted']],
+            'stopped_reason': lr['stopped_reason'],
+            'builder_never_asked_to_stop': all(
+                r.get('builder_continue') is not False for r in lr['rounds']
+            ),
+            'edits_by_path': dict(sorted(edits.items(), key=lambda kv: -kv[1])),
+            'code_edits': sum(n for p, n in edits.items() if p.endswith('.py')),
+            'd_val_first': incumbent[0] if incumbent else None,
+            'd_val_last': incumbent[-1] if incumbent else None,
+            'subset': {'by_task': by_task, **group_means(by_task)},
+            'vs_L3': {
+                'estimate': res.estimate,
+                'ci_low': res.ci_low,
+                'ci_high': res.ci_high,
+                'p_value': res.p_value,
+                'items_better': sum(1 for i in ids if scores[i] > base[i]),
+                'items_worse': sum(1 for i in ids if scores[i] < base[i]),
+            },
+            'cost_usd': lr.get('total_cost', {}).get('total_usd'),
+        }
+    return out
+
+
 def side_rows(ids: list[str], task_of: dict[str, str]) -> dict[str, Any]:
     """Named non-ladder rows with their delta against L3, when they were run."""
     _, base = load_rows()
@@ -530,6 +590,7 @@ def main() -> None:
         'cost': cost_summary(),
         'side_rows': side_rows(ids, task_of),
         'size_sweep': size_sweep(ids, task_of),
+        'stage3': stage3_pair(ids, task_of),
         'previous_runs': previous_runs(ids, task_of),
         'leakage': {
             'checked_pairs': leakage.get('checked_pairs'),
@@ -662,6 +723,9 @@ def _readme(summary: dict[str, Any]) -> str:
         '- `summary.json` -> `previous_runs.v1_omni_describer`: the v1 rows, trajectory, and cost recomputed from the archive.',
         '- `summary.json` -> `side_rows`: non-ladder rows with their delta against L3 (here: replicate 2, the only',
         '  bundle in this run with an accepted patch). Label these clearly on the page; the Stage-2 number is L4.',
+        '- `summary.json` -> `stage3`: both Stage 3 replicates with what each candidate edited, how many touched',
+        '  Python, the D_val trajectory, and the subset delta against L3. The pair differs only in whether the packet',
+        '  described the two verification functions.',
         '- `summary.json` -> `size_sweep`: the full L0/L1/L2/best-of-4/L3 ladder for Qwen3-VL 2B, 4B and 8B, with each',
         '  adjacent difference (modality, format, scaffold, resampling, structure-vs-resampling) and its CI. This is',
         '  where the decomposition of the headline gain lives; the 8B entry repeats the main rows for convenience.',

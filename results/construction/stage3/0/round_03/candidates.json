@@ -1,0 +1,90 @@
+{
+  "evaluated": [
+    {
+      "name": "sentiment_polarity_over_neutral",
+      "patch_name": "sentiment_polarity_over_neutral",
+      "targeted_cluster": "positive | neutral | agree",
+      "patch_hash": "c04d5bc712380f6644e11ad57ad054809cb9b51097b750772846e7e50f4e3429",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_03/candidates/sentiment_polarity_over_neutral",
+      "scores": {
+        "name": "sentiment_polarity_over_neutral",
+        "recognition": 0.47715736040609136,
+        "reasoning": 0.88,
+        "regression_rate": 0.04145077720207254,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 24.13870856157738
+      }
+    },
+    {
+      "name": "understated_frustration_resolution",
+      "patch_name": "understated_frustration_resolution",
+      "targeted_cluster": "Frustration | Neutral | agree",
+      "patch_hash": "afeff987e2f31ab222bd4c43ef42a8953d7f1e2331ad40b6a4060e14963fec51",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_03/candidates/understated_frustration_resolution",
+      "scores": {
+        "name": "understated_frustration_resolution",
+        "recognition": 0.47715736040609136,
+        "reasoning": 0.86625,
+        "regression_rate": 0.03626943005181347,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 26.444302199455002
+      }
+    },
+    {
+      "name": "direct_positive_affect_over_neutral",
+      "patch_name": "direct_positive_affect_over_neutral",
+      "targeted_cluster": "happy | neutral | agree",
+      "patch_hash": "b34d6e6a38da58d0d29b48b6b890569f44b7cf1a4a04bb5f923d7e77eb0ccfcd",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_03/candidates/direct_positive_affect_over_neutral",
+      "scores": {
+        "name": "direct_positive_affect_over_neutral",
+        "recognition": 0.4720812182741117,
+        "reasoning": 0.8575,
+        "regression_rate": 0.06735751295336788,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 26.02082014846383
+      }
+    },
+    {
+      "name": "anger_over_frustration_reproach_rule",
+      "patch_name": "anger_over_frustration_reproach_rule",
+      "targeted_cluster": "Anger | Frustration | agree",
+      "patch_hash": "a5a9cf12e719549d4494c7c8d1055616782a091209d4a1e5c9554e80abeae87a",
+      "directory": "/home/max7/EmoHarness/results/construction/stage3/0/round_03/candidates/anger_over_frustration_reproach_rule",
+      "scores": {
+        "name": "anger_over_frustration_reproach_rule",
+        "recognition": 0.4796954314720812,
+        "reasoning": 0.87875,
+        "regression_rate": 0.04145077720207254,
+        "mean_calls": 4.00507614213198,
+        "p95_latency_s": 24.46678816324569
+      }
+    }
+  ],
+  "gates": [
+    {
+      "name": "sentiment_polarity_over_neutral",
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "name": "understated_frustration_resolution",
+      "passed": true,
+      "reasons": []
+    },
+    {
+      "name": "direct_positive_affect_over_neutral",
+      "passed": false,
+      "reasons": [
+        "regression rate 0.0674 exceeds 0.0500"
+      ]
+    },
+    {
+      "name": "anger_over_frustration_reproach_rule",
+      "passed": true,
+      "reasons": []
+    }
+  ],
+  "rejected": [],
+  "vetoed": []
+}

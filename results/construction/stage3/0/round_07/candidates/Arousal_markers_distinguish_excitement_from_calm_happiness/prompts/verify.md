@@ -1,0 +1,55 @@
+<!-- Rendered with str.format_map. Placeholders: {noun}, {label_set}, {audio_text}, {evidence_json}, {hypotheses_json}. -->
+<!-- Optional placeholders this stage also accepts: {prompt}, {quantifier}. -->
+<!-- A literal brace must be written twice: {{ becomes { and }} becomes }. -->
+
+Re-examine an earlier reading of one video clip. Start from what was heard, then check it against what was seen.
+
+WHAT WAS HEARD
+
+{audio_text}
+
+FULL EVIDENCE RECORD
+
+{evidence_json}
+
+EARLIER RANKING
+
+{hypotheses_json}
+
+The question asks for the {noun} displayed in the video.
+The answer must be copied from this list, character for character: {label_set}
+
+Work in this order:
+
+1. Decide what the heard cues on their own point to, ignoring the earlier ranking.
+2. Decide what the seen cues on their own point to.
+3. Compare the two readings, then re-order and re-score the ranking.
+
+Important distinction between excitement and happiness:
+
+- When the noun is emotion and Excited and Happiness are candidates, first establish positive valence, then assess activation. Excited is positive emotion with observable high energy or anticipation; Happiness is positive emotion that may be warm, calm, or simply pleased.
+- Evidence for Excited includes fast or emphatic speech, repeated or variable/high pitch, exclamations, wide or open-mouthed smiling, expansive or repeated gestures, animated posture, anticipation, eager insistence, or explicit enthusiastic wording.
+- A smile, agreement, praise, or a positive statement without activation supports Happiness rather than automatically supporting Excited. Do not call ordinary fast speech excited unless it is accompanied by positive or animated content; do not call a calm smile excited.
+- When several independent arousal markers accompany positive cues, rank Excited above Happiness even if the face is only moderately expressive. If the only specific cue is a relaxed smile or favorable wording, rank Happiness above Excited.
+- If an earlier ranking omitted Excited but the record contains both positive valence and specific activation markers, add Excited with the relevant evidence ids.
+
+General conflict policy:
+
+- A disagreement is not permission to choose neutral. Resolve it using the strength and specificity of the cues.
+- If one modality supplies explicit affective language, a clear complaint, criticism, rejection, threat, distress, bargaining tension, or negative evaluation, and the other modality supplies only ordinary appearance or generic activity, favor the affective reading over neutral.
+- Treat generic facts such as sitting, looking, speaking, clothing, or room setting as weak evidence. Treat smiles, meaningful gestures, explicit affective wording, and consistent prosody as stronger evidence.
+- When the evidence remains genuinely balanced, retain both competing labels with close confidences and place neutral first only if neither side contains a specific affective cue.
+- The ranked list is consumed downstream, so its first entry must be the best overall interpretation after this comparison, not merely the label favored by the more numerous generic cues.
+
+Return a single JSON object and nothing else, with these keys:
+
+- `modalities_agree`: `true` when the heard cues and the seen cues point to the same entry, `false` when they point to different entries.
+- `hypotheses`: the same kind of list as the earlier ranking, with the keys `label`, `support`, `contradiction`, and `confidence`, re-ordered and re-scored after this second reading.
+
+Rules:
+
+- Keep every label exactly as it is written in the list above.
+- Use only ids that appear in the record; drop any id you cannot find there.
+- When the two readings disagree, say so through `modalities_agree` and lower the confidences, but still resolve the ranking using the conflict policy; do not hide the conflict by dropping a hypothesis.
+- Do not treat the task-word item `t1` as evidence for any emotion or sentiment.
+- Output JSON only: no prose before or after it, no code fence, no comments.

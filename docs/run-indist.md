@@ -237,6 +237,88 @@ scaffold is worth about +12 points over Direct and closes roughly 80% of the
 gap to the Luna teacher, and Stage-2 Builder construction adds nothing
 measurable on top of it, with or without a verifier.
 
+## Stage 3: what the Builder does with code, and whether it transfers (2026-09-12)
+
+ADR-0009 puts the AI4AI claim on `Builder gain = L5 - L3`, and L5 had never
+been run: every earlier Builder result was Stage 2, where only prompts and YAML
+are editable. Stage 3 also unlocks `harness/verification/*.py`, the two pure
+functions that decide whether the seen and heard cues agree and how the
+hypotheses are ordered. They run locally on the stage JSON and issue no model
+calls, so a candidate that edits only them reuses every cached Target call and
+has a different failure profile from a prompt edit: it can change the emitted
+label without changing a single word the Target was asked.
+
+Two replicates ran, differing in one thing. Replicate 0 got the packet as it
+was: the verification paths listed under "Editable paths" and nothing about what
+they do. It proposed 32 candidates over 8 rounds and **edited a prompt every
+single time**, never once the functions the stage had unlocked. Replicate 1 got
+the block added in ADR-0006 §11, which gives each function's name, signature,
+effect and static-allowlist contract, and names no direction to take.
+
+| | Replicate 0, seams not described | Replicate 1, seams described |
+|---|---|---|
+| Rounds / candidates | 8 / 32 | 8 / 32 |
+| **Candidates editing code** | **0** | **3**, all `alternative_hypotheses.py` |
+| `cross_modal.py` edits | 0 | 0 |
+| Other files reached | prompts only | prompts, plus `sampling.yaml` twice |
+| Accepted patches | 2 | 5 |
+| D_val | 45.43 → 47.97 | 45.43 → 47.72 |
+| Cost | $3.05 | $2.70 |
+
+Both replicates ran all 8 rounds because the Builder, which now ends its own
+stage (§10), never once asked to stop.
+
+### The result: three constructions, three zeros on test
+
+| Run | Action space | D_val | Subset, vs L3 |
+|---|---|---|---|
+| Stage 2, replicate 2 | prompts, YAML | **+2.0** | **−0.1** [−1.0, +0.8] |
+| Stage 3, replicate 0 | plus code, seams not described | **+2.5** | **−0.1** [−1.4, +1.2] |
+| Stage 3, replicate 1 | plus code, seams described | **+2.3** | **−0.3** [−1.5, +0.8] |
+
+Overall local Recognition: L3 40.9, L4 40.9, L5 40.8 (replicate 0), L5 40.5
+(replicate 1), teacher 43.9. **Builder gain, L5 − L3, is −0.1**, the number
+ADR-0009 rests the AI4AI claim on.
+
+The third run had every advantage: the largest action space, the Builder setting
+its own round budget and using all of it, five patches through gates that
+required a strict Recognition improvement and at most 5% regression (the
+accepted ones ran as low as 0.6%), and a packet that described the code seams.
+The objective moved 2 to 2.5 points and none of it transferred. Two independent
+stages and three independent replicates give the same answer, so this is a
+property of the loop rather than a run of bad luck: 394 validation items cannot
+separate a reading rule that generalises from one that happens to suit them, and
+a gate on those same items cannot either.
+
+### What the Builder does when code is unlocked
+
+Wording was part of it and not all of it. Describing the seams moved code edits
+from 0 to 3 of 32 and widened the action space (`sampling.yaml` appeared for the
+first time), so the packet had indeed been naming paths without saying what they
+were. But 29 of 32 candidates still edited prose, and `cross_modal.py` was never
+touched in 64 candidates across both replicates. Given a Python seam that
+decides the answer, a described contract, and eight rounds, this Builder prefers
+to write the rule in English in a prompt and let the frozen code apply it.
+
+That preference is visible in what passes, too. Both replicates' accepted
+patches are adjudication rules — "resolve conflicts by affective strength",
+"anger over frustration for reproach", "separate appraisal from delivery" —
+which is exactly the job of the two functions it declined to edit. It is not
+that it failed to see where the decision is made; it saw, and chose prose.
+
+### Recorded for this pass
+
+- Replicate 0 is the uninformed condition and must stay that way: the §11 block
+  is rendered only when a `verification/*.py` path is editable, so Stage 2
+  packets and replicate 0's provenance are unchanged.
+- The block deliberately names no direction. A test asserts it contains none of
+  "should", "prefer", "instead of", "try", "better", because a code edit made
+  after we suggested one would be our idea, not the Builder's.
+- Replicate 1's L5 row is under `results/replicates/stage3-rep1/`
+  (`EMOHARNESS_RESULTS_DIR`) so it does not overwrite replicate 0's. That
+  override also relocates `construction/`, so the row was run with an explicit
+  `--bundle results/construction/stage3/1/final`.
+
 ## Ladder decomposition and the student size sweep (2026-09-12)
 
 The v2 run above measured only L0 and L3, so its "+11.6 harness gain" pooled
