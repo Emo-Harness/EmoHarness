@@ -106,7 +106,12 @@ def test_failure_records_keep_only_wrong_items(make_output: Output) -> None:
     assert records[0].predicted == ('sadness',)
     assert records[0].conflict is True
     assert records[0].keyframe_paths == ('f0.jpg', 'f1.jpg')
-    assert sorted(records[0].stage_outputs) == ['hypotheses', 'verification']
+    assert sorted(records[0].stage_outputs) == [
+        'emitted_labels',
+        'hypotheses',
+        'parse_failures',
+        'verification',
+    ]
     assert 'negative' in records[0].stage_outputs['hypotheses']
     assert 'brow lowered' in records[0].evidence_json
 

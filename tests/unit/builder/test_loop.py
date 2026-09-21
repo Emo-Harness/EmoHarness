@@ -638,3 +638,157 @@ def test_without_the_switch_the_streak_still_ends_the_stage(
 
     assert result.stopped_reason == 'early_stop'
     assert len(result.rounds) == 2
+
+
+def test_next_round_receives_build_and_verifier_feedback_not_validation(
+    bundle_root: Path,
+    tmp_path: Path,
+) -> None:
+    from emoharness.builder.schema import BuildAssessment
+
+    builder = FakeBuilder(
+        [
+            _proposal(_patch('forced'), _patch('weak')),
+            BuilderProposal(
+                candidates=(),
+                continue_search=False,
+                stop_reason='review exhausted this direction',
+            ),
+        ]
+    )
+    verifier = _vetoing(approved=('weak',), vetoed=('forced',))
+
+    def assess(_parent: Path, _candidate: Path) -> BuildAssessment:
+        return BuildAssessment(
+            before=0.4,
+            after=0.45,
+            improved_count=2,
+            regressed_count=1,
+            improved_examples=('build_fixed',),
+            regressed_examples=('build_broken',),
+        )
+
+    result = run_stage(
+        2,
+        0,
+        bundle_root,
+        tmp_path / 'out',
+        builder,
+        _config().model_copy(update={'autonomous_stop': True}),
+        GATES,
+        _diagnose(),
+        _evaluate({'weak': 0.314159}),
+        verifier=verifier,
+        assess_build=assess,
+    )
+    text = builder.calls[1].packet_text
+    assert 'label forcing' in text
+    assert 'build_fixed' in text and 'build_broken' in text
+    assert '0.314159' not in text
+    assert 'gate_results' not in text and 'incumbent_recognition' not in text
+    assert result.stopped_reason == 'builder_stopped'
+    assert len(verifier.requests) == 1
+
+
+def test_unloadable_candidate_is_filtered_before_verifier(
+    bundle_root: Path,
+    tmp_path: Path,
+) -> None:
+    verifier = FakeVerifier()
+
+    def check(path: Path) -> tuple[str, ...]:
+        return ('missing placeholder',) if path.name == 'broken' else ()
+
+    run_stage(
+        2,
+        0,
+        bundle_root,
+        tmp_path / 'out',
+        FakeBuilder([_proposal(_patch('broken'), _patch('good'))]),
+        _config(rounds=1),
+        GATES,
+        _diagnose(),
+        _evaluate({}),
+        verifier=verifier,
+        bundle_check=check,
+    )
+    assert [p.name for p in verifier.requests[0].candidates] == ['good']
+
+
+def test_proxy_is_called_only_after_cheap_gates_and_can_still_veto(
+    bundle_root: Path,
+    tmp_path: Path,
+) -> None:
+    judged = []
+
+    def cheap(path: Path) -> CandidateScores:
+        return _evaluate(
+            {'worse': 0.4, 'regressed': 0.7, 'bad_reasoning': 0.8, 'good': 0.7}
+        )(path).model_copy(
+            update={
+                'reasoning': None,
+                'regression_rate': 0.2 if path.name == 'regressed' else 0.0,
+            }
+        )
+
+    def complete(path: Path, scores: CandidateScores) -> CandidateScores:
+        judged.append(path.name)
+        return scores.model_copy(
+            update={'reasoning': 0.1 if path.name == 'bad_reasoning' else 0.5}
+        )
+
+    result = run_stage(
+        2,
+        0,
+        bundle_root,
+        tmp_path / 'out',
+        FakeBuilder(
+            [
+                _proposal(
+                    *(
+                        _patch(name)
+                        for name in ('worse', 'regressed', 'bad_reasoning', 'good')
+                    )
+                )
+            ]
+        ),
+        _config(rounds=1),
+        GATES,
+        _diagnose(),
+        cheap,
+        complete_evaluation=complete,
+    )
+    assert judged == ['harness', 'bad_reasoning', 'good']
+    assert result.rounds[0].accepted == 'good'
+    assert any(
+        'reasoning' in reason
+        for gate in result.rounds[0].gate_results
+        for reason in gate.reasons
+    )
+
+
+def test_feedback_is_bounded_and_the_history_ablation_disables_it(
+    bundle_root: Path,
+    tmp_path: Path,
+) -> None:
+    for history_rounds in (0, 1):
+        builder = FakeBuilder(
+            [
+                _proposal(_patch(name))
+                for name in ('old_direction', 'recent_direction', 'new_direction')
+            ]
+        )
+        run_stage(
+            2,
+            0,
+            bundle_root,
+            tmp_path / str(history_rounds),
+            builder,
+            _config(early_stop=3).model_copy(update={'history_rounds': history_rounds}),
+            GATES,
+            _diagnose(),
+            _evaluate({}),
+        )
+        text = builder.calls[-1].packet_text
+        assert 'old_direction' not in text
+        assert ('recent_direction' in text) == bool(history_rounds)
