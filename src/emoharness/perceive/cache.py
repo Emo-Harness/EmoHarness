@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic import ValidationError as PydanticValidationError
@@ -42,7 +43,7 @@ class AsrConfig(BaseModel):
     model_config = ConfigDict(frozen=True, extra='forbid')
 
     model: str = Field(min_length=1)
-    backend: str = Field(min_length=1)
+    backend: Literal['faster_whisper', 'none']
     word_timestamps: bool = True
 
 
@@ -63,8 +64,8 @@ class DiarizationConfig(BaseModel):
 class PreprocessConfig(BaseModel):
     """Mirrors ``configs/preprocess.yaml``; its hash keys the preprocessing cache.
 
-    Every tool here is deterministic code (frame sampling, whisper, openSMILE,
-    diarization). An audio-language model used to add a description and an
+    The code-only profile uses frame sampling and openSMILE. The separate
+    ASR profile also invokes Whisper; it is not a code-only tool. An audio-language model used to add a description and an
     opinion channel; that was removed on 2026-09-11 (ADR-0004 amendment).
     """
 
@@ -75,6 +76,14 @@ class PreprocessConfig(BaseModel):
     prosody: ProsodyConfig
     diarization: DiarizationConfig
     cache_root: str = Field(min_length=1)
+
+    @model_validator(mode='after')
+    def _code_only_tools(self) -> PreprocessConfig:
+        if self.asr.backend == 'none' and self.diarization.backend != 'none':
+            raise ValueError(
+                'code-only preprocessing cannot invoke a diarization model'
+            )
+        return self
 
     def config_hash(self) -> str:
         """Stable hash of every setting that can change cached preprocessing output."""

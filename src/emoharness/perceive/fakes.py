@@ -198,6 +198,10 @@ def fake_preprocess(
     seed = clip_seed(media_hash)
     frames_dir = cache.frames_dir(media_hash)
     audio = fake_audio(example, seed)
+    if config.asr.backend == 'none':
+        audio = audio.model_copy(
+            update={'speech_present': None, 'transcript': '', 'language': None}
+        )
     clip = PreprocessedClip(
         media_hash=media_hash,
         config_hash=config_hash,

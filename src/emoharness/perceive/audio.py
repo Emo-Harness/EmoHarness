@@ -1,6 +1,6 @@
 """Audio evidence protocols, frozen records, deterministic fakes, and real adapters.
 
-Every adapter here is a deterministic tool (ADR-0004, amended 2026-09-11): a
+The adapters provide code-based prosody and optional model-based tools: a
 transcriber, a prosody feature extractor, and a diarizer. No audio-language
 model is asked for a description or an opinion. Real adapters
 (``WhisperTranscriber``, ``OpenSmileProsody``, ``PyannoteDiarizer``) import
@@ -38,6 +38,7 @@ class Transcript(BaseModel):
     text: str
     language: str | None = None
     words: tuple[Word, ...] = ()
+    available: bool = True
 
 
 class SpeechSegment(BaseModel):
@@ -243,3 +244,10 @@ def subject_transcript(
 def _midpoint_within(word: Word, windows: Sequence[tuple[float, float]]) -> bool:
     midpoint = (word.start + word.end) / 2
     return any(start <= midpoint <= end for start, end in windows)
+
+
+class NullTranscriber:
+    """No model or inference; missing transcription does not assert silence."""
+
+    def transcribe(self, _wav: Path) -> Transcript:
+        return Transcript(text='', available=False)

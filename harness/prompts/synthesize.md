@@ -33,3 +33,8 @@ Return a single JSON object and nothing else, with these keys:
 - `justification`: one sentence, with citations, saying why the top-ranked reading beats the strongest alternative.
 
 Output JSON only: no prose before or after it, no code fence, no comments.
+
+DETERMINISTIC CHECK (context, not citable evidence):
+{verification_json}
+Use this check to locate disagreements. Cite observed cues, never the check itself
+or t1 (the question). Preserve the ranked decision when explaining it.

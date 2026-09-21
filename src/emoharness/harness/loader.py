@@ -201,6 +201,11 @@ def _check_placeholders(prompts: Mapping[str, str]) -> None:
 
 
 def _check_routing(routing: RoutingConfig) -> None:
+    if (
+        routing.workflow == 'direct_same_tools'
+        and 'generate_hypotheses' not in routing.stages
+    ):
+        raise ValidationError('direct_same_tools requires generate_hypotheses stage')
     unknown = tuple(stage for stage in routing.stages if stage not in STAGE_NAMES)
     if unknown:
         raise ValidationError(f'routing.yaml names unknown stages: {unknown}')

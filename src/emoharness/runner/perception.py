@@ -27,6 +27,7 @@ from emoharness.harness.schema import PerceivedInputs
 from emoharness.perceive.audio import (
     Diarizer,
     NullDiarizer,
+    NullTranscriber,
     OpenSmileProsody,
     PyannoteDiarizer,
     WhisperTranscriber,
@@ -92,7 +93,9 @@ def real_perception_tools(
 ) -> PerceptionTools:
     """The real audio stack. Every heavy import happens inside the adapters' calls."""
     return PerceptionTools(
-        transcriber=WhisperTranscriber(config.asr.model),
+        transcriber=NullTranscriber()
+        if config.asr.backend == 'none'
+        else WhisperTranscriber(config.asr.model),
         prosody=OpenSmileProsody(),
         diarizer=_diarizer_for(config.diarization.backend),
         reference=_reference_stats(paths, config),

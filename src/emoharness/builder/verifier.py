@@ -141,6 +141,7 @@ class ReviewRequest(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
+    workflow_search: bool = False
     stage: int = Field(ge=1)
     round_index: int = Field(ge=0)
     bundle_files: Mapping[str, str] = Field(default_factory=dict)
@@ -218,8 +219,24 @@ def review_request(
 
 def render_review_text(request: ReviewRequest) -> str:
     """The verifier's text input: rules, current files, clusters, and each diff."""
+    instructions = _INSTRUCTIONS
+    if request.workflow_search:
+        instructions += """
+
+Authorized workflow-search extension (these keys are supported):
+The normal four-stage workflow remains available. routing.yaml may set workflow
+multistep or direct_same_tools, rank_policy bundle/confidence/evidence_weighted,
+and audio_weight/visual_weight in [0,2]. verify_on always/conflict remains valid.
+direct_same_tools intentionally uses only generate_hypotheses as one video-plus-
+audio request; code appends a fixed combined JSON contract including visual cues,
+hypotheses and four grounded steps. Other prompts are not called on this path.
+It is not contract damage to select this workflow or propose joint observation
+and reasoning in its generate_hypotheses prompt. All prompt files/placeholders,
+canonical labels, grounding, and the final five-step controller remain required.
+No external model, free-form graph or unrestricted Python interface is added.
+"""
     blocks = [
-        _INSTRUCTIONS,
+        instructions,
         f'Stage: {request.stage}. Round: {request.round_index}.',
         'Editable paths:\n'
         + ('\n'.join(f'- {p}' for p in request.editable_paths) or '- (none)'),

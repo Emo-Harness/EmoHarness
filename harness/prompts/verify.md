@@ -36,3 +36,8 @@ Rules:
 - Use only ids that appear in the record; drop any id you cannot find there.
 - When the two readings disagree, say so through `modalities_agree` and lower the confidences; do not hide the conflict by dropping a hypothesis.
 - Output JSON only: no prose before or after it, no code fence, no comments.
+
+DETERMINISTIC CHECK (context, not citable evidence):
+{verification_json}
+Use this check to locate disagreements. Cite observed cues, never the check itself
+or t1 (the question). Reconsider conflicting readings only against observed cues.

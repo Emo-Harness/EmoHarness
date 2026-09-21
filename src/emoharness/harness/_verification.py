@@ -44,6 +44,15 @@ def apply_bundle_verification(
     bundle: HarnessBundle, record: EvidenceRecord, hypotheses: HypothesisSet
 ) -> VerificationResult:
     """Run the bundle's agreement check and ranker, falling back when they fail."""
+    # Sanitize before running code, so neither the ranker nor its fallback can
+    # count the question or repeated citations as additional observations.
+    hypotheses = hypotheses.model_copy(
+        update={
+            'hypotheses': _validate_ranked(
+                (item.model_dump(mode='json') for item in hypotheses.hypotheses), record
+            )
+        }
+    )
     payload = _Payload(
         record=record,
         hypotheses=hypotheses,
@@ -58,7 +67,10 @@ def apply_bundle_verification(
 
 def _bundle_agreement(bundle: HarnessBundle, payload: _Payload) -> tuple[bool, str]:
     try:
-        return bool(bundle.agree_fn()(payload.record_json, payload.hypotheses_json)), ''
+        agreed = bundle.agree_fn()(payload.record_json, payload.hypotheses_json)
+        if not isinstance(agreed, bool):
+            raise TypeError('modalities_agree must return a bool')
+        return agreed, ''
     except Exception as exc:  # the bundle is Builder-written; never trust it
         _logger.warning('bundle agreement check failed: %s', exc)
         fallback = _cross_modal_agreement(payload.record, payload.hypotheses.hypotheses)
@@ -68,6 +80,9 @@ def _bundle_agreement(bundle: HarnessBundle, payload: _Payload) -> tuple[bool, s
 def _bundle_ranking(
     bundle: HarnessBundle, payload: _Payload
 ) -> tuple[tuple[Hypothesis, ...], str]:
+    policy = bundle.routing.rank_policy
+    if policy != 'bundle':
+        return _policy_ranking(bundle, payload), ''
     try:
         rows = bundle.rank_fn()(payload.record_json, payload.hypotheses_json)
         ranked = _validate_ranked(rows, payload.record)
@@ -94,7 +109,7 @@ def _validate_ranked(
     rows: Iterable[Any], record: EvidenceRecord
 ) -> tuple[Hypothesis, ...]:
     """Keep the rows that are hypotheses over real candidates with real ids."""
-    known = record.item_ids()
+    known = record.decision_ids()
     label_set = LabelSet.from_parsed(record.text)
     valid: list[Hypothesis] = []
     for row in rows:
@@ -172,4 +187,24 @@ def _as_hypothesis(row: Any) -> Hypothesis | None:
 
 
 def _known_ids(ids: Sequence[str], known: frozenset[str]) -> tuple[str, ...]:
-    return tuple(item_id for item_id in ids if item_id in known)
+    return tuple(dict.fromkeys(item_id for item_id in ids if item_id in known))
+
+
+def _policy_ranking(bundle: HarnessBundle, payload: _Payload) -> tuple[Hypothesis, ...]:
+    """Narrow code-owned helpers operating only on validated cue IDs."""
+    modalities = {item.id: item.modality for item in payload.record.items}
+    weights = {
+        'audio': bundle.routing.audio_weight,
+        'visual': bundle.routing.visual_weight,
+    }
+
+    def score(item: Hypothesis) -> float:
+        if bundle.routing.rank_policy == 'confidence':
+            return item.confidence
+        support = sum(weights.get(modalities.get(i), 0.0) for i in item.support)
+        contradiction = sum(
+            weights.get(modalities.get(i), 0.0) for i in item.contradiction
+        )
+        return item.confidence + support - contradiction
+
+    return tuple(sorted(payload.hypotheses.hypotheses, key=lambda item: -score(item)))

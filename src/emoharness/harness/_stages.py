@@ -9,7 +9,7 @@ up in the stage trace so that parse-failure rates appear in the results.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import Any, Final, NamedTuple
 
 from emoharness.common.errors import TargetError, TargetUnavailableError
@@ -45,7 +45,11 @@ _LOGGER = get_logger(__name__)
 
 
 def run_json_stage(
-    stage: str, target: TargetModel, request: TargetRequest, max_calls: int
+    stage: str,
+    target: TargetModel,
+    request: TargetRequest,
+    max_calls: int,
+    payload_check: Callable[[dict[str, Any]], bool] | None = None,
 ) -> StageOutcome:
     """Call the Target until its answer parses, the retries run out, or the budget does."""
     payload: dict[str, Any] | None = None
@@ -69,6 +73,12 @@ def run_json_stage(
         output_tokens += response.output_tokens
         latency += response.latency_s
         payload = extract_json_object(response.text)
+        if (
+            payload is not None
+            and payload_check is not None
+            and not payload_check(payload)
+        ):
+            payload = None
         if payload is None:
             failures += 1
             attempt = with_reminder(attempt)

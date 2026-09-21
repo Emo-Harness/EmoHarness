@@ -1,0 +1,3393 @@
+{
+  "generated_utc": "2026-09-19T17:34:46Z",
+  "resamples": 10000,
+  "item_set": {
+    "n": 5507,
+    "n_source": 5577,
+    "n_excluded": 70,
+    "n_old": 986,
+    "n_new": 4521,
+    "n_old_dropped": 14,
+    "old_label": "old_986",
+    "new_label": "new_4521",
+    "items_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+    "excluded_sha256": "9b78d13dace8187907cdc59396d6296522a389e507459ce65cda20529819d94d",
+    "views": {
+      "full": 5507,
+      "seen": 2963,
+      "held_out": 2544,
+      "old_986": 986,
+      "new_4521": 4521
+    }
+  },
+  "reserved_media": {
+    "ok": true,
+    "blocking": null,
+    "counts": {
+      "build": 0,
+      "val": 0,
+      "ext_test": 0
+    }
+  },
+  "manifest_check": {
+    "ok": true,
+    "blocking": null,
+    "checked": {
+      "evaluation_items.jsonl": "70be1bacef4a06b3...",
+      "evaluation_excluded_ids.json": "9b78d13dace81879..."
+    },
+    "declared_counts": {
+      "n_canonical_full": 5577,
+      "n_full": 5507,
+      "n_excluded": 70,
+      "n_subset": 986,
+      "n_new": 4521
+    }
+  },
+  "mode": "final",
+  "publishable": true,
+  "coverage": {
+    "expected_arms": 16,
+    "present_arms": 16,
+    "missing_arms": [],
+    "arms_not_covering_full_item_set": {},
+    "item_sets_identical_across_arms": true,
+    "arms_covering_exact_frozen_set": 16,
+    "ready_for_final_comparison": true,
+    "marker_defects": []
+  },
+  "models": {
+    "gemma4_e4b": {
+      "arms": {
+        "L0": {
+          "model": "gemma4_e4b",
+          "slot": "L0",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.2703,
+              "sample_weighted": 0.3089
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.2656,
+              "sample_weighted": 0.3345
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.2731,
+              "sample_weighted": 0.279
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.2788,
+              "sample_weighted": 0.2799
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.2704,
+              "sample_weighted": 0.3152
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.0904,
+            "ER_Wild": 0.3078,
+            "SA": 0.3985,
+            "Noise_ER": 0.41,
+            "FG_ER": 0.2506,
+            "ML_ER": 0.3603,
+            "FG_SA": 0.0911,
+            "IR": 0.2535
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.2343,
+              "recall": 0.2506,
+              "f1": 0.2228
+            },
+            "ML_ER": {
+              "precision": 0.4392,
+              "recall": 0.3603,
+              "f1": 0.3619
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4491,
+            "tokens": 15722656,
+            "parse_failures": 0,
+            "cost_usd": 0.0,
+            "wall_s": 14497.6,
+            "uncached_calls_per_s": 0.31,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        },
+        "L1": {
+          "model": "gemma4_e4b",
+          "slot": "L1",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3774,
+              "sample_weighted": 0.4105
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4056,
+              "sample_weighted": 0.4516
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3605,
+              "sample_weighted": 0.3626
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.3836,
+              "sample_weighted": 0.3835
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3753,
+              "sample_weighted": 0.4164
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2712,
+            "ER_Wild": 0.334,
+            "SA": 0.6116,
+            "Noise_ER": 0.524,
+            "FG_ER": 0.2021,
+            "ML_ER": 0.4041,
+            "FG_SA": 0.3275,
+            "IR": 0.3448
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.2238,
+              "recall": 0.2021,
+              "f1": 0.1954
+            },
+            "ML_ER": {
+              "precision": 0.5227,
+              "recall": 0.4041,
+              "f1": 0.4214
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4491,
+            "tokens": 15963151,
+            "parse_failures": 0,
+            "cost_usd": 0.0,
+            "wall_s": 14603.0,
+            "uncached_calls_per_s": 0.31,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        },
+        "L3_scaffold": {
+          "model": "gemma4_e4b",
+          "slot": "L3_scaffold",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.4028,
+              "sample_weighted": 0.4292
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4174,
+              "sample_weighted": 0.457
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.394,
+              "sample_weighted": 0.3969
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.4221,
+              "sample_weighted": 0.4218
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3952,
+              "sample_weighted": 0.4308
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2938,
+            "ER_Wild": 0.3099,
+            "SA": 0.6486,
+            "Noise_ER": 0.474,
+            "FG_ER": 0.2599,
+            "ML_ER": 0.4725,
+            "FG_SA": 0.3883,
+            "IR": 0.3753
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1593,
+              "recall": 0.2599,
+              "f1": 0.1847
+            },
+            "ML_ER": {
+              "precision": 0.4212,
+              "recall": 0.4725,
+              "f1": 0.4352
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22191,
+            "actual_calls": 18099,
+            "tokens": 40122210,
+            "parse_failures": 221,
+            "cost_usd": 0.0,
+            "wall_s": 8292.5,
+            "uncached_calls_per_s": 2.18,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        },
+        "L5_own": {
+          "model": "gemma4_e4b",
+          "slot": "L5_own",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.4021,
+              "sample_weighted": 0.4292
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4179,
+              "sample_weighted": 0.458
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3926,
+              "sample_weighted": 0.3957
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.4165,
+              "sample_weighted": 0.4162
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3952,
+              "sample_weighted": 0.432
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2938,
+            "ER_Wild": 0.3152,
+            "SA": 0.6448,
+            "Noise_ER": 0.472,
+            "FG_ER": 0.2599,
+            "ML_ER": 0.4757,
+            "FG_SA": 0.3861,
+            "IR": 0.3692
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1593,
+              "recall": 0.2599,
+              "f1": 0.1847
+            },
+            "ML_ER": {
+              "precision": 0.424,
+              "recall": 0.4757,
+              "f1": 0.438
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22184,
+            "actual_calls": 8758,
+            "tokens": 42020193,
+            "parse_failures": 209,
+            "cost_usd": 0.0,
+            "wall_s": 2458.1,
+            "uncached_calls_per_s": 3.56,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        }
+      },
+      "comparisons": {
+        "L1 - L0": {
+          "meaning": "fixed perception information, one call",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.10713802456763412,
+                "ci_low": 0.09158135695933733,
+                "ci_high": 0.1228726474632018,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.10161612493190485,
+                "ci_low": 0.08813933781248108,
+                "ci_high": 0.11520224260032687,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.10713802456763413,
+                "ci_low": 0.09141666509677827,
+                "ci_high": 0.12324944822727164,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.14002510507642998,
+                "ci_low": 0.11120574262493575,
+                "ci_high": 0.16859192616891355,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.1171110361120486,
+                "ci_low": 0.0971987850151873,
+                "ci_high": 0.13736078299021262,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.14002510507642998,
+                "ci_low": 0.11162926340509517,
+                "ci_high": 0.1688313365160479,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.08740577626235661,
+                "ci_low": 0.06926002053837987,
+                "ci_high": 0.10571688743055993,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.0835691823899371,
+                "ci_low": 0.06580827437106918,
+                "ci_high": 0.10138233752620543,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.08740577626235661,
+                "ci_low": 0.06944896673448486,
+                "ci_high": 0.10595917887677139,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.10477500611004564,
+                "ci_low": 0.07403466828487794,
+                "ci_high": 0.13526905518258645,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.10358350236646383,
+                "ci_low": 0.0728524340770791,
+                "ci_high": 0.13409398242055443,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.10477500611004564,
+                "ci_low": 0.0739778366164369,
+                "ci_high": 0.1358791262718377,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.1049202462004161,
+                "ci_low": 0.08322377207332265,
+                "ci_high": 0.12715126635889318,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.10118705301187053,
+                "ci_low": 0.08599867285998673,
+                "ci_high": 0.1162581103000811,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.10492024620041608,
+                "ci_low": 0.08256467837158399,
+                "ci_high": 0.1274631113455927,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L3 - L1": {
+          "meaning": "scaffold architecture over the same information",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.02536243404203995,
+                "ci_low": 0.010847025945095706,
+                "ci_high": 0.03951839670974403,
+                "p_value": 0.0006,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.018750810656566967,
+                "ci_low": 0.006636834505002291,
+                "ci_high": 0.03063090698418463,
+                "p_value": 0.0016,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.02536243404203995,
+                "ci_low": 0.011016419540982859,
+                "ci_high": 0.039660367791608794,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.01183987930228083,
+                "ci_low": -0.011937479204129955,
+                "ci_high": 0.03519765306349216,
+                "p_value": 0.3234,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.005399932500843739,
+                "ci_low": -0.011137360782990213,
+                "ci_high": 0.021599730003374958,
+                "p_value": 0.536,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.01183987930228083,
+                "ci_low": -0.012287573315276802,
+                "ci_high": 0.03626746387195006,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.03347596688589542,
+                "ci_low": 0.015449686038168119,
+                "ci_high": 0.05151501780643948,
+                "p_value": 0.0006,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.03430059523809524,
+                "ci_low": 0.016569168351302788,
+                "ci_high": 0.05202853586403114,
+                "p_value": 0.0006,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.03347596688589542,
+                "ci_low": 0.01584290386831388,
+                "ci_high": 0.05086001095583669,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.038537761487629926,
+                "ci_low": 0.009892377414212155,
+                "ci_high": 0.06727165552513487,
+                "p_value": 0.0104,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.03828600405679513,
+                "ci_low": 0.009884212305611904,
+                "ci_high": 0.06676808654496283,
+                "p_value": 0.0108,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.038537761487629926,
+                "ci_low": 0.009781127059332937,
+                "ci_high": 0.06760227292546292,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.019936420288633197,
+                "ci_low": 0.0006195962786753771,
+                "ci_high": 0.03932659334273417,
+                "p_value": 0.043,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.014490315037760293,
+                "ci_low": 0.0013784679432489629,
+                "ci_high": 0.027481962481962476,
+                "p_value": 0.0294,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.019936420288633194,
+                "ci_low": -9.852758829508395e-05,
+                "ci_high": 0.03960931714674748,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L3": {
+          "meaning": "this student's own constructed bundle over the scaffold",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": -0.0006876599866034028,
+                "ci_low": -0.0033366197514118857,
+                "ci_high": 0.0019528875076177505,
+                "p_value": 0.61,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": -1.513225591671201e-05,
+                "ci_low": -0.003208416560740875,
+                "ci_high": 0.0031932843048241575,
+                "p_value": 0.9948,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.0006876599866034029,
+                "ci_low": -0.0033155296145047585,
+                "ci_high": 0.0019035553456084062,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.0005015075437610648,
+                "ci_low": -0.0029872931281381986,
+                "ci_high": 0.004159491483435146,
+                "p_value": 0.7934,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.0010124873439082012,
+                "ci_low": -0.004049949375632805,
+                "ci_high": 0.006074924063449207,
+                "p_value": 0.7614,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0005015075437610648,
+                "ci_low": -0.0030628556588233953,
+                "ci_high": 0.00405709928016347,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": -0.0014011605048220835,
+                "ci_low": -0.005069519089774832,
+                "ci_high": 0.002181748818048311,
+                "p_value": 0.458,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": -0.0012120020964360586,
+                "ci_low": -0.004816070492662473,
+                "ci_high": 0.002325733752620545,
+                "p_value": 0.5148,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.0014011605048220833,
+                "ci_low": -0.005100973083011197,
+                "ci_high": 0.0021976682355339433,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": -0.00561749083107314,
+                "ci_low": -0.013243046178275313,
+                "ci_high": 0.0015244607264621004,
+                "p_value": 0.1242,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": -0.005578093306288032,
+                "ci_low": -0.013184584178498986,
+                "ci_high": 0.0015212981744421906,
+                "p_value": 0.1612,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.00561749083107314,
+                "ci_low": -0.013123973548888222,
+                "ci_high": 0.0015204924431606725,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": -4.479735982296077e-05,
+                "ci_low": -0.0029575884424447004,
+                "ci_high": 0.0028117640528644537,
+                "p_value": 0.9848,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.0011981125119811251,
+                "ci_low": -0.0024146575241465753,
+                "ci_high": 0.0047924500479245005,
+                "p_value": 0.5182,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -4.479735982296077e-05,
+                "ci_low": -0.0029379683349682047,
+                "ci_high": 0.002722131908257514,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L0": {
+          "meaning": "total effect over the student’s own direct baseline",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.1318127986230707,
+                "ci_low": 0.1151048508831258,
+                "ci_high": 0.14861693781768015,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.12035180333255512,
+                "ci_low": 0.10498921286328224,
+                "ci_high": 0.13585593984279748,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.13181279862307066,
+                "ci_low": 0.11442224492668808,
+                "ci_high": 0.1490235728992286,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.15236649192247187,
+                "ci_low": 0.12354230078388588,
+                "ci_high": 0.18149712956826825,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.12352345595680055,
+                "ci_low": 0.10091123860951738,
+                "ci_high": 0.14579817752278096,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.15236649192247187,
+                "ci_low": 0.12352587265228553,
+                "ci_high": 0.18105200563495172,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.11948058264342995,
+                "ci_low": 0.09793532386160869,
+                "ci_high": 0.14107810945033297,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.11665777553159626,
+                "ci_low": 0.09534988956274335,
+                "ci_high": 0.1378476901766996,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.11948058264342998,
+                "ci_low": 0.09816601131473475,
+                "ci_high": 0.14077287961334486,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.13769527676660243,
+                "ci_low": 0.1027293963571175,
+                "ci_high": 0.17385511417600039,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.1362914131169709,
+                "ci_low": 0.10126690331304937,
+                "ci_high": 0.17234617985125084,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.13769527676660243,
+                "ci_low": 0.10229207995013916,
+                "ci_high": 0.17304130530876352,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.12481186912922634,
+                "ci_low": 0.10277784558853485,
+                "ci_high": 0.14728445823943442,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.11687548056161194,
+                "ci_low": 0.09969696311393392,
+                "ci_high": 0.13414970218346128,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.12481186912922632,
+                "ci_low": 0.1017759792958485,
+                "ci_high": 0.1475564539656302,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        }
+      },
+      "name": "Gemma-4-E4B"
+    },
+    "qwen3_5_4b": {
+      "arms": {
+        "L0": {
+          "model": "qwen3_5_4b",
+          "slot": "L0",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.2962,
+              "sample_weighted": 0.3375
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.3017,
+              "sample_weighted": 0.3675
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.2928,
+              "sample_weighted": 0.3026
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.2926,
+              "sample_weighted": 0.2943
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.298,
+              "sample_weighted": 0.347
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.1412,
+            "ER_Wild": 0.381,
+            "SA": 0.383,
+            "Noise_ER": 0.468,
+            "FG_ER": 0.2071,
+            "ML_ER": 0.4667,
+            "FG_SA": 0.0607,
+            "IR": 0.2617
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.229,
+              "recall": 0.2071,
+              "f1": 0.1939
+            },
+            "ML_ER": {
+              "precision": 0.4946,
+              "recall": 0.4667,
+              "f1": 0.4326
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4491,
+            "tokens": 21146388,
+            "parse_failures": 98,
+            "cost_usd": 0.0,
+            "wall_s": 4052.8,
+            "uncached_calls_per_s": 1.11,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        },
+        "L1": {
+          "model": "qwen3_5_4b",
+          "slot": "L1",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3499,
+              "sample_weighted": 0.3964
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.3821,
+              "sample_weighted": 0.4495
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3307,
+              "sample_weighted": 0.3346
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.343,
+              "sample_weighted": 0.3441
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3495,
+              "sample_weighted": 0.4079
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2034,
+            "ER_Wild": 0.3823,
+            "SA": 0.5606,
+            "Noise_ER": 0.512,
+            "FG_ER": 0.2082,
+            "ML_ER": 0.3916,
+            "FG_SA": 0.2169,
+            "IR": 0.3245
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.2245,
+              "recall": 0.2082,
+              "f1": 0.1935
+            },
+            "ML_ER": {
+              "precision": 0.5237,
+              "recall": 0.3916,
+              "f1": 0.4127
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4491,
+            "tokens": 21472144,
+            "parse_failures": 56,
+            "cost_usd": 0.0,
+            "wall_s": 4526.5,
+            "uncached_calls_per_s": 0.99,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        },
+        "L3_scaffold": {
+          "model": "qwen3_5_4b",
+          "slot": "L3_scaffold",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3723,
+              "sample_weighted": 0.4057
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4132,
+              "sample_weighted": 0.4509
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3477,
+              "sample_weighted": 0.3531
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.3824,
+              "sample_weighted": 0.3829
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3684,
+              "sample_weighted": 0.4107
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2994,
+            "ER_Wild": 0.334,
+            "SA": 0.6062,
+            "Noise_ER": 0.456,
+            "FG_ER": 0.2377,
+            "ML_ER": 0.4566,
+            "FG_SA": 0.2495,
+            "IR": 0.3387
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1607,
+              "recall": 0.2377,
+              "f1": 0.1746
+            },
+            "ML_ER": {
+              "precision": 0.4359,
+              "recall": 0.4566,
+              "f1": 0.4357
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22092,
+            "actual_calls": 18014,
+            "tokens": 53858646,
+            "parse_failures": 76,
+            "cost_usd": 0.0,
+            "wall_s": 7201.4,
+            "uncached_calls_per_s": 2.5,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        },
+        "L5_own": {
+          "model": "qwen3_5_4b",
+          "slot": "L5_own",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3723,
+              "sample_weighted": 0.4057
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4132,
+              "sample_weighted": 0.4509
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3477,
+              "sample_weighted": 0.3531
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.3824,
+              "sample_weighted": 0.3829
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3684,
+              "sample_weighted": 0.4107
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2994,
+            "ER_Wild": 0.334,
+            "SA": 0.6062,
+            "Noise_ER": 0.456,
+            "FG_ER": 0.2377,
+            "ML_ER": 0.4566,
+            "FG_SA": 0.2495,
+            "IR": 0.3387
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1607,
+              "recall": 0.2377,
+              "f1": 0.1746
+            },
+            "ML_ER": {
+              "precision": 0.4359,
+              "recall": 0.4566,
+              "f1": 0.4357
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22092,
+            "actual_calls": 0,
+            "tokens": 53858644,
+            "parse_failures": 76,
+            "cost_usd": 0.0,
+            "wall_s": 131.2,
+            "uncached_calls_per_s": 0.0,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.19.1"
+          },
+          "problems": []
+        }
+      },
+      "comparisons": {
+        "L1 - L0": {
+          "meaning": "fixed perception information, one call",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.05377361373919086,
+                "ci_low": 0.04046939558479785,
+                "ci_high": 0.06775418129533319,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.058881120997518306,
+                "ci_low": 0.04604265026330125,
+                "ci_high": 0.07201610828642332,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.05377361373919086,
+                "ci_low": 0.040074311336228866,
+                "ci_high": 0.06736933762579506,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.0803648172948722,
+                "ci_low": 0.05800305216036895,
+                "ci_high": 0.10212331350550495,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.08201147485656429,
+                "ci_low": 0.06277421532230847,
+                "ci_high": 0.10057374282821464,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0803648172948722,
+                "ci_low": 0.05867300697639164,
+                "ci_high": 0.10220852420329646,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.03781889160578204,
+                "ci_low": 0.020279107176127888,
+                "ci_high": 0.05541179663291522,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.031941168763102726,
+                "ci_low": 0.014461805555555556,
+                "ci_high": 0.04941398060796645,
+                "p_value": 0.0004,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.03781889160578205,
+                "ci_low": 0.02023572081301973,
+                "ci_high": 0.05543303765280401,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.05041390624891483,
+                "ci_low": 0.02180854532738876,
+                "ci_high": 0.07838510567843444,
+                "p_value": 0.0006,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.04972954699121027,
+                "ci_low": 0.021078431372549018,
+                "ci_high": 0.07770453008789723,
+                "p_value": 0.0006,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.05041390624891483,
+                "ci_low": 0.0225319964012765,
+                "ci_high": 0.07836456800133476,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.05146636316899246,
+                "ci_low": 0.03362601392203081,
+                "ci_high": 0.06947487953261149,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.060877018358770185,
+                "ci_low": 0.04656915874069159,
+                "ci_high": 0.07517524699550246,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.05146636316899246,
+                "ci_low": 0.033410399342128784,
+                "ci_high": 0.0695520596741407,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L3 - L1": {
+          "meaning": "scaffold architecture over the same information",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.022312836808410497,
+                "ci_low": 0.007376562062501231,
+                "ci_high": 0.03713275695999808,
+                "p_value": 0.0026,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.009273694951014724,
+                "ci_low": -0.0044818931749202335,
+                "ci_high": 0.02296025837246102,
+                "p_value": 0.1884,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.022312836808410497,
+                "ci_low": 0.007698637520418622,
+                "ci_high": 0.037002167702329794,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.03110510162312502,
+                "ci_low": 0.006731159594611492,
+                "ci_high": 0.05553931365461564,
+                "p_value": 0.013,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.0013499831252109348,
+                "ci_low": -0.01822477219034762,
+                "ci_high": 0.021262234222072223,
+                "p_value": 0.8994,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.031105101623125016,
+                "ci_low": 0.006700935596173507,
+                "ci_high": 0.05548150399275274,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.01703747791958178,
+                "ci_low": -0.001746960612567444,
+                "ci_high": 0.03590532164248788,
+                "p_value": 0.075,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.018502452081461514,
+                "ci_low": 0.00014055012728361296,
+                "ci_high": 0.03705359482629529,
+                "p_value": 0.0482,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.01703747791958178,
+                "ci_low": -0.0017393930991310357,
+                "ci_high": 0.036238006622341404,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.03943405837003494,
+                "ci_low": 0.009477718531969619,
+                "ci_high": 0.06901594049876603,
+                "p_value": 0.0102,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.03884381338742393,
+                "ci_low": 0.008789300202839755,
+                "ci_high": 0.06859406693711967,
+                "p_value": 0.0112,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.03943405837003494,
+                "ci_low": 0.010169977697760568,
+                "ci_high": 0.0688925084123217,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.018985159941173165,
+                "ci_low": -0.0013651304999328568,
+                "ci_high": 0.03972283560949509,
+                "p_value": 0.0672,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.0028246489925322035,
+                "ci_low": -0.012336398394792556,
+                "ci_high": 0.01765061985864905,
+                "p_value": 0.7182,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.01898515994117317,
+                "ci_low": -0.0020869603745850298,
+                "ci_high": 0.04003809951657663,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L3": {
+          "meaning": "this student's own constructed bundle over the scaffold",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "p_value": 1.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0,
+                "ci_low": 0.0,
+                "ci_high": 0.0,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L0": {
+          "meaning": "total effect over the student’s own direct baseline",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.07608645054760135,
+                "ci_low": 0.06065427746368149,
+                "ci_high": 0.09159519706423414,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.06815481594853304,
+                "ci_low": 0.05329219521474833,
+                "ci_high": 0.0828982161232025,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.07608645054760135,
+                "ci_low": 0.06010317710976502,
+                "ci_high": 0.09175125868593334,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.11146991891799722,
+                "ci_low": 0.08540205399957132,
+                "ci_high": 0.13725336341354483,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.08336145798177523,
+                "ci_low": 0.061086736415794804,
+                "ci_high": 0.10496118798515018,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.11146991891799722,
+                "ci_low": 0.08550606775608006,
+                "ci_high": 0.13773473190659952,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.05485636952536384,
+                "ci_low": 0.035614760944107045,
+                "ci_high": 0.07476404275461727,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.05044362084456424,
+                "ci_low": 0.031327352875112305,
+                "ci_high": 0.07003359913147646,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.05485636952536384,
+                "ci_low": 0.03500182271996337,
+                "ci_high": 0.07488468826714258,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.08984796461894978,
+                "ci_low": 0.057738256558143214,
+                "ci_high": 0.1211804381560031,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.08857336037863421,
+                "ci_low": 0.056473546315077755,
+                "ci_high": 0.11989688979039889,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.08984796461894977,
+                "ci_low": 0.057338958622728343,
+                "ci_high": 0.12287274894384931,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.07045152311016561,
+                "ci_low": 0.049422734271985375,
+                "ci_high": 0.09141578953561791,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.0637016673513024,
+                "ci_low": 0.04738346710062038,
+                "ci_high": 0.08009099072055274,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.07045152311016563,
+                "ci_low": 0.04937004481072888,
+                "ci_high": 0.09204004295753689,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        }
+      },
+      "name": "Qwen3.5-4B"
+    },
+    "qwen3vl_4b": {
+      "arms": {
+        "L0": {
+          "model": "qwen3vl_4b",
+          "slot": "L0",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.2939,
+              "sample_weighted": 0.3374
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.2861,
+              "sample_weighted": 0.3662
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.2985,
+              "sample_weighted": 0.304
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.2992,
+              "sample_weighted": 0.3003
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.2892,
+              "sample_weighted": 0.3455
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.0847,
+            "ER_Wild": 0.3474,
+            "SA": 0.4263,
+            "Noise_ER": 0.518,
+            "FG_ER": 0.2189,
+            "ML_ER": 0.3692,
+            "FG_SA": 0.1106,
+            "IR": 0.2759
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.2398,
+              "recall": 0.2189,
+              "f1": 0.2051
+            },
+            "ML_ER": {
+              "precision": 0.4957,
+              "recall": 0.3692,
+              "f1": 0.3879
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4492,
+            "tokens": 22034322,
+            "parse_failures": 6,
+            "cost_usd": 0.0,
+            "wall_s": 7033.4,
+            "uncached_calls_per_s": 0.64,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        },
+        "L1": {
+          "model": "qwen3vl_4b",
+          "slot": "L1",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3839,
+              "sample_weighted": 0.4301
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.3979,
+              "sample_weighted": 0.4759
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3755,
+              "sample_weighted": 0.3767
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.3817,
+              "sample_weighted": 0.3816
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3793,
+              "sample_weighted": 0.4406
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.1864,
+            "ER_Wild": 0.3696,
+            "SA": 0.6378,
+            "Noise_ER": 0.614,
+            "FG_ER": 0.2078,
+            "ML_ER": 0.394,
+            "FG_SA": 0.3514,
+            "IR": 0.3103
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.2247,
+              "recall": 0.2078,
+              "f1": 0.1943
+            },
+            "ML_ER": {
+              "precision": 0.5458,
+              "recall": 0.394,
+              "f1": 0.4235
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4491,
+            "tokens": 22356101,
+            "parse_failures": 3,
+            "cost_usd": 0.0,
+            "wall_s": 7294.3,
+            "uncached_calls_per_s": 0.62,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        },
+        "L3_scaffold": {
+          "model": "qwen3vl_4b",
+          "slot": "L3_scaffold",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.376,
+              "sample_weighted": 0.4241
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4126,
+              "sample_weighted": 0.4792
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3541,
+              "sample_weighted": 0.3598
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.3867,
+              "sample_weighted": 0.3879
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.369,
+              "sample_weighted": 0.432
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.226,
+            "ER_Wild": 0.3561,
+            "SA": 0.6556,
+            "Noise_ER": 0.574,
+            "FG_ER": 0.1774,
+            "ML_ER": 0.4537,
+            "FG_SA": 0.2082,
+            "IR": 0.357
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.14,
+              "recall": 0.1774,
+              "f1": 0.1414
+            },
+            "ML_ER": {
+              "precision": 0.4746,
+              "recall": 0.4537,
+              "f1": 0.456
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22075,
+            "actual_calls": 17968,
+            "tokens": 46870164,
+            "parse_failures": 67,
+            "cost_usd": 0.0,
+            "wall_s": 6114.5,
+            "uncached_calls_per_s": 2.94,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        },
+        "L5_own": {
+          "model": "qwen3vl_4b",
+          "slot": "L5_own",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3856,
+              "sample_weighted": 0.4309
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4173,
+              "sample_weighted": 0.4813
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3665,
+              "sample_weighted": 0.3722
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.3928,
+              "sample_weighted": 0.3941
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3811,
+              "sample_weighted": 0.4389
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2373,
+            "ER_Wild": 0.3575,
+            "SA": 0.6571,
+            "Noise_ER": 0.586,
+            "FG_ER": 0.1838,
+            "ML_ER": 0.4644,
+            "FG_SA": 0.2191,
+            "IR": 0.3793
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1333,
+              "recall": 0.1838,
+              "f1": 0.1415
+            },
+            "ML_ER": {
+              "precision": 0.4743,
+              "recall": 0.4644,
+              "f1": 0.4602
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22031,
+            "actual_calls": 16374,
+            "tokens": 50570172,
+            "parse_failures": 3,
+            "cost_usd": 0.0,
+            "wall_s": 5214.8,
+            "uncached_calls_per_s": 3.14,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        }
+      },
+      "comparisons": {
+        "L1 - L0": {
+          "meaning": "fixed perception information, one call",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.09003525759691232,
+                "ci_low": 0.07618608859146568,
+                "ci_high": 0.10381948533400033,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.09261502676247546,
+                "ci_low": 0.08015505157937516,
+                "ci_high": 0.10525976679031881,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.09003525759691232,
+                "ci_low": 0.07639858282405147,
+                "ci_high": 0.1040338723985375,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.111803574539311,
+                "ci_low": 0.09055346329516775,
+                "ci_high": 0.134023129974431,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.10968612892338846,
+                "ci_low": 0.09179885251434357,
+                "ci_high": 0.12757340533243333,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.11180357453931099,
+                "ci_low": 0.09086049174399548,
+                "ci_high": 0.13356830019508753,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.0769742674314731,
+                "ci_low": 0.0588055110273829,
+                "ci_high": 0.09445701070757359,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.07273229260257562,
+                "ci_low": 0.05503402029050614,
+                "ci_high": 0.0897752648622342,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0769742674314731,
+                "ci_low": 0.05899142562333774,
+                "ci_high": 0.09481238750308128,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.08254863453019674,
+                "ci_low": 0.053273376713555004,
+                "ci_high": 0.11134441934971254,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.08130493576741041,
+                "ci_low": 0.05223123732251522,
+                "ci_high": 0.10995605138607166,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.08254863453019674,
+                "ci_low": 0.05342991731785806,
+                "ci_high": 0.11114525184397481,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.09008774519556612,
+                "ci_low": 0.07364366926522233,
+                "ci_high": 0.10710812963221024,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.09508168230795967,
+                "ci_low": 0.08117819224571049,
+                "ci_high": 0.10917335503101926,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.09008774519556612,
+                "ci_low": 0.07329048196985251,
+                "ci_high": 0.10778976175602688,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L3 - L1": {
+          "meaning": "scaffold architecture over the same information",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": -0.007899381094391724,
+                "ci_low": -0.022095950249945342,
+                "ci_high": 0.006438549780361138,
+                "p_value": 0.2776,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": -0.005975727861509595,
+                "ci_low": -0.018143839658616313,
+                "ci_high": 0.006470703952545242,
+                "p_value": 0.3248,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.007899381094391724,
+                "ci_low": -0.02194312527095707,
+                "ci_high": 0.006351684695448113,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.014631608042923391,
+                "ci_low": -0.00838771264529202,
+                "ci_high": 0.037291161331505084,
+                "p_value": 0.2142,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.0033749578130273373,
+                "ci_low": -0.01349983125210935,
+                "ci_high": 0.01991225109686129,
+                "p_value": 0.7172,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.014631608042923393,
+                "ci_low": -0.007862091977596455,
+                "ci_high": 0.03786937640252251,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": -0.021417974576780793,
+                "ci_low": -0.03964411822611802,
+                "ci_high": -0.0030623533612516747,
+                "p_value": 0.0224,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": -0.016866483228511534,
+                "ci_low": -0.03448317937631027,
+                "ci_high": 0.0009796743972746277,
+                "p_value": 0.0646,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.021417974576780793,
+                "ci_low": -0.03986936474866953,
+                "ci_high": -0.0032777656738915747,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.005016541081389337,
+                "ci_low": -0.02343647562618184,
+                "ci_high": 0.03293264881047856,
+                "p_value": 0.7238,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.0062542258282623385,
+                "ci_low": -0.022143340094658556,
+                "ci_high": 0.03406017579445571,
+                "p_value": 0.6626,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.005016541081389336,
+                "ci_low": -0.022675974087418792,
+                "ci_high": 0.033335693508677024,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": -0.010303259622366667,
+                "ci_low": -0.027797079240484947,
+                "ci_high": 0.00819269711458859,
+                "p_value": 0.2672,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": -0.008642999336429993,
+                "ci_low": -0.02239562596770626,
+                "ci_high": 0.004919864705448642,
+                "p_value": 0.2098,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.010303259622366667,
+                "ci_low": -0.027850291280624707,
+                "ci_high": 0.00796171215382171,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L3": {
+          "meaning": "this student's own constructed bundle over the scaffold",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.009543209609024361,
+                "ci_low": 0.0011976906944832382,
+                "ci_high": 0.018178615148803867,
+                "p_value": 0.024,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.006802165209646597,
+                "ci_low": 9.349572405682606e-06,
+                "ci_high": 0.013829584857367681,
+                "p_value": 0.0498,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.009543209609024361,
+                "ci_low": 0.0007758603367606138,
+                "ci_high": 0.018146661512377413,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.004728406065240632,
+                "ci_low": -0.009641898830249268,
+                "ci_high": 0.019124142216765748,
+                "p_value": 0.5234,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.0020249746878164025,
+                "ci_low": -0.007087411407357408,
+                "ci_high": 0.011137360782990213,
+                "p_value": 0.6882,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.004728406065240632,
+                "ci_low": -0.009541271142261842,
+                "ci_high": 0.019099111460372648,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.012432091735294599,
+                "ci_low": 0.0017979361090687592,
+                "ci_high": 0.02307265523247603,
+                "p_value": 0.0218,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.012366165019466906,
+                "ci_low": 0.001962179919137466,
+                "ci_high": 0.022875533468104222,
+                "p_value": 0.0206,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.012432091735294599,
+                "ci_low": 0.001633876056606737,
+                "ci_high": 0.023281687930346733,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.00611719199830407,
+                "ci_low": -0.010419077050734709,
+                "ci_high": 0.022425430428876143,
+                "p_value": 0.478,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.006254225828262339,
+                "ci_low": -0.01031102096010818,
+                "ci_high": 0.02231237322515213,
+                "p_value": 0.4694,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.00611719199830407,
+                "ci_low": -0.01034005285167495,
+                "ci_high": 0.02252062489517485,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.01213029750915919,
+                "ci_low": 0.0008841714652828276,
+                "ci_high": 0.023962703121291888,
+                "p_value": 0.0314,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.006921667140645243,
+                "ci_low": -0.0005530671680306716,
+                "ci_high": 0.014672375475295181,
+                "p_value": 0.0734,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.012130297509159192,
+                "ci_low": 0.0006476367502537075,
+                "ci_high": 0.024008103334201152,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L0": {
+          "meaning": "total effect over the student’s own direct baseline",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.09167908611154496,
+                "ci_low": 0.07629500156326033,
+                "ci_high": 0.10733819904866362,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.09344146411061245,
+                "ci_low": 0.07940622649095955,
+                "ci_high": 0.10747969575518604,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.09167908611154496,
+                "ci_low": 0.07597616210201337,
+                "ci_high": 0.10702990133714921,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.13116358864747502,
+                "ci_low": 0.10493804021256874,
+                "ci_high": 0.15814542878997404,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.1150860614242322,
+                "ci_low": 0.09382382720215997,
+                "ci_high": 0.1360107998650017,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.13116358864747504,
+                "ci_low": 0.104892329131159,
+                "ci_high": 0.15800636759352973,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.06798838458998692,
+                "ci_low": 0.048644740336587056,
+                "ci_high": 0.0871276847094931,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.068231974393531,
+                "ci_low": 0.04914415805630428,
+                "ci_high": 0.08709895131401615,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.06798838458998692,
+                "ci_low": 0.04848523264996681,
+                "ci_high": 0.08732671437416338,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.09368236760989015,
+                "ci_low": 0.06191847175521851,
+                "ci_high": 0.12531281028462615,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.0938133874239351,
+                "ci_low": 0.0617816091954023,
+                "ci_high": 0.12542258282623392,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.09368236760989015,
+                "ci_low": 0.06221660905187275,
+                "ci_high": 0.12415021339161143,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.09191478308235862,
+                "ci_low": 0.07266653160632684,
+                "ci_high": 0.1112720028177113,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.09336035011217493,
+                "ci_low": 0.07714497688037834,
+                "ci_high": 0.10928593152589501,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.09191478308235862,
+                "ci_low": 0.07313569136824954,
+                "ci_high": 0.11169668346008191,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        }
+      },
+      "name": "Qwen3-VL-4B"
+    },
+    "qwen3vl_8b": {
+      "arms": {
+        "L0": {
+          "model": "qwen3vl_8b",
+          "slot": "L0",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.2995,
+              "sample_weighted": 0.3426
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.2869,
+              "sample_weighted": 0.3682
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3071,
+              "sample_weighted": 0.3129
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.2939,
+              "sample_weighted": 0.2951
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3016,
+              "sample_weighted": 0.353
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.0847,
+            "ER_Wild": 0.3622,
+            "SA": 0.4139,
+            "Noise_ER": 0.564,
+            "FG_ER": 0.2361,
+            "ML_ER": 0.388,
+            "FG_SA": 0.1323,
+            "IR": 0.215
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.2212,
+              "recall": 0.2361,
+              "f1": 0.206
+            },
+            "ML_ER": {
+              "precision": 0.4941,
+              "recall": 0.388,
+              "f1": 0.3959
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4491,
+            "tokens": 22327039,
+            "parse_failures": 6,
+            "cost_usd": 0.0,
+            "wall_s": 11679.1,
+            "uncached_calls_per_s": 0.38,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        },
+        "L1": {
+          "model": "qwen3vl_8b",
+          "slot": "L1",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.3915,
+              "sample_weighted": 0.4349
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.415,
+              "sample_weighted": 0.4819
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3774,
+              "sample_weighted": 0.38
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.4038,
+              "sample_weighted": 0.4042
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.3902,
+              "sample_weighted": 0.4415
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2316,
+            "ER_Wild": 0.3803,
+            "SA": 0.6332,
+            "Noise_ER": 0.65,
+            "FG_ER": 0.1917,
+            "ML_ER": 0.4168,
+            "FG_SA": 0.308,
+            "IR": 0.3205
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1957,
+              "recall": 0.1917,
+              "f1": 0.1742
+            },
+            "ML_ER": {
+              "precision": 0.5797,
+              "recall": 0.4168,
+              "f1": 0.4489
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 5507,
+            "actual_calls": 4492,
+            "tokens": 22721138,
+            "parse_failures": 1,
+            "cost_usd": 0.0,
+            "wall_s": 12519.0,
+            "uncached_calls_per_s": 0.36,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        },
+        "L3_scaffold": {
+          "model": "qwen3vl_8b",
+          "slot": "L3_scaffold",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.4047,
+              "sample_weighted": 0.433
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4141,
+              "sample_weighted": 0.4576
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.3991,
+              "sample_weighted": 0.4042
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.4066,
+              "sample_weighted": 0.4075
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.4079,
+              "sample_weighted": 0.4385
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2881,
+            "ER_Wild": 0.3548,
+            "SA": 0.5992,
+            "Noise_ER": 0.566,
+            "FG_ER": 0.2615,
+            "ML_ER": 0.4892,
+            "FG_SA": 0.2668,
+            "IR": 0.4118
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1583,
+              "recall": 0.2615,
+              "f1": 0.1834
+            },
+            "ML_ER": {
+              "precision": 0.4469,
+              "recall": 0.4892,
+              "f1": 0.4567
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22044,
+            "actual_calls": 17978,
+            "tokens": 49314640,
+            "parse_failures": 21,
+            "cost_usd": 0.0,
+            "wall_s": 9554.3,
+            "uncached_calls_per_s": 1.88,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        },
+        "L5_own": {
+          "model": "qwen3vl_8b",
+          "slot": "L5_own",
+          "views": {
+            "full": {
+              "n": 5507,
+              "task_macro": 0.4068,
+              "sample_weighted": 0.4342
+            },
+            "seen": {
+              "n": 2963,
+              "task_macro": 0.4167,
+              "sample_weighted": 0.4587
+            },
+            "held_out": {
+              "n": 2544,
+              "task_macro": 0.4008,
+              "sample_weighted": 0.4057
+            },
+            "old_986": {
+              "n": 986,
+              "task_macro": 0.4113,
+              "sample_weighted": 0.4123
+            },
+            "new_4521": {
+              "n": 4521,
+              "task_macro": 0.4088,
+              "sample_weighted": 0.439
+            }
+          },
+          "by_task": {
+            "ER_Lab": 0.2938,
+            "ER_Wild": 0.3501,
+            "SA": 0.6062,
+            "Noise_ER": 0.572,
+            "FG_ER": 0.2621,
+            "ML_ER": 0.4867,
+            "FG_SA": 0.2777,
+            "IR": 0.4057
+          },
+          "multilabel": {
+            "FG_ER": {
+              "precision": 0.1573,
+              "recall": 0.2621,
+              "f1": 0.183
+            },
+            "ML_ER": {
+              "precision": 0.4455,
+              "recall": 0.4867,
+              "f1": 0.4546
+            }
+          },
+          "cost": {
+            "n": 5507,
+            "logical_calls": 22046,
+            "actual_calls": 6151,
+            "tokens": 50792897,
+            "parse_failures": 26,
+            "cost_usd": 0.0,
+            "wall_s": 3151.7,
+            "uncached_calls_per_s": 1.95,
+            "attempt": 1,
+            "item_set_sha256": "70be1bacef4a06b3eecb87910d7e9a20dbbcea059695bffacfffcaa90537ae73",
+            "git_rev": "7c3eca359fde928b030fa15a543e94f61336b22f",
+            "vllm_version": "0.11.2"
+          },
+          "problems": []
+        }
+      },
+      "comparisons": {
+        "L1 - L0": {
+          "meaning": "fixed perception information, one call",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.09198003617598192,
+                "ci_low": 0.0778236263652634,
+                "ci_high": 0.10645345349877347,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.0922034294015409,
+                "ci_low": 0.07949835490760677,
+                "ci_high": 0.10509967833147423,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.09198003617598194,
+                "ci_low": 0.07763967090244554,
+                "ci_high": 0.10672683360606852,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.12810210886123993,
+                "ci_low": 0.1035792271827125,
+                "ci_high": 0.15319424051818417,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.11373607829902126,
+                "ci_low": 0.09551130610867364,
+                "ci_high": 0.13196085048936887,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.12810210886123993,
+                "ci_low": 0.10364521921757844,
+                "ci_high": 0.1525872045029705,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.07030679256482712,
+                "ci_low": 0.05267521430288634,
+                "ci_high": 0.08837582676727518,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.06712432614555255,
+                "ci_low": 0.04988439184636118,
+                "ci_high": 0.08474915300239591,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.07030679256482712,
+                "ci_low": 0.05228351521532368,
+                "ci_high": 0.08809413153102646,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.10992720853208207,
+                "ci_low": 0.07965483308702989,
+                "ci_high": 0.1399505211128948,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.10916159567275185,
+                "ci_low": 0.07910665990534145,
+                "ci_high": 0.138861984448952,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.10992720853208206,
+                "ci_low": 0.07977583259846309,
+                "ci_high": 0.14036852201911165,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.08857153760364621,
+                "ci_low": 0.07075554343612407,
+                "ci_high": 0.10741758728664715,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.08850496624219252,
+                "ci_low": 0.07427167925343107,
+                "ci_high": 0.10243847494759904,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.08857153760364621,
+                "ci_low": 0.07045596145040273,
+                "ci_high": 0.10777811247650369,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L3 - L1": {
+          "meaning": "scaffold architecture over the same information",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.0131693168159901,
+                "ci_low": -0.002562457812465955,
+                "ci_high": 0.028940366988503045,
+                "p_value": 0.1042,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": -0.001878993834686592,
+                "ci_low": -0.014839987202434997,
+                "ci_high": 0.011231181958892137,
+                "p_value": 0.7706,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.013169316815990097,
+                "ci_low": -0.0028431453610221506,
+                "ci_high": 0.02880193397922923,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": -0.0009886365579848528,
+                "ci_low": -0.028221888976245623,
+                "ci_high": 0.026488337056491743,
+                "p_value": 0.933,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": -0.024299696253796826,
+                "ci_low": -0.043199460006749915,
+                "ci_high": -0.005399932500843739,
+                "p_value": 0.009,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": -0.0009886365579848528,
+                "ci_low": -0.027776648699205694,
+                "ci_high": 0.02605742872310197,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.021664088840375066,
+                "ci_low": 0.002433183875280401,
+                "ci_high": 0.04071050780832864,
+                "p_value": 0.0272,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.02423442647499251,
+                "ci_low": 0.0055029106768493576,
+                "ci_high": 0.042745161350703796,
+                "p_value": 0.013,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.02166408884037507,
+                "ci_low": 0.002719442625322996,
+                "ci_high": 0.04117213784636975,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.0028461860913202956,
+                "ci_low": -0.02542821599923582,
+                "ci_high": 0.03193836176240832,
+                "p_value": 0.854,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.0032961460446247464,
+                "ci_low": -0.025016903313049357,
+                "ci_high": 0.032454361054766734,
+                "p_value": 0.8374,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.002846186091320294,
+                "ci_low": -0.026010646722152784,
+                "ci_high": 0.0317601177923375,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.01771560405769145,
+                "ci_low": -0.0050299588965263126,
+                "ci_high": 0.04010677065485121,
+                "p_value": 0.131,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": -0.003007657387219431,
+                "ci_low": -0.01758056319187706,
+                "ci_high": 0.011664836582719787,
+                "p_value": 0.6854,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.01771560405769145,
+                "ci_low": -0.005461384402237361,
+                "ci_high": 0.04042115220788171,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L3": {
+          "meaning": "this student's own constructed bundle over the scaffold",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.0020987221069422076,
+                "ci_low": -0.0017545945517353889,
+                "ci_high": 0.005918183717616477,
+                "p_value": 0.2924,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.0012408449851703893,
+                "ci_low": -0.0023761424853217116,
+                "ci_high": 0.004812435687912348,
+                "p_value": 0.5006,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0020987221069422076,
+                "ci_low": -0.0016167820381105787,
+                "ci_high": 0.0059764916550136,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.0026348962610600233,
+                "ci_low": -0.00466798346960677,
+                "ci_high": 0.01038460671905408,
+                "p_value": 0.4876,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.0010124873439082012,
+                "ci_low": -0.004724940938238272,
+                "ci_high": 0.006749915626054675,
+                "p_value": 0.7618,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0026348962610600233,
+                "ci_low": -0.004911738332144972,
+                "ci_high": 0.010366990481640293,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.0017770176144715182,
+                "ci_low": -0.0023178625393672123,
+                "ci_high": 0.005936037366122392,
+                "p_value": 0.4056,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.0015068134171907757,
+                "ci_low": -0.002489517819706499,
+                "ci_high": 0.005535901467505241,
+                "p_value": 0.4718,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0017770176144715182,
+                "ci_low": -0.0022930731422394434,
+                "ci_high": 0.005874204144092517,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.00467479674796748,
+                "ci_low": -0.0017539339103068447,
+                "ci_high": 0.011278260228166798,
+                "p_value": 0.1622,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.004732927653820149,
+                "ci_low": -0.0017748478701825558,
+                "ci_high": 0.01140973630831643,
+                "p_value": 0.1648,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.00467479674796748,
+                "ci_low": -0.0016708972383778688,
+                "ci_high": 0.011247642709142198,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.0008882886910060361,
+                "ci_low": -0.006706013704365594,
+                "ci_high": 0.008496428400516754,
+                "p_value": 0.8004,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.0004792450047924499,
+                "ci_low": -0.0036127700361277,
+                "ci_high": 0.004645911671459103,
+                "p_value": 0.822,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0008882886910060361,
+                "ci_low": -0.006551555973001415,
+                "ci_high": 0.008544527491937019,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        },
+        "L5 - L0": {
+          "meaning": "total effect over the student’s own direct baseline",
+          "views": {
+            "full": {
+              "task_macro": {
+                "estimate": 0.10724807509891424,
+                "ci_low": 0.09071540689842668,
+                "ci_high": 0.12382653522426446,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "sample_weighted": {
+                "estimate": 0.0915652805520247,
+                "ci_low": 0.07659342654802978,
+                "ci_high": 0.1066158979480661,
+                "p_value": 0.0,
+                "n_items": 5507
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.10724807509891424,
+                "ci_low": 0.09009182138575637,
+                "ci_high": 0.12406437343470017,
+                "n_clusters": 5083,
+                "n_items": 5507,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "seen": {
+              "task_macro": {
+                "estimate": 0.12974836856431507,
+                "ci_low": 0.1009041355579909,
+                "ci_high": 0.15820107697644104,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "sample_weighted": {
+                "estimate": 0.09044886938913263,
+                "ci_low": 0.06851164360445494,
+                "ci_high": 0.1120485993925076,
+                "p_value": 0.0,
+                "n_items": 2963
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.12974836856431507,
+                "ci_low": 0.10192655780187122,
+                "ci_high": 0.15828400645747503,
+                "n_clusters": 2912,
+                "n_items": 2963,
+                "tasks_in_macro": 3,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "held_out": {
+              "task_macro": {
+                "estimate": 0.0937478990196737,
+                "ci_low": 0.07335759153516587,
+                "ci_high": 0.11440724022456031,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "sample_weighted": {
+                "estimate": 0.09286556603773585,
+                "ci_low": 0.07286933307127882,
+                "ci_high": 0.11310960429769393,
+                "p_value": 0.0,
+                "n_items": 2544
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.0937478990196737,
+                "ci_low": 0.07273558744354182,
+                "ci_high": 0.1145173026922347,
+                "n_clusters": 2534,
+                "n_items": 2544,
+                "tasks_in_macro": 5,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "old_986": {
+              "task_macro": {
+                "estimate": 0.11744819137136984,
+                "ci_low": 0.08373183592857315,
+                "ci_high": 0.15003725114214034,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "sample_weighted": {
+                "estimate": 0.11719066937119675,
+                "ci_low": 0.08355223123732251,
+                "ci_high": 0.14989942528735634,
+                "p_value": 0.0,
+                "n_items": 986
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.11744819137136984,
+                "ci_low": 0.08451677320406231,
+                "ci_high": 0.15107918365335907,
+                "n_clusters": 981,
+                "n_items": 986,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            },
+            "new_4521": {
+              "task_macro": {
+                "estimate": 0.1071754303523437,
+                "ci_low": 0.08476828721958207,
+                "ci_high": 0.1295639716149168,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "sample_weighted": {
+                "estimate": 0.08597655385976555,
+                "ci_low": 0.06908132419081324,
+                "ci_high": 0.10247373368723733,
+                "p_value": 0.0,
+                "n_items": 4521
+              },
+              "media_clustered_diagnostic": {
+                "estimate": 0.10717543035234368,
+                "ci_low": 0.08489100121259728,
+                "ci_high": 0.13015148933071813,
+                "n_clusters": 4224,
+                "n_items": 4521,
+                "tasks_in_macro": 8,
+                "redrawn_incomplete_draws": 0
+              }
+            }
+          }
+        }
+      },
+      "name": "Qwen3-VL-8B"
+    }
+  },
+  "holm": {
+    "gemma4_e4b L1 - L0": 0.0,
+    "gemma4_e4b L5 - L0": 0.0,
+    "qwen3_5_4b L1 - L0": 0.0,
+    "qwen3_5_4b L5 - L0": 0.0,
+    "qwen3vl_4b L1 - L0": 0.0,
+    "qwen3vl_4b L5 - L0": 0.0,
+    "qwen3vl_8b L1 - L0": 0.0,
+    "qwen3vl_8b L5 - L0": 0.0,
+    "gemma4_e4b L3 - L1": 0.0048,
+    "qwen3_5_4b L3 - L1": 0.0182,
+    "qwen3vl_4b L5 - L3": 0.14400000000000002,
+    "qwen3vl_8b L3 - L1": 0.521,
+    "qwen3vl_4b L3 - L1": 1.0,
+    "qwen3vl_8b L5 - L3": 1.0,
+    "gemma4_e4b L5 - L3": 1.0,
+    "qwen3_5_4b L5 - L3": 1.0
+  },
+  "order": [
+    "qwen3vl_8b",
+    "qwen3vl_4b",
+    "qwen3_5_4b",
+    "gemma4_e4b"
+  ],
+  "tasks": [
+    "ER_Lab",
+    "ER_Wild",
+    "SA",
+    "Noise_ER",
+    "FG_ER",
+    "ML_ER",
+    "FG_SA",
+    "IR"
+  ],
+  "task_counts": {
+    "ER_Lab": 177,
+    "ER_Wild": 1491,
+    "SA": 1295,
+    "Noise_ER": 500,
+    "FG_ER": 500,
+    "ML_ER": 590,
+    "FG_SA": 461,
+    "IR": 493
+  },
+  "budget": {
+    "roles": {
+      "target": {
+        "calls": 65906,
+        "usd": 0.0
+      },
+      "judge_proxy": {
+        "calls": 1600,
+        "usd": 0.6723646000000006
+      },
+      "builder": {
+        "calls": 12,
+        "usd": 0.3865968
+      },
+      "verifier": {
+        "calls": 12,
+        "usd": 0.05505739999999999
+      }
+    },
+    "per_student": {
+      "qwen3vl_8b": 0.0,
+      "qwen3vl_4b": 0.4877798000000002,
+      "qwen3_5_4b": 0.22510300000000003,
+      "gemma4_e4b": 0.4011359999999998
+    },
+    "total_usd": 1.1140188
+  },
+  "builds": [
+    {
+      "model": "qwen3vl_4b",
+      "name": "Qwen3-VL-4B",
+      "rounds": 4,
+      "accepted": 2,
+      "promotions": [
+        null,
+        "bounded_candidate_coverage",
+        null,
+        "unanchored_label_recovery_verifier"
+      ],
+      "D_val_trajectory": [
+        0.4593908629441624,
+        0.4593908629441624,
+        0.4720812182741117,
+        0.4720812182741117,
+        0.4796954314720812
+      ],
+      "D_val_n": 394,
+      "usd": 0.4877798000000002
+    },
+    {
+      "model": "qwen3_5_4b",
+      "name": "Qwen3.5-4B",
+      "rounds": 4,
+      "accepted": 0,
+      "promotions": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "D_val_trajectory": [
+        0.41116751269035534,
+        0.41116751269035534,
+        0.41116751269035534,
+        0.41116751269035534,
+        0.41116751269035534
+      ],
+      "D_val_n": 394,
+      "usd": 0.22510300000000003
+    },
+    {
+      "model": "gemma4_e4b",
+      "name": "Gemma-4-E4B",
+      "rounds": 4,
+      "accepted": 2,
+      "promotions": [
+        "conflict_aware_verification_for_neutral_interactions",
+        null,
+        "fear_specific_verification",
+        null
+      ],
+      "D_val_trajectory": [
+        0.4289340101522843,
+        0.434010152284264,
+        0.434010152284264,
+        0.4365482233502538,
+        0.4365482233502538
+      ],
+      "D_val_n": 394,
+      "usd": 0.4011359999999998
+    }
+  ]
+}

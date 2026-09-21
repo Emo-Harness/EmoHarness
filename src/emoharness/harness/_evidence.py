@@ -67,7 +67,7 @@ def _audio_items(
     """Citable items a1..an: transcript sentences, then prosody phrases."""
     transcript = _cut(audio.transcript, transcript_max_chars)
     speech = tuple(_SPEECH_CUE_PREFIX + part for part in split_sentences(transcript))
-    if not speech and not audio.speech_present:
+    if not speech and audio.speech_present is False:
         speech = (_NO_SPEECH_CUE,)
     prosody = tuple(
         _PROSODY_CUE_PREFIX + part for part in audio.prosody if part.strip()

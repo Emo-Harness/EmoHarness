@@ -8,7 +8,7 @@ in the middle of a run.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Final
+from typing import Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -43,6 +43,7 @@ SUPPORTED_PLACEHOLDERS: Final[tuple[str, ...]] = (
     'audio_text',
     'evidence_json',
     'hypotheses_json',
+    'verification_json',
     'step_titles',
 )
 
@@ -103,6 +104,20 @@ class VerificationRouting(BaseModel):
     ranker: str = Field(min_length=1)
 
 
+class MechanismScreenConfig(BaseModel):
+    """Opt-in v5 mechanisms; absent/default settings preserve existing requests."""
+
+    model_config = ConfigDict(frozen=True, extra='forbid')
+    enabled: bool = False
+    evidence_layout: Literal['legacy_json', 'source_table'] = 'legacy_json'
+    verify_style: Literal['all_hypotheses', 'top2_contrast'] = 'all_hypotheses'
+    verify_trigger: Literal['legacy', 'conflict_or_low_margin'] = 'legacy'
+    margin_threshold: float = Field(default=0.15, ge=0.0, le=0.5)
+    review_media: Literal['none', 'video_on_trigger'] = 'none'
+    decision_media: Literal['summary_only', 'cached_frames'] = 'summary_only'
+    decision_frame_limit: int = Field(default=4, ge=1, le=8)
+
+
 class RoutingConfig(BaseModel):
     """``routing.yaml``: which stages run and which deterministic checks they use."""
 
@@ -110,6 +125,12 @@ class RoutingConfig(BaseModel):
 
     stages: tuple[str, ...] = Field(min_length=1)
     verification: VerificationRouting
+    verify_on: Literal['always', 'conflict'] = 'always'
+    workflow: Literal['multistep', 'direct_same_tools'] = 'multistep'
+    rank_policy: Literal['bundle', 'confidence', 'evidence_weighted'] = 'bundle'
+    audio_weight: float = Field(default=1.0, ge=0.0, le=2.0)
+    visual_weight: float = Field(default=1.0, ge=0.0, le=2.0)
+    mechanism_screen: MechanismScreenConfig = Field(default_factory=MechanismScreenConfig)
 
 
 class AudioPipelineConfig(BaseModel):

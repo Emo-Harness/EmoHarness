@@ -1,8 +1,8 @@
 {
-  "version": "stage1-v0",
+  "version": "stage1-v3",
   "stage": 1,
   "parent": null,
   "builder": "human",
-  "created": "2026-09-07",
-  "notes": "Deliberately minimal human scaffold (ADR-0005): four prompts, one cross-modal agreement flag with no conflict-resolution rule, and a confidence ranker. No label priors, no few-shot examples, no salient-moment retrieval, no calibration. The Builder may edit nothing at this stage."
+  "created": "2026-09-12",
+  "notes": "v3 scaffold: ranker order is authoritative after evidence/cardinality filtering; task context is not evidence; deterministic checks are exposed to verify/synthesize; optional conflict routing. Default remains four student calls. Historical v1/v2 bundles and predictions are separate artifacts."
 }

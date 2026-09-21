@@ -11,6 +11,7 @@ told the seen request wording and nothing else about the benchmark.
 from __future__ import annotations
 
 import re
+from collections import Counter
 from collections.abc import Iterable, Mapping
 from typing import Final
 
@@ -24,6 +25,7 @@ from emoharness.builder.clusters import (
 )
 from emoharness.builder.config import PacketLimits
 from emoharness.builder.patch import editable_paths_for
+from emoharness.builder.schema import CandidateFeedback, SelectionMetrics
 from emoharness.common.constants import MAX_CANDIDATES_PER_ROUND
 from emoharness.common.errors import LeakageError
 from emoharness.common.text import truncate
@@ -64,14 +66,16 @@ Rules:
 - "continue_search" is yours to decide: answer false, with a one-sentence
   "stop_reason", when another round would only repeat directions you have
   already tried and you would rather stop than propose filler. Answer true
-  when you still have an untried direction. You are not told which of your
-  earlier candidates were kept; judge from the harness files you are shown
-  now and from the failures that remain.
+  when you still have an untried direction. Consult the search memory for
+  earlier proposals, executable-check failures, reviewer objections, and
+  D_build effects. Validation scores and gate decisions are never shown.
+  When memory is disabled, do not claim to remember previous attempts.
 - Every "content" is the complete new text of that file. Diffs and partial files are
   rejected. A file you do not list stays as it is.
 - Each candidate targets exactly one cluster and repeats that cluster's key verbatim
   in "targeted_cluster".
 - Propose at most {max_candidates} candidates; each is evaluated on its own.
+  When stopping you may return an empty candidates list; do not invent filler.
 - You may replace only the paths listed under "Editable paths" below. A candidate that
   touches any other path is rejected before it is evaluated.
 - The five-step answer format and the output controller that emits the final
@@ -83,6 +87,10 @@ class DiagnosisPacket(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
+    selection_protocol: str = 'current'
+    workflow_search: bool = False
+    max_task_drop: float = 0.03
+    incumbent_selection: SelectionMetrics | None = None
     stage: int = Field(ge=1)
     round_index: int = Field(ge=0)
     bundle_files: Mapping[str, str] = Field(default_factory=dict)
@@ -90,6 +98,9 @@ class DiagnosisPacket(BaseModel):
     confusion: Mapping[str, Mapping[str, int]] = Field(default_factory=dict)
     clusters: tuple[FailureCluster, ...] = ()
     keyframe_samples: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    correct_examples: tuple[FailureRecord, ...] = ()
+    history: tuple[CandidateFeedback, ...] = ()
+    tool_availability: Mapping[str, str] = Field(default_factory=dict)
     editable_paths: tuple[str, ...] = ()
     max_candidates: int = Field(default=MAX_CANDIDATES_PER_ROUND, ge=1)
 
@@ -182,6 +193,8 @@ def _render(
         _render_files(packet),
         _render_confusion(packet),
         _render_clusters(packet, evidence_chars, stage_chars),
+        _render_correct(packet, evidence_chars, stage_chars),
+        _render_history(packet),
     )
     return '\n\n'.join(blocks) + '\n'
 
@@ -189,8 +202,21 @@ def _render(
 def _render_instructions(packet: DiagnosisPacket) -> str:
     editable = '\n'.join(f'- {path}' for path in packet.editable_paths)
     accuracy = f'{packet.build_recognition:.4f}'
+    instructions = _INSTRUCTIONS
+    if packet.selection_protocol == 'macro_feedback':
+        instructions = instructions.replace(
+            '1. raise the share of construction items whose emitted label matches the gold label;\n'
+            '2. keep every item the current harness already answers correctly;',
+            '1. raise task-macro Recognition across ER_Lab, ER_Wild, SA on selection-dev;\n'
+            f'2. allow net improvements while each task stays within {packet.max_task_drop * 100:.1f} '
+            'percentage points below the ORIGINAL scaffold task score;',
+        ).replace(
+            'Validation scores and gate decisions are never shown.',
+            'Aggregate selection-dev scores, costs, gate reasons and promotion status '
+            'are shown; selection-dev is adaptive development data, not a clean test.',
+        )
     blocks = [
-        _INSTRUCTIONS.replace(_CANDIDATE_SLOT, str(packet.max_candidates)),
+        instructions.replace(_CANDIDATE_SLOT, str(packet.max_candidates)),
         '',
         f'Stage: {packet.stage}. Round: {packet.round_index}.',
         f'Current construction-set accuracy: {accuracy}.',
@@ -200,6 +226,27 @@ def _render_instructions(packet: DiagnosisPacket) -> str:
     ]
     if any(path.startswith(f'{VERIFICATION_DIR}/') for path in packet.editable_paths):
         blocks += ['', _VERIFICATION_NOTE.rstrip()]
+    if packet.selection_protocol == 'macro_feedback':
+        blocks += [
+            '',
+            'Selection-dev objective: strict positive macro gain over incumbent; '
+            'tie-break fewer calls, then candidate name. Mean calls <= 4.5; '
+            'proxy reasoning no more than 2 points below incumbent. '
+            'D_build diagnostics remain pooled and are not the selection objective.',
+        ]
+        if packet.incumbent_selection is not None:
+            blocks += [
+                'Current selection-dev aggregate: '
+                + packet.incumbent_selection.model_dump_json()
+            ]
+    if packet.workflow_search:
+        blocks += ['', _WORKFLOW_NOTE]
+    if packet.tool_availability:
+        blocks += ['', 'Available tools (measured on D_build):']
+        blocks += [
+            f'- {name}: {status}'
+            for name, status in sorted(packet.tool_availability.items())
+        ]
     return '\n'.join(blocks)
 
 
@@ -227,7 +274,15 @@ def _render_confusion(packet: DiagnosisPacket) -> str:
 def _render_clusters(
     packet: DiagnosisPacket, evidence_chars: int | None, stage_chars: int | None
 ) -> str:
-    parts = ['## Failure clusters']
+    phases = Counter(
+        record.failure_stage
+        for cluster in packet.clusters
+        for record in cluster.samples
+    )
+    parts = [
+        '## Failure clusters',
+        f'Sampled failure stages (not full-corpus counts): {dict(phases)}',
+    ]
     for index, cluster in enumerate(packet.clusters, start=1):
         parts.append(_render_cluster(index, cluster, evidence_chars, stage_chars))
     if not packet.clusters:
@@ -257,7 +312,11 @@ def _render_cluster(
 def _render_sample(
     record: FailureRecord, evidence_chars: int | None, stage_chars: int | None
 ) -> str:
-    lines = [f'#### Item {record.example_id}', f'- gold: {", ".join(record.gold)}']
+    lines = [
+        f'#### Item {record.example_id}',
+        f'- gold: {", ".join(record.gold)}',
+        f'- trace symptom: {record.failure_stage}',
+    ]
     evidence = truncate(record.evidence_json, evidence_chars, TRUNCATION_MARKER)
     if evidence:
         lines.append(f'- evidence: {evidence}')
@@ -284,11 +343,15 @@ no model calls.
 - `verification/cross_modal.py` exports `modalities_agree(record, hypotheses)
   -> bool`. It decides whether what was seen and what was heard point at the
   same label. Its answer becomes `modalities_agree` in the verification record,
-  which the synthesis step is shown.
+  which verify and synthesize can read through `{verification_json}`.
+  `routing.yaml` sets `verify_on: always` or `verify_on: conflict`; in the
+  latter mode this check controls whether the student verify call runs.
+  A failing check always triggers verification.
 - `verification/alternative_hypotheses.py` exports `rank(record, hypotheses)
   -> list`. It orders the hypotheses; the output controller emits its labels
-  from the front of that order, so this function decides the answer whenever
-  two readings are close.
+  from the front of that order after filtering unsupported readings and
+  applying the requested cardinality. The controller never re-sorts by confidence.
+  Only distinct observed evidence ids count; t1 is task context, not evidence.
 
 A replacement must pass a static check: no imports beyond `__future__` and
 `typing`, no attribute access, no loop other than `for`, no comprehension other
@@ -320,3 +383,60 @@ def assert_no_forbidden_ids(text: str, forbidden_ids: Iterable[str]) -> None:
         raise LeakageError(
             'benchmark ids present in builder input: ' + ', '.join(sorted(hits)[:10])
         )
+
+
+def _render_correct(
+    packet: DiagnosisPacket, evidence_chars: int | None, stage_chars: int | None
+) -> str:
+    if not packet.correct_examples:
+        return ''
+    parts = [
+        '## Correct D_build examples to preserve',
+        'These are boundary examples, not additional failures.',
+    ]
+    parts += [
+        _render_sample(r, evidence_chars, stage_chars) for r in packet.correct_examples
+    ]
+    return '\n\n'.join(parts)
+
+
+def _render_history(packet: DiagnosisPacket) -> str:
+    if not packet.history:
+        return ''
+    parts = [
+        '## Search memory (D_build and review only)',
+        'The current files are authoritative. No validation results are included.',
+    ]
+    if packet.selection_protocol == 'macro_feedback':
+        parts = [
+            '## Search memory (proposal-dev and aggregate selection-dev)',
+            'Selection feedback is adaptive development data, never final evaluation.',
+        ]
+    for entry in packet.history:
+        parts.append(
+            entry.model_dump_json(
+                exclude={'selection'}
+                if packet.selection_protocol == 'current'
+                else None
+            )
+        )
+    return '\n\n'.join(parts)
+
+
+_WORKFLOW_NOTE = """Workflow search (narrow tested switches, not arbitrary graph code):
+- routing.yaml workflow: multistep (default) or direct_same_tools.
+- direct_same_tools uses one nominal student call (normal parse retry applies),
+  the original video plus the SAME cached transcript/prosody evidence. It reuses
+  prompts/generate_hypotheses.md, followed by a fixed JSON output contract asking
+  for visual cues, hypotheses and four grounded step texts. It does not call the
+  extract_visual, verify or synthesize prompts. The final controller stays fixed.
+- multistep retains the four-stage pipeline; verify_on: always or conflict.
+- routing.yaml rank_policy: bundle (default), confidence, evidence_weighted.
+  confidence orders by descending confidence; evidence_weighted orders by
+  confidence + weighted supporting cues - weighted contradicting cues.
+  audio_weight and visual_weight are each in [0, 2], default 1.0. These tested
+  helpers do not use task names, example IDs or label priors. Bundle Python code
+  remains under the original static allowlist. No new model or network tool.
+- Keep stages containing generate_hypotheses for direct_same_tools. All original
+  prompt files remain required; change only files needed for your candidate.
+"""

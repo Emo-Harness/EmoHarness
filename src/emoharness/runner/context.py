@@ -25,6 +25,7 @@ from emoharness.builder.gates import GateConfig
 from emoharness.builder.verifier import FakeVerifier, Verifier, verifier_for
 from emoharness.common.config import load_model
 from emoharness.common.errors import ValidationError
+from emoharness.common.hashing import stable_hash
 from emoharness.data.manifest import Example
 from emoharness.evaluation.fakes import ScoreSpec, fake_score_table, fake_step_scorer
 from emoharness.evaluation.judge import GeminiStepScorer, OpenAIStepScorer, StepScorer
@@ -135,9 +136,27 @@ class RunContext:
     def ledger(self) -> Path:
         return self.paths.ledger
 
+    def call_cache_root(self) -> Path:
+        """Cache root for this Target, isolated when the request shape differs.
+
+        ``request_key`` covers the model id, prompt, media and decoding, but
+        not settings that change the served chat template. Qwen3.5 with
+        thinking on and off produces different answers to byte-identical
+        prompts, so the two must not share entries. Targets without template
+        kwargs -- every Target used before 2026-09-14 -- keep the original
+        root and their existing entries.
+        """
+        root = self.paths.call_cache
+        if self.fake:
+            return root
+        kwargs = self.target_model_config().chat_template_kwargs
+        if not kwargs:
+            return root
+        return root / f'tpl_{stable_hash(dict(kwargs))[:12]}'
+
     def call_cache(self) -> CallCache:
         """The content-addressed Target-call cache shared by every row."""
-        return CallCache(self.paths.call_cache)
+        return CallCache(self.call_cache_root())
 
     def clip_cache(self) -> PreprocessCache:
         """The shared preprocessing cache."""
@@ -264,6 +283,8 @@ class RunContext:
         """Promotion thresholds, taken from the Builder config's gate block."""
         gates = self.builder.gates
         return GateConfig(
+            selection_protocol=self.builder.selection_protocol,
+            max_task_drop=self.builder.max_task_drop,
             regression_rate_limit=gates.regression_rate_limit,
             reasoning_margin_points=gates.reasoning_floor_points,
             max_mean_calls=gates.max_mean_calls,

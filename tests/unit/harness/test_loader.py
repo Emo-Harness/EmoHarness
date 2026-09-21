@@ -66,7 +66,7 @@ def bundle_dir(repo_root: Path, tmp_path: Path) -> Path:
 
 
 def test_stage_one_bundle_loads(bundle: HarnessBundle) -> None:
-    assert bundle.manifest.version == 'stage1-v0'
+    assert bundle.manifest.version == 'stage1-v3'
     assert bundle.manifest.stage == 1
     assert bundle.manifest.parent is None
     assert bundle.manifest.builder == 'human'

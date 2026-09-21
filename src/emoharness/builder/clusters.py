@@ -32,6 +32,7 @@ class FailureRecord(BaseModel):
     gold: tuple[str, ...] = ()
     predicted: tuple[str, ...] = ()
     conflict: bool = False
+    failure_stage: str = 'unknown'
     evidence_json: str = ''
     stage_outputs: Mapping[str, str] = Field(default_factory=dict)
     keyframe_paths: tuple[str, ...] = ()
@@ -104,6 +105,8 @@ def failure_records_from_outputs(
     gold_by_id: Mapping[str, tuple[str, ...]],
     keyframes_by_id: Mapping[str, tuple[str, ...]],
     normalize: Callable[[str], str],
+    *,
+    correct: bool = False,
 ) -> tuple[FailureRecord, ...]:
     """Turn harness outputs into failure records, keeping only the wrong items.
 
@@ -113,7 +116,8 @@ def failure_records_from_outputs(
     records = []
     for output in outputs:
         gold = _gold_for(output.example_id, gold_by_id)
-        if _normalized(gold, normalize) == _normalized(output.labels, normalize):
+        solved = _normalized(gold, normalize) == _normalized(output.labels, normalize)
+        if solved != correct:
             continue
         records.append(
             FailureRecord(
@@ -121,6 +125,9 @@ def failure_records_from_outputs(
                 gold=gold,
                 predicted=output.labels,
                 conflict=not output.verification.modalities_agree,
+                failure_stage='correct'
+                if solved
+                else _failure_stage(output, gold, normalize),
                 evidence_json=compact_json(output.evidence.model_dump(mode='json')),
                 stage_outputs=_stage_outputs(output),
                 keyframe_paths=keyframes_by_id.get(output.example_id, ()),
@@ -138,6 +145,10 @@ def _stage_outputs(output: HarnessOutput) -> dict[str, str]:
     return {
         'hypotheses': compact_json(output.hypotheses.model_dump(mode='json')),
         'verification': compact_json(output.verification.model_dump(mode='json')),
+        'emitted_labels': compact_json(output.labels),
+        'parse_failures': compact_json(
+            {t.stage: t.parse_failures for t in output.traces}
+        ),
     }
 
 
@@ -157,3 +168,30 @@ def _normalized(
 
 def _first_label(labels: tuple[str, ...]) -> str:
     return labels[0] if labels else EMPTY_LABEL
+
+
+def _failure_stage(
+    output: HarnessOutput, gold: tuple[str, ...], normalize: Callable[[str], str]
+) -> str:
+    """Observable trace symptoms, not a claim about unobserved perception errors."""
+    if output.parse_failures:
+        return 'parse_failure'
+    expected = _normalized(gold, normalize)
+    proposed = _normalized((h.label for h in output.hypotheses.hypotheses), normalize)
+    verified = _normalized((h.label for h in output.verification.ranked), normalize)
+    if not expected <= proposed:
+        return 'missing_hypothesis'
+    if not expected <= verified:
+        return 'verification_removed_hypothesis'
+    known = output.evidence.decision_ids()
+    supported = _normalized(
+        (
+            h.label
+            for h in output.verification.ranked
+            if len(set(h.support) & known) > len(set(h.contradiction) & known)
+        ),
+        normalize,
+    )
+    if not expected <= supported:
+        return 'unsupported_hypothesis'
+    return 'ranking_or_cardinality'

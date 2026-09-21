@@ -41,6 +41,8 @@ BUILDER_CONFIG_FILE: Final = 'teacher_gpt_5_6_luna.yaml'
 #: Another file under configs/builder/ to build with (e.g. a stronger teacher
 #: for a Builder-strength replicate); the default is the committed Luna config.
 BUILDER_CONFIG_ENV: Final = 'EMOHARNESS_BUILDER_CONFIG'
+PREPROCESS_CONFIG_ENV: Final = 'EMOHARNESS_PREPROCESS_CONFIG'
+EXTERNAL_MANIFEST_ENV: Final = 'EMOHARNESS_EXTERNAL_MANIFEST'
 TEACHER_CONFIG_FILE: Final = 'teacher_gpt_5_6_luna.yaml'
 CALL_CACHE_DIR: Final = 'calls'
 CALIBRATION_DIR: Final = 'calibration'
@@ -155,7 +157,12 @@ class ProjectPaths(BaseModel):
 
     @property
     def external_manifest(self) -> Path:
-        return self.manifests / EXTERNAL_MANIFEST_FILE
+        name = os.environ.get(EXTERNAL_MANIFEST_ENV, EXTERNAL_MANIFEST_FILE)
+        if Path(name).name != name or name in ('.', '..'):
+            raise ValidationError(
+                f'{EXTERNAL_MANIFEST_ENV} must name a file in data/manifests/'
+            )
+        return self.manifests / name
 
     @property
     def external_report(self) -> Path:
@@ -211,7 +218,12 @@ class ProjectPaths(BaseModel):
 
     @property
     def preprocess_config(self) -> Path:
-        return self.configs / 'preprocess.yaml'
+        name = os.environ.get(PREPROCESS_CONFIG_ENV, 'preprocess.yaml')
+        if Path(name).name != name or name in ('.', '..'):
+            raise ValidationError(
+                f'{PREPROCESS_CONFIG_ENV} must name a file in configs/'
+            )
+        return self.configs / name
 
     @property
     def ladder_config(self) -> Path:

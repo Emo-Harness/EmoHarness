@@ -10,3 +10,6 @@ stages:
 verification:
   agreement_check: cross_modal
   ranker: alternative_hypotheses
+# always preserves the four-call scaffold; conflict skips student verification
+# only when the deterministic agreement check succeeds without a fallback.
+verify_on: always

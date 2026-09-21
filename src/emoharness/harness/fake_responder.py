@@ -158,6 +158,13 @@ def scripted_responder(
             return _NOT_JSON
         if stage in answers:
             return _as_text(answers[stage])
+        if stage == 'direct_same_tools_v1':
+            payload = json.loads(_visual_answer(request))
+            payload.update(
+                _hypotheses(request, choose_label(request)).model_dump(mode='json')
+            )
+            payload['steps'] = list(_SYNTHESIS_STEPS[:MODEL_WRITTEN_STEPS])
+            return json.dumps(payload)
         if stage not in STAGE_NAMES:
             return _single_call_answer(choose_label(request))
         return _stage_answer(stage, request, choose_label(request))

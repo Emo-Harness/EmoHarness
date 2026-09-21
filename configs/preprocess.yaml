@@ -1,8 +1,8 @@
 # Shared preprocessing cache (ADR-0004 as amended 2026-09-11, ADR-0011).
-# Every tool is deterministic code: ffmpeg frame sampling, faster-whisper
+# Fixed perception tools: ffmpeg frame sampling, faster-whisper
 # transcription with language detection, and openSMILE eGeMAPS prosody
 # functionals turned into phrases against fitted reference statistics.
-# No audio-language model is called: the earlier Qwen2.5-Omni-7B description
+# Whisper transcription is allowed; no additional analysis language model is called: the earlier Qwen2.5-Omni-7B description
 # and opinion channels were removed because a second model's judgment is not a
 # tool. No diarization on this box (pyannote.audio does not import against its
 # torchaudio; MME clips are single-utterance, so the whole transcript is the

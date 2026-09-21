@@ -173,3 +173,99 @@ def test_a_ranker_cannot_smuggle_in_a_label_or_an_id(
     assert ranked[1].contradiction == ()
     assert output.verification.notes == ''
     assert output.labels == ('sadness',)
+
+
+REVERSE_RANKER = _HEADER + (
+    'def rank(record: dict[str, Any], hypotheses: dict[str, Any]) -> list[Any]:\n'
+    "    return list(hypotheses['hypotheses'])[::-1]\n"
+)
+
+
+def test_code_ranker_controls_labels_even_when_confidence_disagrees(
+    edited_bundle: Callable[..., HarnessBundle],
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    bundle = edited_bundle(
+        'reverse', {'verification/alternative_hypotheses.py': REVERSE_RANKER}
+    )
+    output = _run(bundle, benchmark_example, inputs, _SPLIT_ROWS, agree=False)
+    assert output.labels == ('anger',)
+    assert (
+        output.verification.ranked[0].confidence
+        < output.verification.ranked[1].confidence
+    )
+
+
+def test_question_and_duplicate_ids_cannot_manufacture_support(
+    bundle: HarnessBundle,
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    rows = (
+        reading(
+            'anger', support=('t1', 'v1', 'v1'), contradiction=('a1',), confidence=0.99
+        ),
+        reading('sadness', support=('a2',), confidence=0.2),
+    )
+    output = _run(bundle, benchmark_example, inputs, rows)
+    assert output.verification.ranked[0].support == ('v1',)
+    assert output.labels == ('sadness',)
+
+
+def test_conflict_routing_skips_only_agreeing_student_verification(
+    bundle: HarnessBundle,
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    routed = bundle.model_copy(
+        update={'routing': bundle.routing.model_copy(update={'verify_on': 'conflict'})}
+    )
+    target = FakeTarget(responder=scripted_responder(reading_script(_AGREEING_ROWS)))
+    output = run_once(routed, target, benchmark_example, inputs)
+    assert output.target_calls == 3
+    assert output.fallback_used is False
+    assert 'verify' not in [request.tag for request in target.requests]
+    assert '"modalities_agree": true' in target.requests[-1].prompt
+
+    target = FakeTarget(
+        responder=scripted_responder(reading_script(_SPLIT_ROWS, agree=False))
+    )
+    output = run_once(routed, target, benchmark_example, inputs)
+    assert output.target_calls == 4
+    assert '"modalities_agree": false' in target.requests[2].prompt
+
+
+def test_malformed_agreement_cannot_skip_student_review(
+    edited_bundle: Callable[..., HarnessBundle],
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    source = _HEADER + (
+        'def modalities_agree(record: dict[str, Any], hypotheses: dict[str, Any]) -> bool:\n'
+        "    return 'false'\n"
+    )
+    bundle = edited_bundle('bad_bool', {'verification/cross_modal.py': source})
+    bundle = bundle.model_copy(
+        update={'routing': bundle.routing.model_copy(update={'verify_on': 'conflict'})}
+    )
+    target = FakeTarget(responder=scripted_responder(reading_script(_AGREEING_ROWS)))
+    output = run_once(bundle, target, benchmark_example, inputs)
+    assert output.target_calls == 4
+    assert 'must return a bool' in output.verification.notes
+
+
+def test_failed_hypothesis_generation_cannot_skip_student_review(
+    bundle: HarnessBundle,
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    bundle = bundle.model_copy(
+        update={'routing': bundle.routing.model_copy(update={'verify_on': 'conflict'})}
+    )
+    target = FakeTarget(
+        responder=scripted_responder({'generate_hypotheses': 'invalid JSON'})
+    )
+    output = run_once(bundle, target, benchmark_example, inputs)
+    assert 'verify' in [request.tag for request in target.requests]
+    assert output.fallback_used is True

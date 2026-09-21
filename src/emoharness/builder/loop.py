@@ -11,6 +11,7 @@ harness runtime, or a network.
 from __future__ import annotations
 
 import shutil
+import tempfile
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -33,7 +34,14 @@ from emoharness.builder.patch import (
     patch_hash,
     validate_patch,
 )
-from emoharness.builder.schema import BuilderProposal, CandidatePatch, CandidateScores
+from emoharness.builder.schema import (
+    BuildAssessment,
+    BuilderProposal,
+    CandidateFeedback,
+    CandidatePatch,
+    CandidateScores,
+    SelectionFeedback,
+)
 from emoharness.builder.verifier import (
     ReviewRequest,
     VerificationReport,
@@ -49,6 +57,8 @@ from emoharness.common.logging import get_logger
 
 Diagnose = Callable[[Path, int], DiagnosisPacket]
 Evaluate = Callable[[Path], CandidateScores]
+AssessBuild = Callable[[Path, Path], BuildAssessment]
+CompleteEvaluation = Callable[[Path, CandidateScores], CandidateScores]
 #: Reasons a written candidate bundle cannot run; empty means it loads.
 BundleCheck = Callable[[Path], tuple[str, ...]]
 
@@ -124,6 +134,7 @@ class RoundRecord(BaseModel):
         description="the Builder's own continue_search answer for this round",
     )
     builder_stop_reason: str = ''
+    feedback: tuple[CandidateFeedback, ...] = ()
     cost: RoundCost = Field(default_factory=RoundCost.empty)
 
 
@@ -149,6 +160,7 @@ class _Scored:
     patch: CandidatePatch
     directory: Path
     scores: CandidateScores
+    build: BuildAssessment | None = None
 
 
 @dataclass(frozen=True)
@@ -187,6 +199,8 @@ class _Context:
     verifier: Verifier | None
     bundle_check: BundleCheck | None
     ledger: Path | None
+    assess_build: AssessBuild | None
+    complete_evaluation: CompleteEvaluation | None
 
 
 @dataclass(frozen=True)
@@ -214,6 +228,8 @@ def run_stage(
     verifier: Verifier | None = None,
     bundle_check: BundleCheck | None = None,
     ledger: Path | None = None,
+    assess_build: AssessBuild | None = None,
+    complete_evaluation: CompleteEvaluation | None = None,
 ) -> LoopResult:
     """Run one stage's construction loop and write its provenance under ``out_dir``.
 
@@ -237,11 +253,16 @@ def run_stage(
         verifier=verifier,
         bundle_check=bundle_check,
         ledger=ledger,
+        assess_build=assess_build,
+        complete_evaluation=complete_evaluation,
     )
     first_row = _ledger_length(ledger)
+    baseline = evaluate(bundle_root)
+    if complete_evaluation is not None:
+        baseline = complete_evaluation(bundle_root, baseline)
     state = _State(
         bundle=bundle_root,
-        scores=evaluate(bundle_root),
+        scores=baseline,
         streak=0,
         rounds=(),
     )
@@ -300,14 +321,33 @@ def _run_round(round_index: int, state: _State, ctx: _Context) -> _State:
     round_dir = ctx.out_dir / f'round_{round_index:02d}'
     first_row = _ledger_length(ctx.ledger)
     packet = ctx.diagnose(state.bundle, round_index)
+    history = (
+        tuple(
+            entry
+            for prior in state.rounds[-ctx.cfg.history_rounds :]
+            for entry in prior.feedback
+        )
+        if ctx.cfg.history_rounds
+        else ()
+    )
+    packet = packet.model_copy(
+        update={
+            'history': history,
+            'selection_protocol': ctx.cfg.selection_protocol,
+            'workflow_search': ctx.cfg.workflow_search,
+            'max_task_drop': ctx.cfg.max_task_drop,
+            'incumbent_selection': state.scores.selection,
+        }
+    )
     packet_text = render_packet_text(packet, ctx.cfg.packet.target_input_tokens)
     images = packet.image_paths()
     # The firewall covers the media paths too: they are recorded in packet.json.
     assert_no_forbidden_ids('\n'.join((packet_text, *images)), ctx.forbidden_ids)
     proposal = ctx.builder.propose(packet_text, images)
     valid, rejections = _validated(proposal, packet, ctx)
+    valid, preflight_rejections = _preflight(valid, state.bundle, ctx)
     review, approved, vetoed = _reviewed(valid, packet, ctx)
-    scored, unloadable = _score_candidates(approved, state.bundle, round_dir, ctx)
+    scored, unloadable = _score_candidates(approved, state, round_dir, ctx)
     best, gate_results = select_candidate(
         (item.scores for item in scored), state.scores, ctx.gate_cfg
     )
@@ -318,7 +358,7 @@ def _run_round(round_index: int, state: _State, ctx: _Context) -> _State:
         proposal=proposal,
         review=review,
         scored=scored,
-        rejections=rejections + unloadable,
+        rejections=rejections + preflight_rejections + unloadable,
         vetoed=vetoed,
         gate_results=gate_results,
         accepted=accepted,
@@ -342,6 +382,7 @@ def _advance(round_index: int, state: _State, outcome: _Outcome) -> _State:
         bundle_hash=directory_hash(bundle),
         builder_continue=outcome.proposal.continue_search,
         builder_stop_reason=outcome.proposal.stop_reason,
+        feedback=_feedback(round_index, outcome),
         cost=outcome.cost,
     )
     return replace(
@@ -389,6 +430,7 @@ def _reviewed(
         tuple((cluster.key, cluster.count) for cluster in packet.clusters),
         BuilderProposal(candidates=valid),
     )
+    request = request.model_copy(update={'workflow_search': ctx.cfg.workflow_search})
     text = render_review_text(request)
     assert_no_forbidden_ids(text, ctx.forbidden_ids)
     report = ctx.verifier.review(request)
@@ -409,7 +451,7 @@ def _reviewed(
 
 def _score_candidates(
     approved: tuple[CandidatePatch, ...],
-    bundle: Path,
+    state: _State,
     round_dir: Path,
     ctx: _Context,
 ) -> tuple[tuple[_Scored, ...], Rejections]:
@@ -418,7 +460,7 @@ def _score_candidates(
     unloadable: list[tuple[str, tuple[str, ...]]] = []
     for patch in approved:
         directory = round_dir / CANDIDATES_DIR / safe_name(patch.name)
-        apply_patch(bundle, patch, directory)
+        apply_patch(state.bundle, patch, directory)
         problems = ctx.bundle_check(directory) if ctx.bundle_check else ()
         if problems:
             unloadable.append((patch.name, tuple(problems)))
@@ -426,8 +468,14 @@ def _score_candidates(
                 'candidate %s does not load: %s', patch.name, '; '.join(problems)
             )
             continue
+        build = ctx.assess_build(state.bundle, directory) if ctx.assess_build else None
+        scores = ctx.evaluate(directory)
+        # Recognition/regression/budget checks do not need a paid proxy score.
+        _, preliminary = select_candidate((scores,), state.scores, ctx.gate_cfg)
+        if ctx.complete_evaluation is not None and preliminary[0].passed:
+            scores = ctx.complete_evaluation(directory, scores)
         scored.append(
-            _Scored(patch=patch, directory=directory, scores=ctx.evaluate(directory))
+            _Scored(patch=patch, directory=directory, scores=scores, build=build)
         )
     return tuple(scored), tuple(unloadable)
 
@@ -476,6 +524,13 @@ def _write_round_provenance(round_dir: Path, outcome: _Outcome) -> None:
     write_json_atomic(round_dir / CANDIDATES_FILE, _candidates_document(outcome))
     write_json_atomic(round_dir / ACCEPTED_FILE, _accepted_document(outcome))
     write_json_atomic(round_dir / COST_FILE, outcome.cost.model_dump(mode='json'))
+    write_json_atomic(
+        round_dir / 'feedback.json',
+        [
+            entry.model_dump(mode='json')
+            for entry in _feedback(outcome.packet.round_index, outcome)
+        ],
+    )
 
 
 def _candidates_document(outcome: _Outcome) -> Mapping[str, Any]:
@@ -527,3 +582,81 @@ def _copy_final(bundle: Path, final_dir: Path) -> Path:
 def write_loop_result(out_dir: Path, result: LoopResult) -> None:
     """Write ``loop_result.json`` for one stage and replicate."""
     write_json_atomic(out_dir / LOOP_RESULT_FILE, result.model_dump(mode='json'))
+
+
+def _preflight(
+    valid: tuple[CandidatePatch, ...], bundle: Path, ctx: _Context
+) -> tuple[tuple[CandidatePatch, ...], Rejections]:
+    """Load candidates in scratch space before spending a verifier call."""
+    if ctx.bundle_check is None:
+        return valid, ()
+    kept: list[CandidatePatch] = []
+    rejected: list[tuple[str, tuple[str, ...]]] = []
+    with tempfile.TemporaryDirectory(prefix='emoharness-preflight-') as scratch:
+        for patch in valid:
+            directory = Path(scratch) / safe_name(patch.name)
+            apply_patch(bundle, patch, directory)
+            problems = ctx.bundle_check(directory)
+            if problems:
+                rejected.append((patch.name, problems))
+            else:
+                kept.append(patch)
+    return tuple(kept), tuple(rejected)
+
+
+def _feedback(round_index: int, outcome: _Outcome) -> tuple[CandidateFeedback, ...]:
+    rejected = dict(outcome.rejections)
+    vetoed = dict(outcome.vetoed)
+    scored = {item.patch.name: item for item in outcome.scored}
+    entries = []
+    for patch in outcome.proposal.candidates:
+        status = (
+            'rejected'
+            if patch.name in rejected
+            else 'vetoed'
+            if patch.name in vetoed
+            else 'evaluated'
+        )
+        assessment = scored[patch.name].build if patch.name in scored else None
+        entries.append(
+            CandidateFeedback(
+                round_index=round_index,
+                name=patch.name,
+                patch_hash=patch_hash(patch),
+                targeted_cluster=patch.targeted_cluster,
+                rationale=patch.rationale[:1200],
+                files=tuple(file.path for file in patch.files),
+                status=status,
+                review_issues=tuple(
+                    reason[:1200]
+                    for reason in rejected.get(patch.name, vetoed.get(patch.name, ()))
+                ),
+                build=assessment,
+                selection=_selection_feedback(patch.name, outcome),
+            )
+        )
+    return tuple(entries)
+
+
+def _selection_feedback(name: str, outcome: _Outcome) -> SelectionFeedback | None:
+    if outcome.packet.selection_protocol != 'macro_feedback':
+        return None
+    item = next((item for item in outcome.scored if item.patch.name == name), None)
+    gate = next(
+        (
+            gate
+            for gate in outcome.gate_results
+            if item is not None and gate.name == item.scores.name
+        ),
+        None,
+    )
+    if item is None or item.scores.selection is None or gate is None:
+        return None
+    return SelectionFeedback(
+        metrics=item.scores.selection,
+        mean_calls=item.scores.mean_calls,
+        p95_latency_s=item.scores.p95_latency_s,
+        accepted=outcome.accepted is item,
+        gate_passed=gate.passed,
+        gate_reasons=gate.reasons,
+    )

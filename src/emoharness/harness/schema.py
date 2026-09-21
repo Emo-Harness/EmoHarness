@@ -37,16 +37,18 @@ class VisualEvidence(BaseModel):
 
 
 class AudioEvidence(BaseModel):
-    """What deterministic tools heard (ADR-0004, amended 2026-09-11).
+    """Audio cues from the selected perception protocol.
 
-    The transcript and language come from whisper, the prosody phrases from
+    When enabled, transcript and language come from Whisper; prosody comes from
     openSMILE functionals compared with corpus reference statistics. No model
     opinion enters here. Empty transcript means no intelligible speech.
     """
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
-    speech_present: bool
+    speech_present: bool | None = Field(
+        description='None when transcription is disabled; unknown is not silence'
+    )
     transcript: str = ''
     language: str | None = None
     prosody: tuple[str, ...] = ()
@@ -66,6 +68,10 @@ class EvidenceRecord(BaseModel):
 
     def item_ids(self) -> frozenset[str]:
         return frozenset(item.id for item in self.items)
+
+    def decision_ids(self) -> frozenset[str]:
+        """Observed cues only; the question is context, never label evidence."""
+        return frozenset(item.id for item in self.items if item.modality != 'text')
 
 
 class Hypothesis(BaseModel):
@@ -160,7 +166,14 @@ class PerceivedInputs(BaseModel):
 
     def audio_text(self) -> str:
         """Observable-cue audio channel rendered as the text block single-call rows append."""
-        lines = [f'Speech present: {"yes" if self.audio.speech_present else "no"}']
+        speech = (
+            'unknown (ASR disabled)'
+            if self.audio.speech_present is None
+            else 'yes'
+            if self.audio.speech_present
+            else 'no'
+        )
+        lines = [f'Speech present: {speech}']
         if self.audio.transcript:
             lines.append(f'Transcript: {self.audio.transcript}')
         if self.audio.language:

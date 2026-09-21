@@ -1,0 +1,61 @@
+{
+  "status": "passed",
+  "url": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/",
+  "answer_combinations_verified": 96,
+  "videos": [
+    {
+      "src": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/media/mme_sa_267466_45.mp4",
+      "ready": 4,
+      "time": 0.371059,
+      "width": 480,
+      "duration": 2.377007,
+      "error": null
+    },
+    {
+      "src": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/media/mme_noise_er_samplenew3_00009341.mp4",
+      "ready": 4,
+      "time": 0.357091,
+      "width": 1920,
+      "duration": 2.048,
+      "error": null
+    },
+    {
+      "src": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/media/mme_fg_sa_nzpVDcQ0ywM_7.mp4",
+      "ready": 4,
+      "time": 0.367702,
+      "width": 480,
+      "duration": 1.8,
+      "error": null
+    },
+    {
+      "src": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/media/mme_fg_sa_yDtzw_Y-7RU_8.mp4",
+      "ready": 4,
+      "time": 0.370988,
+      "width": 640,
+      "duration": 1.833333,
+      "error": null
+    },
+    {
+      "src": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/media/mme_er_lab_Ses05F_script03_1_F002.mp4",
+      "ready": 4,
+      "time": 0.367773,
+      "width": 720,
+      "duration": 2.136009,
+      "error": null
+    },
+    {
+      "src": "https://abu-waterproof-die-eva.trycloudflare.com/new-results/media/mme_er_lab_Ses05F_impro08_F008.mp4",
+      "ready": 4,
+      "time": 0.370981,
+      "width": 720,
+      "duration": 7.220998,
+      "error": null
+    }
+  ],
+  "js_errors": [],
+  "responsive_widths": [
+    1280,
+    390,
+    320
+  ]
+}

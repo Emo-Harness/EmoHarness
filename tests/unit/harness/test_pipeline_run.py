@@ -209,3 +209,40 @@ def test_an_unfilled_placeholder_renders_as_nothing(
 
     assert target.requests[0].prompt.rstrip().endswith('Record so far: []')
     assert output.labels == ('sadness',)
+
+
+def test_requested_crops_without_inputs_fail_before_a_model_call(
+    bundle: HarnessBundle,
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    crops = bundle.sampling.face_crops.model_copy(update={'enabled': True})
+    configured = bundle.model_copy(
+        update={'sampling': bundle.sampling.model_copy(update={'face_crops': crops})}
+    )
+    target = FakeTarget(responder=scripted_responder())
+    with pytest.raises(ValidationError, match='no usable crops'):
+        run_once(
+            configured,
+            target,
+            benchmark_example,
+            inputs.model_copy(update={'face_crop_paths': ()}),
+        )
+    assert target.call_count == 0
+
+
+def test_disabled_asr_is_unknown_and_not_a_silence_cue(
+    bundle: HarnessBundle,
+    benchmark_example: Example,
+    inputs: PerceivedInputs,
+) -> None:
+    audio = inputs.audio.model_copy(
+        update={'speech_present': None, 'transcript': '', 'language': None}
+    )
+    unknown = inputs.model_copy(update={'audio': audio})
+    assert 'unknown (ASR disabled)' in unknown.audio_text()
+    target = FakeTarget(responder=scripted_responder())
+    output = run_once(bundle, target, benchmark_example, unknown)
+    assert not any(
+        'no intelligible speech' in item.cue for item in output.evidence.items
+    )

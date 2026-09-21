@@ -2,11 +2,19 @@
   "$defs": {
     "AudioEvidence": {
       "additionalProperties": false,
-      "description": "What deterministic tools heard (ADR-0004, amended 2026-09-11).\n\nThe transcript and language come from whisper, the prosody phrases from\nopenSMILE functionals compared with corpus reference statistics. No model\nopinion enters here. Empty transcript means no intelligible speech.",
+      "description": "Audio cues from the selected perception protocol.\n\nWhen enabled, transcript and language come from Whisper; prosody comes from\nopenSMILE functionals compared with corpus reference statistics. No model\nopinion enters here. Empty transcript means no intelligible speech.",
       "properties": {
         "speech_present": {
-          "title": "Speech Present",
-          "type": "boolean"
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "None when transcription is disabled; unknown is not silence",
+          "title": "Speech Present"
         },
         "transcript": {
           "default": "",

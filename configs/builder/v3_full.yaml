@@ -1,0 +1,30 @@
+# v3 ablation: fixed model and gates; use an isolated results directory.
+provider: openai
+model_id: gpt-5.6-luna
+api_key_env: OPENAI_API_KEY
+endpoint: ${OPENAI_ENDPOINT:-https://api.openai.com/v1}
+temperature: 0.0
+reasoning_effort: high
+max_candidates_per_round: 4
+max_rounds_per_stage: 4
+early_stop_rounds: 2
+autonomous_stop: true
+packet:
+  max_failures_per_cluster: 5
+  max_keyframe_samples: 20
+  max_frames_per_sample: 4
+  target_input_tokens: 100000
+  max_correct_examples: 8
+gates:
+  regression_rate_limit: 0.05
+  reasoning_floor_points: 2.0
+  gate_sample_size: 200
+  max_mean_calls: 4.5
+verifier:
+  enabled: true
+  reasoning_effort: high
+pricing_usd_per_million:
+  input: 0.2
+  output: 1.2
+history_rounds: 4
+require_isolated_splits: true

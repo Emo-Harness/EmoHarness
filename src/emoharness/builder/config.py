@@ -46,6 +46,7 @@ class PacketLimits(BaseModel):
     model_config = ConfigDict(frozen=True, extra='forbid')
 
     max_failures_per_cluster: int = Field(default=DEFAULT_FAILURES_PER_CLUSTER, ge=1)
+    max_correct_examples: int = Field(default=8, ge=0, le=32)
     max_keyframe_samples: int = Field(default=DEFAULT_KEYFRAME_SAMPLES, ge=0)
     max_frames_per_sample: int = Field(default=JUDGE_MAX_FRAMES, ge=1)
     target_input_tokens: int = Field(default=DEFAULT_TARGET_INPUT_TOKENS, ge=1)
@@ -131,6 +132,11 @@ class BuilderConfig(BaseModel):
         'early_stop_rounds rounds without an acceptance (ADR-0006 §10). The '
         'round cap still applies, and the gates stay ours either way.',
     )
+    selection_protocol: Literal['current', 'macro_feedback'] = 'current'
+    workflow_search: bool = False
+    max_task_drop: float = Field(default=0.03, ge=0.0, le=1.0)
+    require_isolated_splits: bool = False
+    history_rounds: int = Field(default=4, ge=0, le=8)
     packet: PacketLimits = PacketLimits()
     gates: GateThresholds = GateThresholds()
     verifier: VerifierConfig = VerifierConfig()

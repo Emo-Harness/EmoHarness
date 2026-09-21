@@ -159,7 +159,7 @@ def _build_audio_evidence(
     subject_text = subject_transcript(transcript, segments, speaker)
     descriptors = describe_prosody(tools.prosody.extract(wav), tools.reference)
     evidence = AudioEvidence(
-        speech_present=bool(subject_text.strip()),
+        speech_present=bool(subject_text.strip()) if transcript.available else None,
         transcript=subject_text,
         language=transcript.language,
         prosody=descriptors,

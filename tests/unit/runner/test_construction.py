@@ -253,3 +253,57 @@ class TestFreeze:
         scores = evaluate_external_test(ctx.paths.bundle, ctx)
         assert scores.count == len(examples_for('external:ext_test', ctx.paths))
         assert 0.0 <= scores.recognition <= 1.0
+
+
+def test_code_preflight_catches_runtime_fallback_before_review(
+    ctx: RunContext,
+    tmp_path: Path,
+) -> None:
+    from emoharness.harness.loader import write_bundle_copy
+    from emoharness.runner.construction import make_bundle_check
+
+    broken = write_bundle_copy(
+        ctx.paths.bundle,
+        tmp_path / 'broken_code',
+        {
+            'verification/alternative_hypotheses.py': "def rank(record, hypotheses):\n    return hypotheses['missing_key']\n",
+        },
+    )
+    check = make_bundle_check(ctx, load_construction_data(ctx))
+    assert 'contract probe' in check(broken)[0]
+
+
+def test_builder_diagnosis_has_only_build_preservation_examples(
+    ctx: RunContext,
+) -> None:
+    data = load_construction_data(ctx)
+    packet = make_diagnose(ctx, data, 3, RegressionTracker())(ctx.paths.bundle, 0)
+    build_ids = {example.example_id for example in data.build}
+    assert all(
+        item.example_id in build_ids and item.gold == item.predicted
+        for item in packet.correct_examples
+    )
+    assert len(packet.correct_examples) <= ctx.builder.packet.max_correct_examples
+    assert 'unavailable' in packet.tool_availability['face_crops']
+
+
+def test_candidate_build_assessment_never_reads_validation(
+    ctx: RunContext,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from emoharness.runner import construction
+
+    data = load_construction_data(ctx)
+    allowed = {example.example_id for example in data.build}
+    run = construction.run_harness
+
+    def build_only(examples, *args, **kwargs):
+        assert {example.example_id for example in examples} <= allowed
+        return run(examples, *args, **kwargs)
+
+    monkeypatch.setattr(construction, 'run_harness', build_only)
+    assessment = construction.make_build_assessment(ctx, data)(
+        ctx.paths.bundle, ctx.paths.bundle
+    )
+    assert assessment.before == assessment.after
+    assert assessment.improved_count == assessment.regressed_count == 0

@@ -7,6 +7,7 @@ non-regression gates. Every rejection carries a reason so provenance can explain
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -24,6 +25,8 @@ class GateConfig(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
+    selection_protocol: Literal['current', 'macro_feedback'] = 'current'
+    max_task_drop: float = Field(default=0.03, ge=0.0, le=1.0)
     regression_rate_limit: float = Field(default=REGRESSION_RATE_LIMIT, ge=0.0, le=1.0)
     reasoning_margin_points: float = Field(default=REASONING_GATE_FLOOR_POINTS, ge=0.0)
     min_recognition_gain: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -85,6 +88,23 @@ def _reasoning_reason(
 
 
 def _regression_reason(candidate: CandidateScores, cfg: GateConfig) -> str | None:
+    if cfg.selection_protocol == 'macro_feedback':
+        metrics = candidate.selection
+        if metrics is None or set(metrics.per_task) != {'ER_Lab', 'ER_Wild', 'SA'}:
+            return 'selection-dev requires all three seen-task aggregates'
+        if set(metrics.scaffold_per_task) != set(metrics.per_task):
+            return 'selection-dev missing frozen scaffold task reference'
+        drops = tuple(
+            f'{task} drop {metrics.scaffold_per_task[task] - score:.4f}'
+            for task, score in sorted(metrics.per_task.items())
+            if metrics.scaffold_per_task[task] - score > cfg.max_task_drop + 1e-12
+        )
+        return (
+            f'task harm exceeds scaffold-relative limit {cfg.max_task_drop:.4f}: '
+            + ', '.join(drops)
+            if drops
+            else None
+        )
     if candidate.regression_rate <= cfg.regression_rate_limit:
         return None
     return (

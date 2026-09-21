@@ -154,6 +154,11 @@ class OpenAICompatTarget:
                 'fps': video.fps,
                 'max_frames': video.max_frames,
             }
+        if self._config.chat_template_kwargs:
+            # Thinking models otherwise spend the whole token budget
+            # deliberating and never reach the answer tag: Qwen3.5-4B hit
+            # max_tokens on 15 of 24 smoke items with no </answer> at all.
+            payload['chat_template_kwargs'] = dict(self._config.chat_template_kwargs)
         if request.json_schema is not None:
             payload['response_format'] = {
                 'type': 'json_schema',

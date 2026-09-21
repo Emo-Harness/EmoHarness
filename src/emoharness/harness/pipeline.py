@@ -28,6 +28,10 @@ from emoharness.data.manifest import Example
 from emoharness.data.prompt_template import ParsedPrompt, parse_prompt
 from emoharness.harness._controller import MODEL_WRITTEN_STEPS, build_output
 from emoharness.harness._evidence import build_record
+from emoharness.harness._mechanism_screen import (
+    RAW_FRAMES_CONTRACT, REVIEW_VIDEO_CONTRACT, TOP_TWO_CONTRACT,
+    confidence_margin, decision_frames, source_table, top_two,
+)
 from emoharness.harness._stages import (
     StageOutcome,
     agreement_from_payload,
@@ -100,32 +104,97 @@ class HarnessPipeline:
         self._bundle = bundle
         self._target = target
         self._config = config or PipelineConfig()
+        self.mechanism_trace: dict[str, Any] = {}
 
     def run(self, example: Example, inputs: PerceivedInputs) -> HarnessOutput:
         """Produce one item's labels, five steps, and response text."""
         parsed = self._parsed(example, inputs)
         values = _base_values(example, inputs, parsed)
+        mechanism = self._bundle.routing.mechanism_screen
+        self.mechanism_trace = {'enabled': mechanism.enabled}
+        if self._bundle.routing.workflow == 'direct_same_tools':
+            return self._direct_same_tools(example, inputs, parsed, values)
 
         visual = self._call(STAGE_VISUAL, self._visual_request(inputs, values), ())
         traces: tuple[StageTrace, ...] = (visual.trace,)
         record = self._record(parsed, visual.payload, inputs)
 
         request = self._text_request(STAGE_HYPOTHESES, values, record)
+        if mechanism.enabled and mechanism.decision_media == 'cached_frames':
+            frames = decision_frames(inputs, mechanism.decision_frame_limit)
+            if not frames:
+                raise ValidationError('v5 decision_media requires existing cached frames')
+            request = request.model_copy(update={
+                'image_paths': frames, 'prompt': request.prompt + '\n\n' + RAW_FRAMES_CONTRACT,
+            })
+            self.mechanism_trace['decision_frame_paths'] = list(frames)
         proposed = self._call(STAGE_HYPOTHESES, request, traces)
         traces += (proposed.trace,)
         hypotheses = self._hypotheses(proposed.payload, parsed)
 
-        request = self._text_request(STAGE_VERIFY, values, record, hypotheses)
-        checked = self._call(STAGE_VERIFY, request, traces)
+        preliminary = apply_bundle_verification(self._bundle, record, hypotheses)
+        should_verify = (
+            self._bundle.routing.verify_on == 'always'
+            or not preliminary.modalities_agree
+            or bool(preliminary.notes)
+            or proposed.payload is None
+            or visual.payload is None
+        )
+        verify_hypotheses = hypotheses
+        if mechanism.enabled:
+            sanitized = hypotheses.model_copy(update={'hypotheses': preliminary.ranked})
+            margin = confidence_margin(sanitized)
+            invalid_hypotheses = (proposed.payload is None or hypothesis_set_from_payload(
+                proposed.payload, LabelSet.from_parsed(parsed)) is None)
+            if mechanism.verify_trigger == 'conflict_or_low_margin':
+                should_verify = (not preliminary.modalities_agree or
+                                 margin < mechanism.margin_threshold or
+                                 bool(preliminary.notes) or
+                                 invalid_hypotheses or visual.payload is None)
+            if mechanism.verify_style == 'top2_contrast':
+                verify_hypotheses = top_two(sanitized)
+            self.mechanism_trace.update({
+                'margin': margin, 'modalities_agree': preliminary.modalities_agree,
+                'verify_trigger': mechanism.verify_trigger, 'verify_executed': should_verify,
+                'verify_style': mechanism.verify_style,
+                'verify_input_labels': [h.label for h in verify_hypotheses.hypotheses],
+                'visual_payload_missing': visual.payload is None,
+                'hypothesis_payload_missing': invalid_hypotheses,
+            })
+        verify_record = preliminary
+        if mechanism.enabled and mechanism.verify_style == 'top2_contrast':
+            verify_record = preliminary.model_copy(update={'ranked': verify_hypotheses.hypotheses})
+        request = self._text_request(
+            STAGE_VERIFY, values, record, verify_hypotheses, verify_record
+        )
+        if mechanism.enabled and mechanism.verify_style == 'top2_contrast':
+            request = request.model_copy(update={'prompt': request.prompt + '\n\n' + TOP_TWO_CONTRACT})
+        if mechanism.enabled and mechanism.review_media == 'video_on_trigger' and should_verify:
+            request = request.model_copy(update={
+                'video_path': inputs.video_path,
+                'prompt': request.prompt + '\n\n' + REVIEW_VIDEO_CONTRACT,
+            })
+            self.mechanism_trace['review_video_path'] = inputs.video_path
+        checked = (
+            self._call(STAGE_VERIFY, request, traces)
+            if should_verify
+            else _skipped(STAGE_VERIFY)
+        )
         traces += (checked.trace,)
-        verification = self._verification(checked.payload, record, hypotheses)
+        verification = (
+            self._verification(checked.payload, record, hypotheses)
+            if should_verify
+            else preliminary
+        )
 
         ranked = hypotheses.model_copy(update={'hypotheses': verification.ranked})
-        request = self._text_request(STAGE_SYNTHESIZE, values, record, ranked)
+        request = self._text_request(
+            STAGE_SYNTHESIZE, values, record, ranked, verification
+        )
         written = self._call(STAGE_SYNTHESIZE, request, traces)
         traces += (written.trace,)
 
-        outcomes = (visual, proposed, checked, written)
+        outcomes = (visual, proposed, written) + ((checked,) if should_verify else ())
         return build_output(
             example.example_id,
             parsed,
@@ -136,6 +205,53 @@ class HarnessPipeline:
             cap=MULTILABEL_CAP,
             traces=traces,
             fallback_used=any(outcome.payload is None for outcome in outcomes),
+        )
+
+    def _direct_same_tools(
+        self,
+        example: Example,
+        inputs: PerceivedInputs,
+        parsed: ParsedPrompt,
+        values: _Placeholders,
+    ) -> HarnessOutput:
+        # One real stage trace, not fake four-stage traces. The distinct request
+        # tag + full contract + video/schema form a separate content-cache key.
+        audio_record = self._record(parsed, None, inputs)
+        request = self._text_request(STAGE_HYPOTHESES, values, audio_record)
+        request = request.model_copy(
+            update={
+                'prompt': request.prompt + '\n\n' + _DIRECT_CONTRACT,
+                'tag': 'direct_same_tools_v1',
+                'video_path': inputs.video_path,
+                'image_paths': self._extra_images(inputs),
+            }
+        )
+        allowed = min(1 + self._config.retries_per_stage, self._config.call_hard_cap)
+        outcome = run_json_stage(
+            'direct_same_tools',
+            self._target,
+            request,
+            allowed,
+            payload_check=lambda payload: _valid_direct_payload(payload, parsed),
+        )
+        record = self._record(parsed, outcome.payload, inputs)
+        hypotheses = self._hypotheses(outcome.payload, parsed)
+        verification = apply_bundle_verification(self._bundle, record, hypotheses)
+        valid_hypotheses = (
+            hypothesis_set_from_payload(outcome.payload, LabelSet.from_parsed(parsed))
+            if outcome.payload
+            else None
+        )
+        return build_output(
+            example.example_id,
+            parsed,
+            record,
+            hypotheses,
+            verification,
+            self._step_texts(outcome),
+            cap=MULTILABEL_CAP,
+            traces=(outcome.trace,),
+            fallback_used=valid_hypotheses is None,
         )
 
     def _parsed(self, example: Example, inputs: PerceivedInputs) -> ParsedPrompt:
@@ -219,8 +335,15 @@ class HarnessPipeline:
         values: _Placeholders,
         record: EvidenceRecord,
         hypotheses: HypothesisSet | None = None,
+        verification: VerificationResult | None = None,
     ) -> TargetRequest:
-        extra = {'evidence_json': _as_json(record)}
+        extra = {
+            'evidence_json': _as_json(record),
+            'verification_json': _as_json(verification) if verification else '{}',
+        }
+        mechanism = self._bundle.routing.mechanism_screen
+        if mechanism.enabled and mechanism.evidence_layout == 'source_table':
+            extra['evidence_json'] = source_table(record)
         if hypotheses is not None:
             extra['hypotheses_json'] = _as_json(hypotheses)
         return TargetRequest(
@@ -238,6 +361,10 @@ class HarnessPipeline:
         sampling = self._bundle.sampling
         images: tuple[str, ...] = ()
         if sampling.face_crops.enabled:
+            if not inputs.face_crop_paths or sampling.face_crops.max_crops == 0:
+                raise ValidationError(
+                    'face crops requested but no usable crops are available'
+                )
             images += tuple(inputs.face_crop_paths[: sampling.face_crops.max_crops])
         if sampling.extra_images.enabled:
             images += tuple(inputs.frame_paths[:VIDEO_MAX_FRAMES])
@@ -279,3 +406,33 @@ def _as_json(model: BaseModel) -> str:
 
 def _joined(first: str, second: str) -> str:
     return '; '.join(part for part in (first, second) if part)
+
+
+_DIRECT_CONTRACT = """DIRECT SAME-TOOLS WORKFLOW — output contract v1.
+You also receive the original video. Complete observation, label hypotheses and
+explanation in this one answer, using video plus the cached audio evidence above.
+For this workflow the following JSON shape extends/supersedes any earlier output
+shape. Return one object with:
+face: list of visible face cues; body: list of body cues; scene: list of scene cues;
+temporal_change: string or null; coarse: string;
+hypotheses: list of {label, confidence, support, contradiction};
+steps: exactly four grounded explanation strings.
+Use only labels from the request. Existing a1..an audio IDs remain unchanged.
+Your visual cues get v1..vn in face, body, scene, temporal_change order; cite those
+and audio IDs in hypotheses, and [v1] or [a1] style citations in steps. t1 is only
+the question and is not supporting evidence. Do not invent missing audio, extra
+model calls, or tools. Give hypotheses for plausible alternatives, then distinguish
+them with observed evidence. The fixed controller will emit the final answer.
+"""
+
+
+def _valid_direct_payload(payload: dict[str, Any], parsed: ParsedPrompt) -> bool:
+    """A JSON object alone is not a successful direct-workflow answer."""
+    hypotheses = hypothesis_set_from_payload(payload, LabelSet.from_parsed(parsed))
+    steps = payload.get('steps')
+    return (
+        hypotheses is not None
+        and isinstance(steps, list)
+        and len(steps) == MODEL_WRITTEN_STEPS
+        and all(isinstance(step, str) and bool(step.strip()) for step in steps)
+    )

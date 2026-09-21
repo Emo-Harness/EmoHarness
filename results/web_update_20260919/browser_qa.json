@@ -1,0 +1,171 @@
+{
+  "status": "passed",
+  "states": [
+    {
+      "model": "qwen3vl_8b",
+      "view": "full",
+      "scores": "Direct \u00b7 L0\t29.95\t34.26\t5,507\nFixed tools \u00b7 L1\t39.15\t43.49\t5,507\nScaffold \u00b7 L3\t40.47\t43.30\t5,507\nFinal harness \u00b7 L5\t40.68\t43.42\t5,507",
+      "deltas": "Added tool information\t+9.20\t[+7.78, +10.65]\tBelow resolution\tBelow resolution\nAdditional scaffold\t+1.32\t[\u22120.26, +2.89]\t0.1042\t0.5210\nBuilder increment\t+0.21\t[\u22120.18, +0.59]\t0.2924\t1.0000\nTotal: harness vs direct\t+10.72\t[+9.07, +12.38]\tBelow resolution\tBelow resolution"
+    },
+    {
+      "model": "qwen3vl_8b",
+      "view": "seen",
+      "scores": "Direct \u00b7 L0\t28.69\t36.82\t2,963\nFixed tools \u00b7 L1\t41.50\t48.19\t2,963\nScaffold \u00b7 L3\t41.41\t45.76\t2,963\nFinal harness \u00b7 L5\t41.67\t45.87\t2,963",
+      "deltas": "Added tool information\t+12.81\t[+10.36, +15.32]\tBelow resolution\t\u2014\nAdditional scaffold\t\u22120.10\t[\u22122.82, +2.65]\t0.9330\t\u2014\nBuilder increment\t+0.26\t[\u22120.47, +1.04]\t0.4876\t\u2014\nTotal: harness vs direct\t+12.97\t[+10.09, +15.82]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_8b",
+      "view": "held_out",
+      "scores": "Direct \u00b7 L0\t30.71\t31.29\t2,544\nFixed tools \u00b7 L1\t37.74\t38.00\t2,544\nScaffold \u00b7 L3\t39.91\t40.42\t2,544\nFinal harness \u00b7 L5\t40.08\t40.57\t2,544",
+      "deltas": "Added tool information\t+7.03\t[+5.27, +8.84]\tBelow resolution\t\u2014\nAdditional scaffold\t+2.17\t[+0.24, +4.07]\t0.0272\t\u2014\nBuilder increment\t+0.18\t[\u22120.23, +0.59]\t0.4056\t\u2014\nTotal: harness vs direct\t+9.37\t[+7.34, +11.44]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_8b",
+      "view": "old_986",
+      "scores": "Direct \u00b7 L0\t29.39\t29.51\t986\nFixed tools \u00b7 L1\t40.38\t40.42\t986\nScaffold \u00b7 L3\t40.66\t40.75\t986\nFinal harness \u00b7 L5\t41.13\t41.23\t986",
+      "deltas": "Added tool information\t+10.99\t[+7.97, +14.00]\tBelow resolution\t\u2014\nAdditional scaffold\t+0.28\t[\u22122.54, +3.19]\t0.8540\t\u2014\nBuilder increment\t+0.47\t[\u22120.18, +1.13]\t0.1622\t\u2014\nTotal: harness vs direct\t+11.74\t[+8.37, +15.00]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_8b",
+      "view": "new_4521",
+      "scores": "Direct \u00b7 L0\t30.16\t35.30\t4,521\nFixed tools \u00b7 L1\t39.02\t44.15\t4,521\nScaffold \u00b7 L3\t40.79\t43.85\t4,521\nFinal harness \u00b7 L5\t40.88\t43.90\t4,521",
+      "deltas": "Added tool information\t+8.86\t[+7.08, +10.74]\tBelow resolution\t\u2014\nAdditional scaffold\t+1.77\t[\u22120.50, +4.01]\t0.1310\t\u2014\nBuilder increment\t+0.09\t[\u22120.67, +0.85]\t0.8004\t\u2014\nTotal: harness vs direct\t+10.72\t[+8.48, +12.96]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_4b",
+      "view": "full",
+      "scores": "Direct \u00b7 L0\t29.39\t33.74\t5,507\nFixed tools \u00b7 L1\t38.39\t43.01\t5,507\nScaffold \u00b7 L3\t37.60\t42.41\t5,507\nFinal harness \u00b7 L5\t38.56\t43.09\t5,507",
+      "deltas": "Added tool information\t+9.00\t[+7.62, +10.38]\tBelow resolution\tBelow resolution\nAdditional scaffold\t\u22120.79\t[\u22122.21, +0.64]\t0.2776\t1.0000\nBuilder increment\t+0.95\t[+0.12, +1.82]\t0.0240\t0.1440\nTotal: harness vs direct\t+9.17\t[+7.63, +10.73]\tBelow resolution\tBelow resolution"
+    },
+    {
+      "model": "qwen3vl_4b",
+      "view": "seen",
+      "scores": "Direct \u00b7 L0\t28.61\t36.62\t2,963\nFixed tools \u00b7 L1\t39.79\t47.59\t2,963\nScaffold \u00b7 L3\t41.26\t47.92\t2,963\nFinal harness \u00b7 L5\t41.73\t48.13\t2,963",
+      "deltas": "Added tool information\t+11.18\t[+9.06, +13.40]\tBelow resolution\t\u2014\nAdditional scaffold\t+1.46\t[\u22120.84, +3.73]\t0.2142\t\u2014\nBuilder increment\t+0.47\t[\u22120.96, +1.91]\t0.5234\t\u2014\nTotal: harness vs direct\t+13.12\t[+10.49, +15.81]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_4b",
+      "view": "held_out",
+      "scores": "Direct \u00b7 L0\t29.85\t30.40\t2,544\nFixed tools \u00b7 L1\t37.55\t37.67\t2,544\nScaffold \u00b7 L3\t35.41\t35.98\t2,544\nFinal harness \u00b7 L5\t36.65\t37.22\t2,544",
+      "deltas": "Added tool information\t+7.70\t[+5.88, +9.45]\tBelow resolution\t\u2014\nAdditional scaffold\t\u22122.14\t[\u22123.96, \u22120.31]\t0.0224\t\u2014\nBuilder increment\t+1.24\t[+0.18, +2.31]\t0.0218\t\u2014\nTotal: harness vs direct\t+6.80\t[+4.86, +8.71]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_4b",
+      "view": "old_986",
+      "scores": "Direct \u00b7 L0\t29.92\t30.03\t986\nFixed tools \u00b7 L1\t38.17\t38.16\t986\nScaffold \u00b7 L3\t38.67\t38.79\t986\nFinal harness \u00b7 L5\t39.28\t39.41\t986",
+      "deltas": "Added tool information\t+8.25\t[+5.33, +11.13]\tBelow resolution\t\u2014\nAdditional scaffold\t+0.50\t[\u22122.34, +3.29]\t0.7238\t\u2014\nBuilder increment\t+0.61\t[\u22121.04, +2.24]\t0.4780\t\u2014\nTotal: harness vs direct\t+9.37\t[+6.19, +12.53]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3vl_4b",
+      "view": "new_4521",
+      "scores": "Direct \u00b7 L0\t28.92\t34.55\t4,521\nFixed tools \u00b7 L1\t37.93\t44.06\t4,521\nScaffold \u00b7 L3\t36.90\t43.20\t4,521\nFinal harness \u00b7 L5\t38.11\t43.89\t4,521",
+      "deltas": "Added tool information\t+9.01\t[+7.36, +10.71]\tBelow resolution\t\u2014\nAdditional scaffold\t\u22121.03\t[\u22122.78, +0.82]\t0.2672\t\u2014\nBuilder increment\t+1.21\t[+0.09, +2.40]\t0.0314\t\u2014\nTotal: harness vs direct\t+9.19\t[+7.27, +11.13]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3_5_4b",
+      "view": "full",
+      "scores": "Direct \u00b7 L0\t29.62\t33.75\t5,507\nFixed tools \u00b7 L1\t34.99\t39.64\t5,507\nScaffold \u00b7 L3\t37.23\t40.57\t5,507\nFinal harness \u00b7 L5\t37.23\t40.57\t5,507",
+      "deltas": "Added tool information\t+5.38\t[+4.05, +6.78]\tBelow resolution\tBelow resolution\nAdditional scaffold\t+2.23\t[+0.74, +3.71]\t0.0026\t0.0182\nBuilder increment\t0.00\t[0.00, 0.00]\t1.0000\t1.0000\nTotal: harness vs direct\t+7.61\t[+6.07, +9.16]\tBelow resolution\tBelow resolution"
+    },
+    {
+      "model": "qwen3_5_4b",
+      "view": "seen",
+      "scores": "Direct \u00b7 L0\t30.17\t36.75\t2,963\nFixed tools \u00b7 L1\t38.21\t44.95\t2,963\nScaffold \u00b7 L3\t41.32\t45.09\t2,963\nFinal harness \u00b7 L5\t41.32\t45.09\t2,963",
+      "deltas": "Added tool information\t+8.04\t[+5.80, +10.21]\tBelow resolution\t\u2014\nAdditional scaffold\t+3.11\t[+0.67, +5.55]\t0.0130\t\u2014\nBuilder increment\t0.00\t[0.00, 0.00]\t1.0000\t\u2014\nTotal: harness vs direct\t+11.15\t[+8.54, +13.73]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3_5_4b",
+      "view": "held_out",
+      "scores": "Direct \u00b7 L0\t29.28\t30.26\t2,544\nFixed tools \u00b7 L1\t33.07\t33.46\t2,544\nScaffold \u00b7 L3\t34.77\t35.31\t2,544\nFinal harness \u00b7 L5\t34.77\t35.31\t2,544",
+      "deltas": "Added tool information\t+3.78\t[+2.03, +5.54]\tBelow resolution\t\u2014\nAdditional scaffold\t+1.70\t[\u22120.17, +3.59]\t0.0750\t\u2014\nBuilder increment\t0.00\t[0.00, 0.00]\t1.0000\t\u2014\nTotal: harness vs direct\t+5.49\t[+3.56, +7.48]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3_5_4b",
+      "view": "old_986",
+      "scores": "Direct \u00b7 L0\t29.26\t29.43\t986\nFixed tools \u00b7 L1\t34.30\t34.41\t986\nScaffold \u00b7 L3\t38.24\t38.29\t986\nFinal harness \u00b7 L5\t38.24\t38.29\t986",
+      "deltas": "Added tool information\t+5.04\t[+2.18, +7.84]\t0.0006\t\u2014\nAdditional scaffold\t+3.94\t[+0.95, +6.90]\t0.0102\t\u2014\nBuilder increment\t0.00\t[0.00, 0.00]\t1.0000\t\u2014\nTotal: harness vs direct\t+8.98\t[+5.77, +12.12]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "qwen3_5_4b",
+      "view": "new_4521",
+      "scores": "Direct \u00b7 L0\t29.80\t34.70\t4,521\nFixed tools \u00b7 L1\t34.95\t40.79\t4,521\nScaffold \u00b7 L3\t36.84\t41.07\t4,521\nFinal harness \u00b7 L5\t36.84\t41.07\t4,521",
+      "deltas": "Added tool information\t+5.15\t[+3.36, +6.95]\tBelow resolution\t\u2014\nAdditional scaffold\t+1.90\t[\u22120.14, +3.97]\t0.0672\t\u2014\nBuilder increment\t0.00\t[0.00, 0.00]\t1.0000\t\u2014\nTotal: harness vs direct\t+7.05\t[+4.94, +9.14]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "gemma4_e4b",
+      "view": "full",
+      "scores": "Direct \u00b7 L0\t27.03\t30.89\t5,507\nFixed tools \u00b7 L1\t37.74\t41.05\t5,507\nScaffold \u00b7 L3\t40.28\t42.92\t5,507\nFinal harness \u00b7 L5\t40.21\t42.92\t5,507",
+      "deltas": "Added tool information\t+10.71\t[+9.16, +12.29]\tBelow resolution\tBelow resolution\nAdditional scaffold\t+2.54\t[+1.08, +3.95]\t0.0006\t0.0048\nBuilder increment\t\u22120.07\t[\u22120.33, +0.20]\t0.6100\t1.0000\nTotal: harness vs direct\t+13.18\t[+11.51, +14.86]\tBelow resolution\tBelow resolution"
+    },
+    {
+      "model": "gemma4_e4b",
+      "view": "seen",
+      "scores": "Direct \u00b7 L0\t26.56\t33.45\t2,963\nFixed tools \u00b7 L1\t40.56\t45.16\t2,963\nScaffold \u00b7 L3\t41.74\t45.70\t2,963\nFinal harness \u00b7 L5\t41.79\t45.80\t2,963",
+      "deltas": "Added tool information\t+14.00\t[+11.12, +16.86]\tBelow resolution\t\u2014\nAdditional scaffold\t+1.18\t[\u22121.19, +3.52]\t0.3234\t\u2014\nBuilder increment\t+0.05\t[\u22120.30, +0.42]\t0.7934\t\u2014\nTotal: harness vs direct\t+15.24\t[+12.35, +18.15]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "gemma4_e4b",
+      "view": "held_out",
+      "scores": "Direct \u00b7 L0\t27.31\t27.90\t2,544\nFixed tools \u00b7 L1\t36.05\t36.26\t2,544\nScaffold \u00b7 L3\t39.40\t39.69\t2,544\nFinal harness \u00b7 L5\t39.26\t39.57\t2,544",
+      "deltas": "Added tool information\t+8.74\t[+6.93, +10.57]\tBelow resolution\t\u2014\nAdditional scaffold\t+3.35\t[+1.54, +5.15]\t0.0006\t\u2014\nBuilder increment\t\u22120.14\t[\u22120.51, +0.22]\t0.4580\t\u2014\nTotal: harness vs direct\t+11.95\t[+9.79, +14.11]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "gemma4_e4b",
+      "view": "old_986",
+      "scores": "Direct \u00b7 L0\t27.88\t27.99\t986\nFixed tools \u00b7 L1\t38.36\t38.35\t986\nScaffold \u00b7 L3\t42.21\t42.18\t986\nFinal harness \u00b7 L5\t41.65\t41.62\t986",
+      "deltas": "Added tool information\t+10.48\t[+7.40, +13.53]\tBelow resolution\t\u2014\nAdditional scaffold\t+3.85\t[+0.99, +6.73]\t0.0104\t\u2014\nBuilder increment\t\u22120.56\t[\u22121.32, +0.15]\t0.1242\t\u2014\nTotal: harness vs direct\t+13.77\t[+10.27, +17.39]\tBelow resolution\t\u2014"
+    },
+    {
+      "model": "gemma4_e4b",
+      "view": "new_4521",
+      "scores": "Direct \u00b7 L0\t27.04\t31.52\t4,521\nFixed tools \u00b7 L1\t37.53\t41.64\t4,521\nScaffold \u00b7 L3\t39.52\t43.08\t4,521\nFinal harness \u00b7 L5\t39.52\t43.20\t4,521",
+      "deltas": "Added tool information\t+10.49\t[+8.32, +12.72]\tBelow resolution\t\u2014\nAdditional scaffold\t+1.99\t[+0.06, +3.93]\t0.0430\t\u2014\nBuilder increment\t\u22120.00\t[\u22120.30, +0.28]\t0.9848\t\u2014\nTotal: harness vs direct\t+12.48\t[+10.28, +14.73]\tBelow resolution\t\u2014"
+    }
+  ],
+  "images": [
+    {
+      "src": "http://127.0.0.1:8899/new-results/data/harness_flow.svg",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:8899/new-results/data/token_efficiency.svg",
+      "loaded": true
+    },
+    {
+      "src": "http://127.0.0.1:8899/new-results/data/loop_scaling.svg",
+      "loaded": true
+    }
+  ],
+  "downloads": [
+    {
+      "url": "http://127.0.0.1:8899/new-results/data/harness_flow.svg",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8899/new-results/data/token_efficiency.svg",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8899/new-results/data/loop_scaling.svg",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8899/new-results/data/full_results.json",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8899/new-results/data/final_comparison.md",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8899/new-results/data/acceptance.json",
+      "status": 200
+    }
+  ],
+  "screenshots": [
+    "desktop",
+    "mobile",
+    "narrow"
+  ],
+  "errors": []
+}

@@ -8,7 +8,9 @@ config can point at different endpoints per machine.
 
 from __future__ import annotations
 
-from typing import Literal
+from collections.abc import Mapping
+
+from typing import Literal, Any
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -102,6 +104,13 @@ class TargetConfig(BaseModel):
         default='none',
         min_length=1,
         description='reasoning_effort sent under the openai_reasoning flavor',
+    )
+    chat_template_kwargs: Mapping[str, Any] | None = Field(
+        default=None,
+        description='extra arguments for the served chat template, e.g. '
+        "{'enable_thinking': false} for the Qwen3.5 family. Sent verbatim as "
+        'the top-level chat_template_kwargs field vLLM reads; omitted when '
+        'unset, so every existing Target keeps its exact request spelling.',
     )
     pricing: Pricing = Field(default=_FREE, alias='pricing_usd_per_million')
 

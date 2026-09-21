@@ -99,10 +99,8 @@ def _gate_labels(
     cardinality = label_set.cardinality(cap)
     maximum = min(cap, cardinality.maximum or cap)
     scored = _score_hypotheses(ranked, record, label_set)
-    passing = sorted(
-        (item for item in scored if item.passes),
-        key=lambda item: (-item.confidence, -item.support),
-    )
+    # The ranker owns decision order. Re-sorting here silently disables code edits.
+    passing = tuple(item for item in scored if item.passes)
     labels = label_set.canonical_many(item.label for item in passing)[:maximum]
     if len(labels) < cardinality.minimum:
         return _fill(labels, scored, label_set.labels, cardinality.minimum, maximum)
@@ -113,7 +111,7 @@ def _score_hypotheses(
     ranked: Sequence[Hypothesis], record: EvidenceRecord, label_set: LabelSet
 ) -> tuple[_ScoredHypothesis, ...]:
     """Canonicalize labels and count the support and contradiction ids that exist."""
-    known = record.item_ids()
+    known = record.decision_ids()
     scored = []
     for hypothesis in ranked:
         label = label_set.canonical(hypothesis.label)
@@ -137,7 +135,7 @@ def _render_steps(
     record: EvidenceRecord,
 ) -> tuple[str, ...]:
     """Exactly ``NUM_STEPS`` steps: four grounded ones plus the fixed decision."""
-    known = record.item_ids()
+    known = record.decision_ids()
     bodies = tuple(
         _grounded(_text_at(step_texts, index), known)
         for index in range(MODEL_WRITTEN_STEPS)
@@ -168,7 +166,7 @@ def _render_response(steps: Sequence[str], labels: Sequence[str]) -> str:
 
 
 def _count_known(ids: Sequence[str], known: frozenset[str]) -> int:
-    return len([item_id for item_id in ids if item_id in known])
+    return len(set(ids) & known)
 
 
 def _fill(
