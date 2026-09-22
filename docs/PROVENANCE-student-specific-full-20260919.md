@@ -71,7 +71,7 @@ own CI (ruff, mypy --strict, pytest, codespell). Both changes are inert:
   import order only: `Literal, Any` -> `Any, Literal`, plus one blank line
 * `src/emoharness/evaluation/official.py`
   pinned `2ac08760de247815` -> now `0bdf27b3f0d4d49e`
-  "unparseable" -> "unparsable" inside a log-message string
+  a misspelling corrected inside a log-message string
 
 The codespell hit predates this work -- it is present at `7c3eca3`, the base
 of this branch -- so fixing it here is arguably out of scope; I did it anyway
