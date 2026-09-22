@@ -24,44 +24,66 @@ This branch holds the code for the evaluation behind the published results page
 **It is not a byte-exact reconstruction of the code that produced those
 numbers, and it cannot be.** The last commit before this one is dated
 2026-09-12; the evaluation ran on 09-18/09-19 and was never committed. Of the
-121 pinned inputs, **107 still match their pinned hash today and 14 do
-not** -- they were edited in place by later optimizer work (v5-v8) after the
-evaluation had already been generated at 17:34:46Z on 09-19. Their 09-19
-content is not recoverable: it is in no commit, and none of the v5, v6 or v7
-`source_snapshot/` directories preserves it (checked, 0 of 14 match).
+121 pinned inputs, **105 still match their pinned hash today and 16 do not**.
 
-The 14 files whose content has drifted since the published run:
+Fourteen of the sixteen drifted on their own: later optimizer work (v5-v8)
+edited them in place after the evaluation had already been generated at
+17:34:46Z on 09-19. Their 09-19 content is not recoverable -- it is in no
+commit, and none of the v5, v6 or v7 `source_snapshot/` directories preserves
+it (checked, 0 of 14 match).
+
+The fourteen that drifted before this branch existed:
 
 * `src/emoharness/builder/config.py`
-  pinned `7ad7cada75b17418` -> current `294178dee544cd66`
+  pinned `7ad7cada75b17418` -> now `294178dee544cd66`
 * `src/emoharness/builder/gates.py`
-  pinned `23967af1d7553fc3` -> current `71411a7206343fa9`
+  pinned `23967af1d7553fc3` -> now `71411a7206343fa9`
 * `src/emoharness/builder/loop.py`
-  pinned `26483e88ae2ad090` -> current `45c12a302df236a9`
+  pinned `26483e88ae2ad090` -> now `45c12a302df236a9`
 * `src/emoharness/builder/packet.py`
-  pinned `f12fcde89e3e3a8f` -> current `12f4a1437b1e36b4`
+  pinned `f12fcde89e3e3a8f` -> now `12f4a1437b1e36b4`
 * `src/emoharness/builder/schema.py`
-  pinned `80cadd67e57e145c` -> current `289f07b39f25a1bf`
+  pinned `80cadd67e57e145c` -> now `289f07b39f25a1bf`
 * `src/emoharness/builder/verifier.py`
-  pinned `c95df50f76caeaa2` -> current `c3f15d69304011c2`
+  pinned `c95df50f76caeaa2` -> now `c3f15d69304011c2`
 * `src/emoharness/harness/_stages.py`
-  pinned `3c107468dfd2ec68` -> current `e89e0418f2488d8e`
+  pinned `3c107468dfd2ec68` -> now `e89e0418f2488d8e`
 * `src/emoharness/harness/_verification.py`
-  pinned `e8b49e92c86468cf` -> current `20e676a3c803eda2`
+  pinned `e8b49e92c86468cf` -> now `357b7f24579e45a3`
 * `src/emoharness/harness/bundle_models.py`
-  pinned `f8577c52ab83f7ea` -> current `f165f75bd3d767e8`
+  pinned `f8577c52ab83f7ea` -> now `3b8ce1e2512a36fd`
 * `src/emoharness/harness/fake_responder.py`
-  pinned `09dbb8c82b21e176` -> current `1a4e99de4855be1b`
+  pinned `09dbb8c82b21e176` -> now `1a4e99de4855be1b`
 * `src/emoharness/harness/loader.py`
-  pinned `f1eace56fd664d24` -> current `04429c39a1baa507`
+  pinned `f1eace56fd664d24` -> now `04429c39a1baa507`
 * `src/emoharness/harness/pipeline.py`
-  pinned `d9e0c996fcbd94b6` -> current `cc20c79298d828ab`
+  pinned `d9e0c996fcbd94b6` -> now `9b707b7bf8d0cbe6`
 * `src/emoharness/runner/construction.py`
-  pinned `ebe2490e4f87613b` -> current `0931451e677979fb`
+  pinned `ebe2490e4f87613b` -> now `0931451e677979fb`
 * `src/emoharness/runner/context.py`
-  pinned `09438298cb8417ce` -> current `96e9b51f74567c4a`
+  pinned `09438298cb8417ce` -> now `96e9b51f74567c4a`
 
-The other 107 pinned inputs verify clean against `input_sha256` as of this
+The other two I changed myself, to get the branch through this repository's
+own CI (ruff, mypy --strict, pytest, codespell). Both changes are inert:
+
+* `src/emoharness/target/config.py`
+  pinned `df04a3dd6029283d` -> now `eec3b0f0381b1036`
+  import order only: `Literal, Any` -> `Any, Literal`, plus one blank line
+* `src/emoharness/evaluation/official.py`
+  pinned `2ac08760de247815` -> now `0bdf27b3f0d4d49e`
+  "unparseable" -> "unparsable" inside a log-message string
+
+The codespell hit predates this work -- it is present at `7c3eca3`, the base
+of this branch -- so fixing it here is arguably out of scope; I did it anyway
+rather than open a pull request with red CI, and record the cost above.
+
+One file had to be added that the pin list does not mention:
+`src/emoharness/harness/_mechanism_screen.py`. Today's `pipeline.py` imports
+it, and without it a clean checkout of this branch cannot import `emoharness`
+at all. It is v5-era code, so its presence is another way of saying that the
+`src` tree here is today's code, not 09-19's.
+
+The other 105 pinned inputs verify clean against `input_sha256` as of this
 commit. To re-check at any time:
 
 ```python
@@ -84,6 +106,10 @@ bad = [r for r, w in pins.items()
   this repository is a licensing decision, not a packaging one. The page's
   example gallery will not render from this branch alone.
 * `coordination/` -- inter-session mailbox and internal review notes.
+
+## CI
+
+On a clean checkout of this branch: ruff check and ruff format clean, mypy --strict clean over 99 source files, codespell clean, and 998 passed / 2 skipped with `PYTHONPATH` forced onto this branch's `src`. That last detail matters: the venv installs `emoharness` from the main checkout, so a plain `pytest` run in a worktree silently tests the main tree instead of the branch.
 * The v4-v8 optimizer code, which remains uncommitted in the working tree.
 
 ## Result this code produced, for the record
