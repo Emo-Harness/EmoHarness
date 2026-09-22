@@ -124,7 +124,7 @@ def step_scores_from_eval_json(path: Path) -> tuple[StepScores, ...]:
         video_id = row.get('video_id')
         scores = parse_score_string(str(row.get('score', '')))
         if video_id is None or scores is None:
-            _logger.warning('skipping unparseable eval row for video_id=%s', video_id)
+            _logger.warning('skipping unparsable eval row for video_id=%s', video_id)
             continue
         results.append(StepScores(example_id=str(video_id), scores=scores))
     return tuple(results)

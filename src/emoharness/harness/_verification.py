@@ -201,9 +201,9 @@ def _policy_ranking(bundle: HarnessBundle, payload: _Payload) -> tuple[Hypothesi
     def score(item: Hypothesis) -> float:
         if bundle.routing.rank_policy == 'confidence':
             return item.confidence
-        support = sum(weights.get(modalities.get(i), 0.0) for i in item.support)
+        support = sum(weights.get(modalities.get(i, ''), 0.0) for i in item.support)
         contradiction = sum(
-            weights.get(modalities.get(i), 0.0) for i in item.contradiction
+            weights.get(modalities.get(i, ''), 0.0) for i in item.contradiction
         )
         return item.confidence + support - contradiction
 
