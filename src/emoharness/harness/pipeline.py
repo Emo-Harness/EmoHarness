@@ -29,8 +29,13 @@ from emoharness.data.prompt_template import ParsedPrompt, parse_prompt
 from emoharness.harness._controller import MODEL_WRITTEN_STEPS, build_output
 from emoharness.harness._evidence import build_record
 from emoharness.harness._mechanism_screen import (
-    RAW_FRAMES_CONTRACT, REVIEW_VIDEO_CONTRACT, TOP_TWO_CONTRACT,
-    confidence_margin, decision_frames, source_table, top_two,
+    RAW_FRAMES_CONTRACT,
+    REVIEW_VIDEO_CONTRACT,
+    TOP_TWO_CONTRACT,
+    confidence_margin,
+    decision_frames,
+    source_table,
+    top_two,
 )
 from emoharness.harness._stages import (
     StageOutcome,
@@ -123,10 +128,15 @@ class HarnessPipeline:
         if mechanism.enabled and mechanism.decision_media == 'cached_frames':
             frames = decision_frames(inputs, mechanism.decision_frame_limit)
             if not frames:
-                raise ValidationError('v5 decision_media requires existing cached frames')
-            request = request.model_copy(update={
-                'image_paths': frames, 'prompt': request.prompt + '\n\n' + RAW_FRAMES_CONTRACT,
-            })
+                raise ValidationError(
+                    'v5 decision_media requires existing cached frames'
+                )
+            request = request.model_copy(
+                update={
+                    'image_paths': frames,
+                    'prompt': request.prompt + '\n\n' + RAW_FRAMES_CONTRACT,
+                }
+            )
             self.mechanism_trace['decision_frame_paths'] = list(frames)
         proposed = self._call(STAGE_HYPOTHESES, request, traces)
         traces += (proposed.trace,)
@@ -144,36 +154,60 @@ class HarnessPipeline:
         if mechanism.enabled:
             sanitized = hypotheses.model_copy(update={'hypotheses': preliminary.ranked})
             margin = confidence_margin(sanitized)
-            invalid_hypotheses = (proposed.payload is None or hypothesis_set_from_payload(
-                proposed.payload, LabelSet.from_parsed(parsed)) is None)
+            invalid_hypotheses = (
+                proposed.payload is None
+                or hypothesis_set_from_payload(
+                    proposed.payload, LabelSet.from_parsed(parsed)
+                )
+                is None
+            )
             if mechanism.verify_trigger == 'conflict_or_low_margin':
-                should_verify = (not preliminary.modalities_agree or
-                                 margin < mechanism.margin_threshold or
-                                 bool(preliminary.notes) or
-                                 invalid_hypotheses or visual.payload is None)
+                should_verify = (
+                    not preliminary.modalities_agree
+                    or margin < mechanism.margin_threshold
+                    or bool(preliminary.notes)
+                    or invalid_hypotheses
+                    or visual.payload is None
+                )
             if mechanism.verify_style == 'top2_contrast':
                 verify_hypotheses = top_two(sanitized)
-            self.mechanism_trace.update({
-                'margin': margin, 'modalities_agree': preliminary.modalities_agree,
-                'verify_trigger': mechanism.verify_trigger, 'verify_executed': should_verify,
-                'verify_style': mechanism.verify_style,
-                'verify_input_labels': [h.label for h in verify_hypotheses.hypotheses],
-                'visual_payload_missing': visual.payload is None,
-                'hypothesis_payload_missing': invalid_hypotheses,
-            })
+            self.mechanism_trace.update(
+                {
+                    'margin': margin,
+                    'modalities_agree': preliminary.modalities_agree,
+                    'verify_trigger': mechanism.verify_trigger,
+                    'verify_executed': should_verify,
+                    'verify_style': mechanism.verify_style,
+                    'verify_input_labels': [
+                        h.label for h in verify_hypotheses.hypotheses
+                    ],
+                    'visual_payload_missing': visual.payload is None,
+                    'hypothesis_payload_missing': invalid_hypotheses,
+                }
+            )
         verify_record = preliminary
         if mechanism.enabled and mechanism.verify_style == 'top2_contrast':
-            verify_record = preliminary.model_copy(update={'ranked': verify_hypotheses.hypotheses})
+            verify_record = preliminary.model_copy(
+                update={'ranked': verify_hypotheses.hypotheses}
+            )
         request = self._text_request(
             STAGE_VERIFY, values, record, verify_hypotheses, verify_record
         )
         if mechanism.enabled and mechanism.verify_style == 'top2_contrast':
-            request = request.model_copy(update={'prompt': request.prompt + '\n\n' + TOP_TWO_CONTRACT})
-        if mechanism.enabled and mechanism.review_media == 'video_on_trigger' and should_verify:
-            request = request.model_copy(update={
-                'video_path': inputs.video_path,
-                'prompt': request.prompt + '\n\n' + REVIEW_VIDEO_CONTRACT,
-            })
+            request = request.model_copy(
+                update={'prompt': request.prompt + '\n\n' + TOP_TWO_CONTRACT}
+            )
+        if (
+            mechanism.enabled
+            and mechanism.review_media == 'video_on_trigger'
+            and should_verify
+        ):
+            request = request.model_copy(
+                update={
+                    'video_path': inputs.video_path,
+                    'prompt': request.prompt + '\n\n' + REVIEW_VIDEO_CONTRACT,
+                }
+            )
             self.mechanism_trace['review_video_path'] = inputs.video_path
         checked = (
             self._call(STAGE_VERIFY, request, traces)

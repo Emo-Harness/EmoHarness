@@ -130,7 +130,9 @@ class RoutingConfig(BaseModel):
     rank_policy: Literal['bundle', 'confidence', 'evidence_weighted'] = 'bundle'
     audio_weight: float = Field(default=1.0, ge=0.0, le=2.0)
     visual_weight: float = Field(default=1.0, ge=0.0, le=2.0)
-    mechanism_screen: MechanismScreenConfig = Field(default_factory=MechanismScreenConfig)
+    mechanism_screen: MechanismScreenConfig = Field(
+        default_factory=MechanismScreenConfig
+    )
 
 
 class AudioPipelineConfig(BaseModel):

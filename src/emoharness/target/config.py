@@ -9,8 +9,7 @@ config can point at different endpoints per machine.
 from __future__ import annotations
 
 from collections.abc import Mapping
-
-from typing import Literal, Any
+from typing import Any, Literal
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
