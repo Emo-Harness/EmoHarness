@@ -1,0 +1,14 @@
+{
+  "hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+  "host": "jupyter-max7",
+  "model": "qwen3vl_8b",
+  "note": "reused finished full/replicate_0 bundle; 8B is not rebuilt and this is the plan's one legitimate reuse",
+  "path": "results/v3/fixed_asr/full/replicate_0/construction/stage3/0/final",
+  "published_utc": "2026-09-18T17:20:21Z",
+  "reused_from": "results/v3/fixed_asr/full/replicate_0/construction/stage3/0/final",
+  "scaffold_hash": "b38c518b7e4161a3ba4f417f31ff4b359b3ea32474d4675cc2f8ec6f0df8ab17",
+  "session": "session1-worker",
+  "source": "results/v3/fixed_asr/full/replicate_0/construction/stage3/0/final",
+  "source_hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+  "student": "qwen3vl_8b"
+}
