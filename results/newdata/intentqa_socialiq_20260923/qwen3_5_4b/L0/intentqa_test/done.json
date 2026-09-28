@@ -1,0 +1,26 @@
+{
+  "manifest": "results/newdata/intentqa_socialiq_20260923/manifests/intentqa_test.jsonl",
+  "manifest_sha256": "14671e4740064ce1984ca084008cb1f9e14617fae1705470f78b131368d46d0e",
+  "n_items": 2134,
+  "student": "qwen3_5_4b",
+  "dataset": "intentqa_test",
+  "row": "L0",
+  "bundle": null,
+  "bundle_hash": null,
+  "target_config": "configs/target/qwen3_5_4b.yaml",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "predictions": "results/newdata/intentqa_socialiq_20260923/qwen3_5_4b/L0/intentqa_test/raw_predictions/L0/intentqa_test.jsonl",
+  "n_written": 2134,
+  "seconds": 1825.7,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-24T03:37:57Z"
+}

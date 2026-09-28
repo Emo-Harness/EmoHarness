@@ -1,0 +1,26 @@
+{
+  "manifest": "results/newdata/intentqa_socialiq_20260923/manifests/social_iq_val.jsonl",
+  "manifest_sha256": "a35096031f6a02952b60c8be167bfa6c97b4890a9d68f52ff0c2253e9868d488",
+  "n_items": 795,
+  "student": "gemma4_e4b",
+  "dataset": "social_iq_val",
+  "row": "L1",
+  "bundle": null,
+  "bundle_hash": null,
+  "target_config": "configs/target/gemma4_e4b_it.yaml",
+  "model_id": "google/gemma-4-E4B-it",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "predictions": "results/newdata/intentqa_socialiq_20260923/gemma4_e4b/L1/social_iq_val/raw_predictions/L1/social_iq_val.jsonl",
+  "n_written": 795,
+  "seconds": 2804.6,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-24T08:32:31Z"
+}

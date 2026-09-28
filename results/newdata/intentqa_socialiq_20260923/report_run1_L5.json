@@ -1,0 +1,212 @@
+{
+  "generated_at": "2026-09-23T13:48:35Z",
+  "scoring": "local Recognition, exact option match; no judge",
+  "ci": "10000 video-clustered bootstrap resamples",
+  "rendering": "MME-Emotion template, quantifier \"the most prominent\", noun = answer to the question \"<q>\", labels = option texts; commas removed and semicolons -> \" -\" inside options",
+  "results": {
+    "intentqa_test": {
+      "label": "IntentQA test",
+      "chance": 0.2,
+      "n_items": 2134,
+      "n_excluded": 0,
+      "students": {
+        "qwen3vl_8b": {
+          "n": 2134,
+          "n_videos": 567,
+          "accuracy": 0.6344892221180881,
+          "ci95_video_clustered": [
+            0.6120612061206121,
+            0.6568816169393648
+          ],
+          "by_question_type": {
+            "CH": {
+              "n": 359,
+              "accuracy": 0.6685236768802229
+            },
+            "CW": {
+              "n": 1250,
+              "accuracy": 0.664
+            },
+            "TN": {
+              "n": 503,
+              "accuracy": 0.5467196819085487
+            },
+            "TP": {
+              "n": 22,
+              "accuracy": 0.4090909090909091
+            }
+          },
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.009372071227741,
+          "max_target_calls": 5,
+          "bundle_hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+          "seconds": 5830.6
+        },
+        "qwen3vl_4b": {
+          "n": 2134,
+          "n_videos": 567,
+          "accuracy": 0.5749765698219307,
+          "ci95_video_clustered": [
+            0.5507921714818267,
+            0.598210080075365
+          ],
+          "by_question_type": {
+            "CH": {
+              "n": 359,
+              "accuracy": 0.6016713091922006
+            },
+            "CW": {
+              "n": 1250,
+              "accuracy": 0.612
+            },
+            "TN": {
+              "n": 503,
+              "accuracy": 0.47514910536779326
+            },
+            "TP": {
+              "n": 22,
+              "accuracy": 0.3181818181818182
+            }
+          },
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.0046860356138705,
+          "max_target_calls": 5,
+          "bundle_hash": "4ace41173bb48fda24a4a0fd9c8134bc659f40d2f6fa2d428d1324c53cafe513",
+          "seconds": 3572.8
+        },
+        "qwen3_5_4b": {
+          "n": 2134,
+          "n_videos": 567,
+          "accuracy": 0.5993439550140581,
+          "ci95_video_clustered": [
+            0.5770625566636446,
+            0.6212906264719736
+          ],
+          "by_question_type": {
+            "CH": {
+              "n": 359,
+              "accuracy": 0.6155988857938719
+            },
+            "CW": {
+              "n": 1250,
+              "accuracy": 0.6352
+            },
+            "TN": {
+              "n": 503,
+              "accuracy": 0.5049701789264414
+            },
+            "TP": {
+              "n": 22,
+              "accuracy": 0.45454545454545453
+            }
+          },
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.05904404873477,
+          "max_target_calls": 6,
+          "bundle_hash": "d8b0b2794c4c95fee8df06ffcc979df9e83242c877848d80d50dd3a77ad4175e",
+          "seconds": 4351.4
+        },
+        "gemma4_e4b": {
+          "n": 2134,
+          "n_videos": 567,
+          "accuracy": 0.5229615745079662,
+          "ci95_video_clustered": [
+            0.5002359603586597,
+            0.5451505016722408
+          ],
+          "by_question_type": {
+            "CH": {
+              "n": 359,
+              "accuracy": 0.48746518105849584
+            },
+            "CW": {
+              "n": 1250,
+              "accuracy": 0.564
+            },
+            "TN": {
+              "n": 503,
+              "accuracy": 0.4552683896620278
+            },
+            "TP": {
+              "n": 22,
+              "accuracy": 0.3181818181818182
+            }
+          },
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.044985941893159,
+          "max_target_calls": 5,
+          "bundle_hash": "468afcba8c97dd1e98a8822fe892b5832d31f999d5a70fc8a5ff0f269a5a9f17",
+          "seconds": 4873.1
+        }
+      }
+    },
+    "social_iq_val": {
+      "label": "Social-IQ 2.0 val",
+      "chance": 0.25,
+      "n_items": 795,
+      "n_excluded": 148,
+      "students": {
+        "qwen3vl_8b": {
+          "n": 795,
+          "n_videos": 122,
+          "accuracy": 0.6113207547169811,
+          "ci95_video_clustered": [
+            0.5721271393643031,
+            0.6506024096385542
+          ],
+          "by_question_type": {},
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.059119496855346,
+          "max_target_calls": 6,
+          "bundle_hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+          "seconds": 2820.3
+        },
+        "qwen3vl_4b": {
+          "n": 795,
+          "n_videos": 122,
+          "accuracy": 0.5371069182389937,
+          "ci95_video_clustered": [
+            0.5021598272138229,
+            0.5735475896168108
+          ],
+          "by_question_type": {},
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.090566037735849,
+          "max_target_calls": 6,
+          "bundle_hash": "4ace41173bb48fda24a4a0fd9c8134bc659f40d2f6fa2d428d1324c53cafe513",
+          "seconds": 2129.3
+        },
+        "qwen3_5_4b": {
+          "n": 795,
+          "n_videos": 122,
+          "accuracy": 0.6125786163522012,
+          "ci95_video_clustered": [
+            0.5747549019607843,
+            0.6515892420537898
+          ],
+          "by_question_type": {},
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.056603773584905,
+          "max_target_calls": 6,
+          "bundle_hash": "d8b0b2794c4c95fee8df06ffcc979df9e83242c877848d80d50dd3a77ad4175e",
+          "seconds": 1699.4
+        },
+        "gemma4_e4b": {
+          "n": 795,
+          "n_videos": 122,
+          "accuracy": 0.5937106918238994,
+          "ci95_video_clustered": [
+            0.553050397877984,
+            0.6349614395886889
+          ],
+          "by_question_type": {},
+          "no_parsable_answer": 0,
+          "mean_target_calls": 4.079245283018868,
+          "max_target_calls": 5,
+          "bundle_hash": "468afcba8c97dd1e98a8822fe892b5832d31f999d5a70fc8a5ff0f269a5a9f17",
+          "seconds": 1781.3
+        }
+      }
+    }
+  }
+}
