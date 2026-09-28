@@ -7,16 +7,6 @@
 frozen multimodal model better at emotion understanding, without touching its
 weights?**
 
-## News
-
-- **2026-09** Emotion-context test on IntentQA and Social-IQ 2.0. The harness's
-  emotion analysis adds nothing beyond the transcript it is computed from. See
-  [experiments](experiments/README.md#3-emotion-context-does-the-harnesss-context-help-the-bare-model).
-- **2026-09** Main evaluation of four per-student harnesses on 5507 MME-Emotion
-  items. Most of the gain over the bare model comes from the audio transcript;
-  the Builder's own edits add ≈ 0.
-  See [experiments](experiments/README.md#1-main-evaluation-mme-emotion-5507-items).
-
 ## Introduction
 
 A **harness** is a directory of prompts, routing rules, schemas and small
@@ -25,36 +15,8 @@ frozen student model, over evidence from fixed perception tools. The
 **Builder** (GPT 5.6 Luna) improves a harness for one student by proposing
 patches from its failures on a construction corpus drawn from outside
 MME-Emotion. It keeps only the patches that pass the gates: a local
-Recognition gain, Reasoning held above a floor, and the call budget. The student's
-weights never change.
-
-```mermaid
-flowchart LR
-    subgraph P["Perception: fixed tools, cached per clip"]
-        frames["Frames<br/>2 fps, 4 to 32"]
-        asr["Transcript<br/>faster-whisper large-v3"]
-        prosody["Prosody phrases<br/>openSMILE eGeMAPS"]
-    end
-    subgraph H["Harness bundle: four calls to the frozen student"]
-        s1["1. extract_visual<br/>visual evidence"]
-        s2["2. generate_hypotheses<br/>ranked labels"]
-        chk["cross_modal, alternative_hypotheses<br/>deterministic checks"]
-        s3["3. verify"]
-        s4["4. synthesize<br/>answer and five-step rationale"]
-    end
-    subgraph B["Construction only: the Builder, GPT 5.6 Luna"]
-        fail["Failures on the<br/>construction corpus"]
-        patch["Candidate patches<br/>to the bundle"]
-        gate{"Gates: Recognition gain,<br/>Reasoning floor, call budget"}
-    end
-    frames --> s1
-    asr --> s2
-    prosody --> s2
-    s1 --> s2 --> chk --> s3 --> s4
-    s4 -.-> fail
-    fail --> patch --> gate
-    gate -- "accepted: new bundle" --> s1
-```
+Recognition gain, Reasoning held above a floor, and the call budget. The
+student's weights never change.
 
 Methods form a ladder, so each ingredient is measured separately:
 
