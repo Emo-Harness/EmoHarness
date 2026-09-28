@@ -43,7 +43,7 @@ this document.
 4. **Cache projection instead of re-transcription.** The preprocessing cache
    is keyed by the config hash, and the describer block leaving the config
    changes that hash. Whisper and openSMILE are deterministic on the same
-   `audio.wav`, so `scripts/strip_describer_cache.py` wrote every v1 entry
+   `audio.wav`, so a one-off migration (since removed; it is in the git history) wrote every v1 entry
    under the new hash with the description and opinion fields dropped and
    `speech_present` recomputed as "transcript non-empty" (36 of 1,903 clips
    had been marked speech-present on the strength of the description alone).
