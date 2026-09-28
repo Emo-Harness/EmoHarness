@@ -1,0 +1,33 @@
+{
+  "student": "qwen3vl_8b",
+  "dataset": "intentqa_test",
+  "stage": "qa",
+  "condition": "emoctx",
+  "videos_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_videos.jsonl",
+  "videos_manifest_sha256": "29a7a0e3e3446278afef215802538fdb773d63464022d06399f550e7ebdb9878",
+  "qa_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_qa.jsonl",
+  "qa_manifest_sha256": "c947aa3ac39517555e4f5141cc07988714d6f4e9a92d149feb01334f15a59a69",
+  "contexts_sha256": "e90828058938c65a6319237baaa1c62f749569cdf2184ed23d44b7761d7a5559",
+  "predictions": "results/newdata/emotion_context_20260925/qwen3vl_8b/qa_emoctx/intentqa_test/predictions.jsonl",
+  "n_written": 2134,
+  "accuracy": 0.6986879100281163,
+  "n_unparsed": 101,
+  "n_errors": 100,
+  "example_prompt": "The 28 images are frames sampled from one video at 2 frames per second, in temporal order.\n\nAudio evidence (from external tools):\nSpeech present: yes\nTranscript: for the nurturing parents eyes for the impact you had on me c's for the captivating beauty and a sense for all all that i believe when i strive to achieve and those times of my life that i cried on my knees i got up\nLanguage: en\nProsody: loud voice\n\nEmotion analysis of this video (from an emotion-recognition pipeline):\nPredicted emotion: happy (confidence 0.80)\nAlternatives considered: sad (0.70), neutral (0.20), angry (0.10)\nAnalysis:\nStep 1: Setting and context: The setting features a person in vibrant attire with a drummer behind them and repeating 'DPR' logos, suggesting a performance context. The person’s active movement and hand gestures indicate engagement with the audience or emotion.\nStep 2: Facial and bodily cues: Facial cues are absent, but bodily cues like head movement and hand gestures suggest expressive communication. The person’s attire and accessories may signal celebratory or emotional intent, though no direct facial expression is visible.\nStep 3: Vocal and verbal cues: The vocal delivery is loud and emotionally charged, with lyrics referencing gratitude, personal struggle, and resilience. The speech references crying and rising again, indicating emotional depth.\nStep 4: Cross-modal synthesis and strongest alternative: The strongest alternative is 'neutral,' which is contradicted by the emotional speech content and the loud, expressive delivery. The top reading, 'happy,' is supported by the uplifting tone and gratitude in the speech, while 'sad' is also supported but less confidently. The top reading 'happy' is supported by the emotional speech content and the loud, expressive delivery, while 'neutral' is contradicted by the same speech content.\n\nQuestion: why is the lady holding on to the microphone for the whole duration of time\n\nOptions:\nA. waiting to start\nB. watch her moves\nC. observe her reactions\nD. project her voice\nE. sing\n\nAnswer with the option's letter from the given choices directly.",
+  "target_config": "configs/target/qwen3vl_8b_instruct.yaml",
+  "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "qa_max_tokens": 64,
+  "chat_template_kwargs": {},
+  "seconds": 1513.1,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-25T07:36:27Z"
+}

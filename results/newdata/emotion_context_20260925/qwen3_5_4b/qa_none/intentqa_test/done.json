@@ -1,0 +1,47 @@
+{
+  "student": "qwen3_5_4b",
+  "dataset": "intentqa_test",
+  "stage": "qa",
+  "condition": "none",
+  "videos_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_videos.jsonl",
+  "videos_manifest_sha256": "29a7a0e3e3446278afef215802538fdb773d63464022d06399f550e7ebdb9878",
+  "qa_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_qa.jsonl",
+  "qa_manifest_sha256": "c947aa3ac39517555e4f5141cc07988714d6f4e9a92d149feb01334f15a59a69",
+  "qa_max_tokens": 1024,
+  "predictions": "results/newdata/emotion_context_20260925/qwen3_5_4b/qa_none/intentqa_test/predictions.jsonl",
+  "n_written": 2134,
+  "accuracy": 0.7989690721649485,
+  "n_unparsed": 1,
+  "n_errors": 0,
+  "n_truncated": 2,
+  "example_prompt": "The 28 images are frames sampled from one video at 2 frames per second, in temporal order.\n\nQuestion: why is the lady holding on to the microphone for the whole duration of time\n\nOptions:\nA. waiting to start\nB. watch her moves\nC. observe her reactions\nD. project her voice\nE. sing\n\nAnswer with the option's letter from the given choices directly.",
+  "target_config": "configs/target/qwen3_5_4b.yaml",
+  "model_id": "Qwen/Qwen3.5-4B",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "seconds": 138.4,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-25T22:31:57Z",
+  "topup": {
+    "max_model_len": 32768,
+    "at": "2026-09-25T22:32:38Z",
+    "errors_before": 100,
+    "errors_after": 0,
+    "accuracy_before": 0.7638238050609185,
+    "unparsed_before": 101,
+    "kept": [
+      "predictions.maxlen16384.jsonl",
+      "done.maxlen16384.json"
+    ]
+  }
+}

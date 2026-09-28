@@ -1,0 +1,33 @@
+{
+  "student": "gemma4_e4b",
+  "dataset": "intentqa_test",
+  "stage": "context",
+  "condition": null,
+  "videos_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_videos.jsonl",
+  "videos_manifest_sha256": "29a7a0e3e3446278afef215802538fdb773d63464022d06399f550e7ebdb9878",
+  "bundle": "results/v3/student_specific_full_20260918/bundles/gemma4_e4b/final",
+  "bundle_hash": "468afcba8c97dd1e98a8822fe892b5832d31f999d5a70fc8a5ff0f269a5a9f17",
+  "contexts": "results/newdata/emotion_context_20260925/gemma4_e4b/context/intentqa_test/contexts.jsonl",
+  "contexts_sha256": "fb1c27b0c78d7c57c49e63af28dbe9c08f6be8d90a337ed8e233bf2188cf3786",
+  "harness_outputs": "results/newdata/emotion_context_20260925/gemma4_e4b/context/intentqa_test/raw_predictions/L5/intentqa_test_videos.outputs.jsonl",
+  "n_written": 567,
+  "n_fallback": 15,
+  "target_config": "configs/target/gemma4_e4b_it.yaml",
+  "model_id": "google/gemma-4-E4B-it",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "qa_max_tokens": null,
+  "chat_template_kwargs": {
+    "enable_thinking": false
+  },
+  "seconds": 1312.7,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-25T10:03:52Z"
+}

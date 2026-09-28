@@ -1,0 +1,1301 @@
+{
+  "generated_at": "2026-09-28T20:57:33Z",
+  "scoring": "parsed option letter == gold index; unparsed replies count as wrong",
+  "ci": "10000 video-clustered bootstrap resamples, seed 20260923",
+  "holm": "per dataset over 12 comparisons, p floored at 2/(B+1)",
+  "emotion_prompt": "As an emotion recognition expert, identify the most prominent emotion displayed in the video. Candidate labels: neutral, happy, angry, sad, fear, surprise, disgust. Please think step by step. Enclose your final answer within <answer></answer> tags.",
+  "datasets": {
+    "intentqa_test": {
+      "label": "IntentQA test",
+      "chance": 0.2,
+      "n_items": 2134,
+      "n_videos": 567,
+      "arms": {
+        "qwen3vl_8b/none": {
+          "accuracy": 0.7099343955014058,
+          "ci95": [
+            0.6889721878219319,
+            0.7301592820716604
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T13:56:09Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.676663542642924,
+            "unparsed_before": 100,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8485.406279287723,
+          "seconds": 284.5
+        },
+        "qwen3vl_8b/asr": {
+          "accuracy": 0.7263355201499532,
+          "ci95": [
+            0.7061519244763241,
+            0.7462052922882673
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T14:01:18Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.6944704779756327,
+            "unparsed_before": 100,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8587.710871602625,
+          "seconds": 280.7
+        },
+        "qwen3vl_8b/emoctx": {
+          "accuracy": 0.7310215557638238,
+          "ci95": [
+            0.7109617289868968,
+            0.7510568341944575
+          ],
+          "n_unparsed": 1,
+          "n_errors": 0,
+          "n_truncated": 1,
+          "qa_max_tokens": 64,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T20:37:23Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.6986879100281163,
+            "unparsed_before": 101,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8852.579662605436,
+          "seconds": 121.4
+        },
+        "qwen3vl_4b/none": {
+          "accuracy": 0.6747891283973758,
+          "ci95": [
+            0.6528570770849775,
+            0.69608760735924
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T20:44:39Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.6415182755388941,
+            "unparsed_before": 100,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8485.406279287723,
+          "seconds": 226.4
+        },
+        "qwen3vl_4b/asr": {
+          "accuracy": 0.6841611996251171,
+          "ci95": [
+            0.6627692131337263,
+            0.7055581702969932
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T20:48:48Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.6513589503280225,
+            "unparsed_before": 100,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8587.710871602625,
+          "seconds": 210.8
+        },
+        "qwen3vl_4b/emoctx": {
+          "accuracy": 0.7029053420805998,
+          "ci95": [
+            0.6823808065167632,
+            0.7235734331150608
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T20:52:51Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.6701030927835051,
+            "unparsed_before": 100,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8832.559512652297,
+          "seconds": 223.6
+        },
+        "qwen3_5_4b/none": {
+          "accuracy": 0.7989690721649485,
+          "ci95": [
+            0.7805885739344344,
+            0.8173174320098734
+          ],
+          "n_unparsed": 1,
+          "n_errors": 0,
+          "n_truncated": 2,
+          "qa_max_tokens": 1024,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T22:32:38Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.7638238050609185,
+            "unparsed_before": 101,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8522.903467666354,
+          "seconds": 138.4
+        },
+        "qwen3_5_4b/asr": {
+          "accuracy": 0.7783505154639175,
+          "ci95": [
+            0.7587649618404885,
+            0.7979295683303325
+          ],
+          "n_unparsed": 1,
+          "n_errors": 0,
+          "n_truncated": 1,
+          "qa_max_tokens": 1024,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T22:35:38Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.7436738519212746,
+            "unparsed_before": 101,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8624.608716026241,
+          "seconds": 127.3
+        },
+        "qwen3_5_4b/emoctx": {
+          "accuracy": 0.7633552014995314,
+          "ci95": [
+            0.7435064935064936,
+            0.7833991587444948
+          ],
+          "n_unparsed": 3,
+          "n_errors": 0,
+          "n_truncated": 2,
+          "qa_max_tokens": 1024,
+          "topup": {
+            "max_model_len": 32768,
+            "at": "2026-09-25T22:38:38Z",
+            "errors_before": 100,
+            "errors_after": 0,
+            "accuracy_before": 0.7296157450796626,
+            "unparsed_before": 103,
+            "kept": [
+              "predictions.maxlen16384.jsonl",
+              "done.maxlen16384.json"
+            ]
+          },
+          "mean_input_tokens": 8852.027647610123,
+          "seconds": 134.6
+        },
+        "gemma4_e4b/none": {
+          "accuracy": 0.5731021555763823,
+          "ci95": [
+            0.5506125689161104,
+            0.5960301088161195
+          ],
+          "n_unparsed": 3,
+          "n_errors": 0,
+          "n_truncated": 3,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 8507.125585754451,
+          "seconds": 3169.5
+        },
+        "gemma4_e4b/asr": {
+          "accuracy": 0.6059044048734771,
+          "ci95": [
+            0.5834092250536224,
+            0.6281690459787712
+          ],
+          "n_unparsed": 3,
+          "n_errors": 0,
+          "n_truncated": 3,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 8609.835051546392,
+          "seconds": 3172.2
+        },
+        "gemma4_e4b/emoctx": {
+          "accuracy": 0.6162136832239925,
+          "ci95": [
+            0.5936211381181488,
+            0.6383293233190767
+          ],
+          "n_unparsed": 10,
+          "n_errors": 0,
+          "n_truncated": 9,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 8849.698687910028,
+          "seconds": 3204.2
+        }
+      },
+      "comparisons": {
+        "qwen3vl_8b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.01640112464854733,
+          "n_items": 2134,
+          "ci95": [
+            0.0009471959908779315,
+            0.031884223036545506
+          ],
+          "p_raw": 0.0414,
+          "p_for_holm": 0.0414,
+          "items_gained": 159,
+          "items_lost": 124,
+          "p_holm": 0.207
+        },
+        "qwen3vl_8b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": 0.004686035613870665,
+          "n_items": 2134,
+          "ci95": [
+            -0.011461454952173775,
+            0.0204573944828637
+          ],
+          "p_raw": 0.5782,
+          "p_for_holm": 0.5782,
+          "items_gained": 150,
+          "items_lost": 140,
+          "p_holm": 0.6948
+        },
+        "qwen3vl_8b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.021087160262417994,
+          "n_items": 2134,
+          "ci95": [
+            0.004681593171147204,
+            0.03758027795971015
+          ],
+          "p_raw": 0.0144,
+          "p_for_holm": 0.0144,
+          "items_gained": 204,
+          "items_lost": 159,
+          "p_holm": 0.0864
+        },
+        "qwen3vl_4b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.00937207122774133,
+          "n_items": 2134,
+          "ci95": [
+            -0.006747069280013012,
+            0.025471998628758666
+          ],
+          "p_raw": 0.2666,
+          "p_for_holm": 0.2666,
+          "items_gained": 159,
+          "items_lost": 139,
+          "p_holm": 0.6948
+        },
+        "qwen3vl_4b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": 0.01874414245548266,
+          "n_items": 2134,
+          "ci95": [
+            0.004730257192575199,
+            0.03271714358486337
+          ],
+          "p_raw": 0.0106,
+          "p_for_holm": 0.0106,
+          "items_gained": 144,
+          "items_lost": 104,
+          "p_holm": 0.0848
+        },
+        "qwen3vl_4b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.028116213683223992,
+          "n_items": 2134,
+          "ci95": [
+            0.01030891653681575,
+            0.045841751688139885
+          ],
+          "p_raw": 0.002,
+          "p_for_holm": 0.002,
+          "items_gained": 218,
+          "items_lost": 158,
+          "p_holm": 0.018000000000000002
+        },
+        "qwen3_5_4b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": -0.020618556701030927,
+          "n_items": 2134,
+          "ci95": [
+            -0.036557198992675295,
+            -0.0047388889634771315
+          ],
+          "p_raw": 0.0116,
+          "p_for_holm": 0.0116,
+          "items_gained": 128,
+          "items_lost": 172,
+          "p_holm": 0.0848
+        },
+        "qwen3_5_4b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": -0.01499531396438613,
+          "n_items": 2134,
+          "ci95": [
+            -0.030473941445561446,
+            0.000904681139755765
+          ],
+          "p_raw": 0.0658,
+          "p_for_holm": 0.0658,
+          "items_gained": 122,
+          "items_lost": 154,
+          "p_holm": 0.2632
+        },
+        "qwen3_5_4b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": -0.03561387066541706,
+          "n_items": 2134,
+          "ci95": [
+            -0.05265829416125868,
+            -0.018224108654940372
+          ],
+          "p_raw": 0.0,
+          "p_for_holm": 0.00019998000199980003,
+          "items_gained": 131,
+          "items_lost": 207,
+          "p_holm": 0.0023997600239976003
+        },
+        "gemma4_e4b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.03280224929709466,
+          "n_items": 2134,
+          "ci95": [
+            0.014050087195699253,
+            0.05105386416861827
+          ],
+          "p_raw": 0.0004,
+          "p_for_holm": 0.0004,
+          "items_gained": 235,
+          "items_lost": 165,
+          "p_holm": 0.004
+        },
+        "gemma4_e4b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": 0.010309278350515464,
+          "n_items": 2134,
+          "ci95": [
+            -0.006263309367686435,
+            0.02657044262383733
+          ],
+          "p_raw": 0.2316,
+          "p_for_holm": 0.2316,
+          "items_gained": 164,
+          "items_lost": 142,
+          "p_holm": 0.6948
+        },
+        "gemma4_e4b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.04311152764761012,
+          "n_items": 2134,
+          "ci95": [
+            0.022096517107053067,
+            0.0629109547657729
+          ],
+          "p_raw": 0.0,
+          "p_for_holm": 0.00019998000199980003,
+          "items_gained": 289,
+          "items_lost": 197,
+          "p_holm": 0.0023997600239976003
+        }
+      },
+      "contexts": {
+        "qwen3vl_8b": {
+          "n_videos": 567,
+          "n_fallback": 2,
+          "labels": {
+            "happy": 265,
+            "neutral": 256,
+            "angry": 26,
+            "sad": 9,
+            "surprise": 8,
+            "fear": 3
+          },
+          "mean_chars": 1183,
+          "bundle_hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+          "seconds": 1613.8
+        },
+        "qwen3vl_4b": {
+          "n_videos": 567,
+          "n_fallback": 1,
+          "labels": {
+            "happy": 297,
+            "neutral": 149,
+            "angry": 53,
+            "sad": 25,
+            "surprise": 23,
+            "fear": 20
+          },
+          "mean_chars": 1053,
+          "bundle_hash": "4ace41173bb48fda24a4a0fd9c8134bc659f40d2f6fa2d428d1324c53cafe513",
+          "seconds": 977.6
+        },
+        "qwen3_5_4b": {
+          "n_videos": 567,
+          "n_fallback": 6,
+          "labels": {
+            "neutral": 261,
+            "happy": 222,
+            "surprise": 25,
+            "fear": 25,
+            "sad": 18,
+            "angry": 15,
+            "disgust": 1
+          },
+          "mean_chars": 979,
+          "bundle_hash": "d8b0b2794c4c95fee8df06ffcc979df9e83242c877848d80d50dd3a77ad4175e",
+          "seconds": 1182.7
+        },
+        "gemma4_e4b": {
+          "n_videos": 567,
+          "n_fallback": 15,
+          "labels": {
+            "happy": 234,
+            "neutral": 210,
+            "angry": 47,
+            "surprise": 39,
+            "sad": 23,
+            "fear": 13,
+            "disgust": 1
+          },
+          "mean_chars": 1039,
+          "bundle_hash": "468afcba8c97dd1e98a8822fe892b5832d31f999d5a70fc8a5ff0f269a5a9f17",
+          "seconds": 1312.7
+        }
+      },
+      "answered_in_all_arms": {
+        "qwen3vl_8b": {
+          "n_items": 2133,
+          "accuracy": {
+            "none": 0.7097984060009377,
+            "asr": 0.726207219878106,
+            "emoctx": 0.7313642756680732
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.016408813877168308,
+              "n_items": 2133,
+              "ci95": [
+                0.0009472070064473373,
+                0.03189076743579772
+              ],
+              "p_raw": 0.0414,
+              "p_for_holm": 0.0414,
+              "items_gained": 159,
+              "items_lost": 124
+            },
+            "emoctx - asr": {
+              "estimate": 0.005157055789967183,
+              "n_items": 2133,
+              "ci95": [
+                -0.011055284712231772,
+                0.020852899506989545
+              ],
+              "p_raw": 0.5346,
+              "p_for_holm": 0.5346,
+              "items_gained": 150,
+              "items_lost": 139
+            },
+            "emoctx - none": {
+              "estimate": 0.02156586966713549,
+              "n_items": 2133,
+              "ci95": [
+                0.005149392194078447,
+                0.03814417395799101
+              ],
+              "p_raw": 0.0116,
+              "p_for_holm": 0.0116,
+              "items_gained": 204,
+              "items_lost": 158
+            }
+          }
+        },
+        "qwen3vl_4b": {
+          "n_items": 2134,
+          "accuracy": {
+            "none": 0.6747891283973758,
+            "asr": 0.6841611996251171,
+            "emoctx": 0.7029053420805998
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.00937207122774133,
+              "n_items": 2134,
+              "ci95": [
+                -0.006747069280013012,
+                0.025471998628758666
+              ],
+              "p_raw": 0.2666,
+              "p_for_holm": 0.2666,
+              "items_gained": 159,
+              "items_lost": 139
+            },
+            "emoctx - asr": {
+              "estimate": 0.01874414245548266,
+              "n_items": 2134,
+              "ci95": [
+                0.004730257192575199,
+                0.03271714358486337
+              ],
+              "p_raw": 0.0106,
+              "p_for_holm": 0.0106,
+              "items_gained": 144,
+              "items_lost": 104
+            },
+            "emoctx - none": {
+              "estimate": 0.028116213683223992,
+              "n_items": 2134,
+              "ci95": [
+                0.01030891653681575,
+                0.045841751688139885
+              ],
+              "p_raw": 0.002,
+              "p_for_holm": 0.002,
+              "items_gained": 218,
+              "items_lost": 158
+            }
+          }
+        },
+        "qwen3_5_4b": {
+          "n_items": 2129,
+          "accuracy": {
+            "none": 0.7994363550962893,
+            "asr": 0.778769375293565,
+            "emoctx": 0.7646782527007985
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": -0.020666979802724285,
+              "n_items": 2129,
+              "ci95": [
+                -0.03657421696387746,
+                -0.004788701335700128
+              ],
+              "p_raw": 0.0118,
+              "p_for_holm": 0.0118,
+              "items_gained": 127,
+              "items_lost": 171
+            },
+            "emoctx - asr": {
+              "estimate": -0.014091122592766557,
+              "n_items": 2129,
+              "ci95": [
+                -0.029508235734739898,
+                0.0014556571224871725
+              ],
+              "p_raw": 0.0814,
+              "p_for_holm": 0.0814,
+              "items_gained": 122,
+              "items_lost": 152
+            },
+            "emoctx - none": {
+              "estimate": -0.03475810239549084,
+              "n_items": 2129,
+              "ci95": [
+                -0.05170025086003317,
+                -0.017669369783231595
+              ],
+              "p_raw": 0.0,
+              "p_for_holm": 0.00019998000199980003,
+              "items_gained": 130,
+              "items_lost": 204
+            }
+          }
+        },
+        "gemma4_e4b": {
+          "n_items": 2121,
+          "accuracy": {
+            "none": 0.5747289014615747,
+            "asr": 0.6067892503536068,
+            "emoctx": 0.61999057048562
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.03206034889203206,
+              "n_items": 2121,
+              "ci95": [
+                0.013608474868003201,
+                0.05058579249335881
+              ],
+              "p_raw": 0.0,
+              "p_for_holm": 0.00019998000199980003,
+              "items_gained": 233,
+              "items_lost": 165
+            },
+            "emoctx - asr": {
+              "estimate": 0.013201320132013201,
+              "n_items": 2121,
+              "ci95": [
+                -0.002932171763362758,
+                0.029908345393150026
+              ],
+              "p_raw": 0.1208,
+              "p_for_holm": 0.1208,
+              "items_gained": 164,
+              "items_lost": 136
+            },
+            "emoctx - none": {
+              "estimate": 0.04526166902404526,
+              "n_items": 2121,
+              "ci95": [
+                0.02544709180657838,
+                0.06546823505281783
+              ],
+              "p_raw": 0.0,
+              "p_for_holm": 0.00019998000199980003,
+              "items_gained": 289,
+              "items_lost": 193
+            }
+          }
+        }
+      }
+    },
+    "social_iq_val": {
+      "label": "Social-IQ 2.0 val",
+      "chance": 0.25,
+      "n_items": 795,
+      "n_videos": 122,
+      "arms": {
+        "qwen3vl_8b/none": {
+          "accuracy": 0.6188679245283019,
+          "ci95": [
+            0.5818170468732267,
+            0.6541935483870968
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 7178.464150943396,
+          "seconds": 451.0
+        },
+        "qwen3vl_8b/asr": {
+          "accuracy": 0.7018867924528301,
+          "ci95": [
+            0.6703296703296703,
+            0.7342749015147017
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 7405.280503144654,
+          "seconds": 459.5
+        },
+        "qwen3vl_8b/emoctx": {
+          "accuracy": 0.6641509433962264,
+          "ci95": [
+            0.627356346483705,
+            0.7013808825348579
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 7687.413836477987,
+          "seconds": 460.7
+        },
+        "qwen3vl_4b/none": {
+          "accuracy": 0.5911949685534591,
+          "ci95": [
+            0.5558111341400226,
+            0.6274013446075597
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 7178.464150943396,
+          "seconds": 337.7
+        },
+        "qwen3vl_4b/asr": {
+          "accuracy": 0.6842767295597484,
+          "ci95": [
+            0.6511592925307139,
+            0.71625
+          ],
+          "n_unparsed": 3,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 7405.280503144654,
+          "seconds": 339.4
+        },
+        "qwen3vl_4b/emoctx": {
+          "accuracy": 0.6528301886792452,
+          "ci95": [
+            0.6165798158476617,
+            0.6862495747535176
+          ],
+          "n_unparsed": 0,
+          "n_errors": 0,
+          "n_truncated": 0,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 7672.549685534591,
+          "seconds": 351.1
+        },
+        "qwen3_5_4b/none": {
+          "accuracy": 0.6591194968553459,
+          "ci95": [
+            0.6244130064748682,
+            0.6938775510204082
+          ],
+          "n_unparsed": 4,
+          "n_errors": 0,
+          "n_truncated": 3,
+          "qa_max_tokens": 1024,
+          "topup": null,
+          "mean_input_tokens": 7220.749685534591,
+          "seconds": 347.7
+        },
+        "qwen3_5_4b/asr": {
+          "accuracy": 0.7182389937106918,
+          "ci95": [
+            0.6830900968888456,
+            0.7537012113055181
+          ],
+          "n_unparsed": 11,
+          "n_errors": 0,
+          "n_truncated": 8,
+          "qa_max_tokens": 1024,
+          "topup": null,
+          "mean_input_tokens": 7449.075471698113,
+          "seconds": 329.2
+        },
+        "qwen3_5_4b/emoctx": {
+          "accuracy": 0.7270440251572327,
+          "ci95": [
+            0.6923989814683056,
+            0.7619047619047619
+          ],
+          "n_unparsed": 4,
+          "n_errors": 0,
+          "n_truncated": 3,
+          "qa_max_tokens": 1024,
+          "topup": null,
+          "mean_input_tokens": 7682.471698113208,
+          "seconds": 301.3
+        },
+        "gemma4_e4b/none": {
+          "accuracy": 0.5773584905660377,
+          "ci95": [
+            0.5402884516128067,
+            0.6146907216494846
+          ],
+          "n_unparsed": 4,
+          "n_errors": 0,
+          "n_truncated": 2,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 8637.529559748427,
+          "seconds": 1176.8
+        },
+        "gemma4_e4b/asr": {
+          "accuracy": 0.6490566037735849,
+          "ci95": [
+            0.6150177341294693,
+            0.6834812085803976
+          ],
+          "n_unparsed": 9,
+          "n_errors": 0,
+          "n_truncated": 8,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 8871.355974842767,
+          "seconds": 1186.4
+        },
+        "gemma4_e4b/emoctx": {
+          "accuracy": 0.6113207547169811,
+          "ci95": [
+            0.5769209354120267,
+            0.6458885941644562
+          ],
+          "n_unparsed": 23,
+          "n_errors": 0,
+          "n_truncated": 20,
+          "qa_max_tokens": 64,
+          "topup": null,
+          "mean_input_tokens": 9119.637735849057,
+          "seconds": 1195.4
+        }
+      },
+      "comparisons": {
+        "qwen3vl_8b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.0830188679245283,
+          "n_items": 795,
+          "ci95": [
+            0.04951758439362677,
+            0.11771715739132708
+          ],
+          "p_raw": 0.0,
+          "p_for_holm": 0.00019998000199980003,
+          "items_gained": 133,
+          "items_lost": 67,
+          "p_holm": 0.0023997600239976003
+        },
+        "qwen3vl_8b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": -0.03773584905660377,
+          "n_items": 795,
+          "ci95": [
+            -0.06675067014159469,
+            -0.009295840510636503
+          ],
+          "p_raw": 0.0094,
+          "p_for_holm": 0.0094,
+          "items_gained": 38,
+          "items_lost": 68,
+          "p_holm": 0.056400000000000006
+        },
+        "qwen3vl_8b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.045283018867924525,
+          "n_items": 795,
+          "ci95": [
+            0.010356211511642774,
+            0.08115333967951767
+          ],
+          "p_raw": 0.0138,
+          "p_for_holm": 0.0138,
+          "items_gained": 126,
+          "items_lost": 90,
+          "p_holm": 0.069
+        },
+        "qwen3vl_4b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.0930817610062893,
+          "n_items": 795,
+          "ci95": [
+            0.054253477319136996,
+            0.13068862296393924
+          ],
+          "p_raw": 0.0,
+          "p_for_holm": 0.00019998000199980003,
+          "items_gained": 144,
+          "items_lost": 70,
+          "p_holm": 0.0023997600239976003
+        },
+        "qwen3vl_4b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": -0.031446540880503145,
+          "n_items": 795,
+          "ci95": [
+            -0.05781078014459514,
+            -0.0052412724889789285
+          ],
+          "p_raw": 0.0222,
+          "p_for_holm": 0.0222,
+          "items_gained": 47,
+          "items_lost": 72,
+          "p_holm": 0.0888
+        },
+        "qwen3vl_4b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.061635220125786164,
+          "n_items": 795,
+          "ci95": [
+            0.023286080544950974,
+            0.09844590317088611
+          ],
+          "p_raw": 0.002,
+          "p_for_holm": 0.002,
+          "items_gained": 137,
+          "items_lost": 88,
+          "p_holm": 0.014
+        },
+        "qwen3_5_4b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.05911949685534591,
+          "n_items": 795,
+          "ci95": [
+            0.026712852909570484,
+            0.09320905459387484
+          ],
+          "p_raw": 0.0002,
+          "p_for_holm": 0.0002,
+          "items_gained": 116,
+          "items_lost": 69,
+          "p_holm": 0.0023997600239976003
+        },
+        "qwen3_5_4b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": 0.00880503144654088,
+          "n_items": 795,
+          "ci95": [
+            -0.0160895657518772,
+            0.033462951608112884
+          ],
+          "p_raw": 0.5276,
+          "p_for_holm": 0.5276,
+          "items_gained": 57,
+          "items_lost": 50,
+          "p_holm": 0.5276
+        },
+        "qwen3_5_4b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.06792452830188679,
+          "n_items": 795,
+          "ci95": [
+            0.03733261131167269,
+            0.09824687866455127
+          ],
+          "p_raw": 0.0002,
+          "p_for_holm": 0.0002,
+          "items_gained": 121,
+          "items_lost": 67,
+          "p_holm": 0.0023997600239976003
+        },
+        "gemma4_e4b asr - none": {
+          "meaning": "transcript + prosody over frames alone",
+          "estimate": 0.07169811320754717,
+          "n_items": 795,
+          "ci95": [
+            0.02672896243647595,
+            0.11580345847185852
+          ],
+          "p_raw": 0.001,
+          "p_for_holm": 0.001,
+          "items_gained": 141,
+          "items_lost": 84,
+          "p_holm": 0.008
+        },
+        "gemma4_e4b emoctx - asr": {
+          "meaning": "harness emotion analysis over the same raw perception",
+          "estimate": -0.03773584905660377,
+          "n_items": 795,
+          "ci95": [
+            -0.0704416473717917,
+            -0.004866032230312816
+          ],
+          "p_raw": 0.0244,
+          "p_for_holm": 0.0244,
+          "items_gained": 43,
+          "items_lost": 73,
+          "p_holm": 0.0888
+        },
+        "gemma4_e4b emoctx - none": {
+          "meaning": "total effect of the harness context",
+          "estimate": 0.033962264150943396,
+          "n_items": 795,
+          "ci95": [
+            -0.01219549420768933,
+            0.07737490404127563
+          ],
+          "p_raw": 0.157,
+          "p_for_holm": 0.157,
+          "items_gained": 137,
+          "items_lost": 110,
+          "p_holm": 0.314
+        }
+      },
+      "contexts": {
+        "qwen3vl_8b": {
+          "n_videos": 122,
+          "n_fallback": 6,
+          "labels": {
+            "neutral": 46,
+            "happy": 34,
+            "angry": 24,
+            "sad": 11,
+            "surprise": 4,
+            "fear": 3
+          },
+          "mean_chars": 1308,
+          "bundle_hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+          "seconds": 439.9
+        },
+        "qwen3vl_4b": {
+          "n_videos": 122,
+          "n_fallback": 2,
+          "labels": {
+            "happy": 47,
+            "angry": 27,
+            "sad": 19,
+            "neutral": 18,
+            "surprise": 5,
+            "fear": 5,
+            "disgust": 1
+          },
+          "mean_chars": 1202,
+          "bundle_hash": "4ace41173bb48fda24a4a0fd9c8134bc659f40d2f6fa2d428d1324c53cafe513",
+          "seconds": 262.9
+        },
+        "qwen3_5_4b": {
+          "n_videos": 122,
+          "n_fallback": 2,
+          "labels": {
+            "neutral": 43,
+            "happy": 27,
+            "angry": 16,
+            "sad": 15,
+            "fear": 13,
+            "surprise": 6,
+            "disgust": 2
+          },
+          "mean_chars": 1041,
+          "bundle_hash": "d8b0b2794c4c95fee8df06ffcc979df9e83242c877848d80d50dd3a77ad4175e",
+          "seconds": 294.8
+        },
+        "gemma4_e4b": {
+          "n_videos": 122,
+          "n_fallback": 6,
+          "labels": {
+            "neutral": 48,
+            "happy": 28,
+            "angry": 21,
+            "sad": 11,
+            "surprise": 6,
+            "fear": 5,
+            "disgust": 3
+          },
+          "mean_chars": 1093,
+          "bundle_hash": "468afcba8c97dd1e98a8822fe892b5832d31f999d5a70fc8a5ff0f269a5a9f17",
+          "seconds": 361.3
+        }
+      },
+      "answered_in_all_arms": {
+        "qwen3vl_8b": {
+          "n_items": 795,
+          "accuracy": {
+            "none": 0.6188679245283019,
+            "asr": 0.7018867924528301,
+            "emoctx": 0.6641509433962264
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.0830188679245283,
+              "n_items": 795,
+              "ci95": [
+                0.04951758439362677,
+                0.11771715739132708
+              ],
+              "p_raw": 0.0,
+              "p_for_holm": 0.00019998000199980003,
+              "items_gained": 133,
+              "items_lost": 67
+            },
+            "emoctx - asr": {
+              "estimate": -0.03773584905660377,
+              "n_items": 795,
+              "ci95": [
+                -0.06675067014159469,
+                -0.009295840510636503
+              ],
+              "p_raw": 0.0094,
+              "p_for_holm": 0.0094,
+              "items_gained": 38,
+              "items_lost": 68
+            },
+            "emoctx - none": {
+              "estimate": 0.045283018867924525,
+              "n_items": 795,
+              "ci95": [
+                0.010356211511642774,
+                0.08115333967951767
+              ],
+              "p_raw": 0.0138,
+              "p_for_holm": 0.0138,
+              "items_gained": 126,
+              "items_lost": 90
+            }
+          }
+        },
+        "qwen3vl_4b": {
+          "n_items": 792,
+          "accuracy": {
+            "none": 0.5934343434343434,
+            "asr": 0.6868686868686869,
+            "emoctx": 0.6527777777777778
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.09343434343434344,
+              "n_items": 792,
+              "ci95": [
+                0.05443016447085163,
+                0.1311693133599074
+              ],
+              "p_raw": 0.0,
+              "p_for_holm": 0.00019998000199980003,
+              "items_gained": 144,
+              "items_lost": 70
+            },
+            "emoctx - asr": {
+              "estimate": -0.03409090909090909,
+              "n_items": 792,
+              "ci95": [
+                -0.06072364498007093,
+                -0.007666682499944123
+              ],
+              "p_raw": 0.015,
+              "p_for_holm": 0.015,
+              "items_gained": 45,
+              "items_lost": 72
+            },
+            "emoctx - none": {
+              "estimate": 0.059343434343434344,
+              "n_items": 792,
+              "ci95": [
+                0.02069857697283312,
+                0.09668874172185431
+              ],
+              "p_raw": 0.0034,
+              "p_for_holm": 0.0034,
+              "items_gained": 135,
+              "items_lost": 88
+            }
+          }
+        },
+        "qwen3_5_4b": {
+          "n_items": 777,
+          "accuracy": {
+            "none": 0.6628056628056628,
+            "asr": 0.7297297297297297,
+            "emoctx": 0.7323037323037324
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.06692406692406692,
+              "n_items": 777,
+              "ci95": [
+                0.03453025900770484,
+                0.10042067243710538
+              ],
+              "p_raw": 0.0,
+              "p_for_holm": 0.00019998000199980003,
+              "items_gained": 114,
+              "items_lost": 62
+            },
+            "emoctx - asr": {
+              "estimate": 0.002574002574002574,
+              "n_items": 777,
+              "ci95": [
+                -0.021963861630147418,
+                0.026353111882865692
+              ],
+              "p_raw": 0.9012,
+              "p_for_holm": 0.9012,
+              "items_gained": 50,
+              "items_lost": 48
+            },
+            "emoctx - none": {
+              "estimate": 0.0694980694980695,
+              "n_items": 777,
+              "ci95": [
+                0.0397415014164306,
+                0.09881499033421787
+              ],
+              "p_raw": 0.0002,
+              "p_for_holm": 0.0002,
+              "items_gained": 118,
+              "items_lost": 64
+            }
+          }
+        },
+        "gemma4_e4b": {
+          "n_items": 768,
+          "accuracy": {
+            "none": 0.58203125,
+            "asr": 0.6549479166666666,
+            "emoctx": 0.6276041666666666
+          },
+          "comparisons": {
+            "asr - none": {
+              "estimate": 0.07291666666666667,
+              "n_items": 768,
+              "ci95": [
+                0.02970267632463959,
+                0.1151685393258427
+              ],
+              "p_raw": 0.0008,
+              "p_for_holm": 0.0008,
+              "items_gained": 132,
+              "items_lost": 76
+            },
+            "emoctx - asr": {
+              "estimate": -0.02734375,
+              "n_items": 768,
+              "ci95": [
+                -0.058496192141290815,
+                0.002809585574688854
+              ],
+              "p_raw": 0.0898,
+              "p_for_holm": 0.0898,
+              "items_gained": 42,
+              "items_lost": 63
+            },
+            "emoctx - none": {
+              "estimate": 0.045572916666666664,
+              "n_items": 768,
+              "ci95": [
+                0.0024271109149749926,
+                0.08791208791208792
+              ],
+              "p_raw": 0.0426,
+              "p_for_holm": 0.0426,
+              "items_gained": 133,
+              "items_lost": 98
+            }
+          }
+        }
+      }
+    }
+  }
+}

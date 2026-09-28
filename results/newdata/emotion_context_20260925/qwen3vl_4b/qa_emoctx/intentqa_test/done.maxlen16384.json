@@ -1,0 +1,33 @@
+{
+  "student": "qwen3vl_4b",
+  "dataset": "intentqa_test",
+  "stage": "qa",
+  "condition": "emoctx",
+  "videos_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_videos.jsonl",
+  "videos_manifest_sha256": "29a7a0e3e3446278afef215802538fdb773d63464022d06399f550e7ebdb9878",
+  "qa_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_qa.jsonl",
+  "qa_manifest_sha256": "c947aa3ac39517555e4f5141cc07988714d6f4e9a92d149feb01334f15a59a69",
+  "contexts_sha256": "989d4918c70e484a308031087cf45139e4910fb5f42a70033621be9c65d55427",
+  "predictions": "results/newdata/emotion_context_20260925/qwen3vl_4b/qa_emoctx/intentqa_test/predictions.jsonl",
+  "n_written": 2134,
+  "accuracy": 0.6701030927835051,
+  "n_unparsed": 100,
+  "n_errors": 100,
+  "example_prompt": "The 28 images are frames sampled from one video at 2 frames per second, in temporal order.\n\nAudio evidence (from external tools):\nSpeech present: yes\nTranscript: for the nurturing parents eyes for the impact you had on me c's for the captivating beauty and a sense for all all that i believe when i strive to achieve and those times of my life that i cried on my knees i got up\nLanguage: en\nProsody: loud voice\n\nEmotion analysis of this video (from an emotion-recognition pipeline):\nPredicted emotion: sad (confidence 0.85)\nAlternatives considered: happy (0.10), neutral (0.10), angry (0.05)\nAnalysis:\nStep 1: Setting and context: The setting features a white backdrop with 'DPR' logos, and a drummer in blue shirt behind the speaker, suggesting a performance context with emotional delivery.\nStep 2: Facial and bodily cues: The woman wears a colorful headwrap, green necklace, and gold bracelets, and gestures with her free hand, indicating expressive physical engagement with the emotion being conveyed.\nStep 3: Vocal and verbal cues: The audio transcript includes phrases like 'cried on my knees' and is delivered with a loud voice, reinforcing an emotionally charged, possibly sorrowful narrative.\nStep 4: Cross-modal synthesis and strongest alternative: The strongest alternative is 'happy', but it contradicts the explicit mention of crying and the somber tone of the speech, which aligns with sadness and the ranked confidence of 0.85 for 'sad'. The ranked reading for 'sad' is supported by both the vocal content and the gestural cue, while 'happy' has no supporting evidence and contradicts the emotional content of the speech.\n\nQuestion: why is the lady holding on to the microphone for the whole duration of time\n\nOptions:\nA. waiting to start\nB. watch her moves\nC. observe her reactions\nD. project her voice\nE. sing\n\nAnswer with the option's letter from the given choices directly.",
+  "target_config": "configs/target/qwen3vl_4b_instruct.yaml",
+  "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "qa_max_tokens": 64,
+  "chat_template_kwargs": {},
+  "seconds": 1167.7,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-25T09:21:26Z"
+}

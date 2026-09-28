@@ -1,0 +1,46 @@
+{
+  "written_at": "2026-09-25T04:08:49Z",
+  "emotion_labels": [
+    "neutral",
+    "happy",
+    "angry",
+    "sad",
+    "fear",
+    "surprise",
+    "disgust"
+  ],
+  "intentqa_test": {
+    "videos": {
+      "file": "results/newdata/emotion_context_20260925/manifests/intentqa_test_videos.jsonl",
+      "sha256": "29a7a0e3e3446278afef215802538fdb773d63464022d06399f550e7ebdb9878",
+      "n": 567
+    },
+    "qa": {
+      "file": "results/newdata/emotion_context_20260925/manifests/intentqa_test_qa.jsonl",
+      "sha256": "c947aa3ac39517555e4f5141cc07988714d6f4e9a92d149feb01334f15a59a69",
+      "n": 2134
+    },
+    "n_videos": 567,
+    "n_questions": 2134,
+    "emotion_prompt": "As an emotion recognition expert, identify the most prominent emotion displayed in the video. Candidate labels: neutral, happy, angry, sad, fear, surprise, disgust. Please think step by step. Enclose your final answer within <answer></answer> tags.",
+    "source_manifest": "results/newdata/intentqa_socialiq_20260923/manifests/intentqa_test.jsonl",
+    "source_manifest_sha256": "14671e4740064ce1984ca084008cb1f9e14617fae1705470f78b131368d46d0e"
+  },
+  "social_iq_val": {
+    "videos": {
+      "file": "results/newdata/emotion_context_20260925/manifests/social_iq_val_videos.jsonl",
+      "sha256": "91288321d16b92660a7e61b0e49cba9b97cba6deb8fd6525aa576ff77cfaa501",
+      "n": 122
+    },
+    "qa": {
+      "file": "results/newdata/emotion_context_20260925/manifests/social_iq_val_qa.jsonl",
+      "sha256": "f70d8c0f1f6da5d8b138e6c7e72a9a32f36b6f660977c0c39678e062a3aaec67",
+      "n": 795
+    },
+    "n_videos": 122,
+    "n_questions": 795,
+    "emotion_prompt": "As an emotion recognition expert, identify the most prominent emotion displayed in the video. Candidate labels: neutral, happy, angry, sad, fear, surprise, disgust. Please think step by step. Enclose your final answer within <answer></answer> tags.",
+    "source_manifest": "results/newdata/intentqa_socialiq_20260923/manifests/social_iq_val.jsonl",
+    "source_manifest_sha256": "a35096031f6a02952b60c8be167bfa6c97b4890a9d68f52ff0c2253e9868d488"
+  }
+}

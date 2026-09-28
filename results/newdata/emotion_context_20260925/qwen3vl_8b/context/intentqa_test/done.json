@@ -1,0 +1,31 @@
+{
+  "student": "qwen3vl_8b",
+  "dataset": "intentqa_test",
+  "stage": "context",
+  "condition": null,
+  "videos_manifest": "results/newdata/emotion_context_20260925/manifests/intentqa_test_videos.jsonl",
+  "videos_manifest_sha256": "29a7a0e3e3446278afef215802538fdb773d63464022d06399f550e7ebdb9878",
+  "bundle": "results/v3/fixed_asr/full/replicate_0/construction/stage3/0/final",
+  "bundle_hash": "569c76f9edc0e2e6473fdad9f8854fdfa473fcf94964961d48877a338478e9e2",
+  "contexts": "results/newdata/emotion_context_20260925/qwen3vl_8b/context/intentqa_test/contexts.jsonl",
+  "contexts_sha256": "e90828058938c65a6319237baaa1c62f749569cdf2184ed23d44b7761d7a5559",
+  "harness_outputs": "results/newdata/emotion_context_20260925/qwen3vl_8b/context/intentqa_test/raw_predictions/L5/intentqa_test_videos.outputs.jsonl",
+  "n_written": 567,
+  "n_fallback": 2,
+  "target_config": "configs/target/qwen3vl_8b_instruct.yaml",
+  "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+  "decoding": {
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 0,
+    "max_tokens": 1024
+  },
+  "qa_max_tokens": null,
+  "chat_template_kwargs": {},
+  "seconds": 1613.8,
+  "asr_config_hash": "6ce8cc9178cefb39a0f109c5d10586a2e2041550a7ac515e8851c63c11cb2c00",
+  "endpoint": "http://127.0.0.1:8000/v1",
+  "python": "3.12.3",
+  "host": "jupyter-max7--session2",
+  "finished_at": "2026-09-25T05:56:39Z"
+}
