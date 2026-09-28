@@ -1,4 +1,4 @@
-"""Item-set resolution: full, subset, and the three construction splits."""
+"""Item-set resolution: full, clean, subset, and the three construction splits."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from emoharness.common.errors import ValidationError
+from emoharness.common.io import write_json_atomic
 from emoharness.data.tasks import Split
 from emoharness.runner.context import RunContext
 from emoharness.runner.items import (
@@ -49,6 +50,25 @@ class TestSelectItems:
         assert all(
             sets[i] & sets[j] == set() for i in range(3) for j in range(i + 1, 3)
         )
+
+    def test_clean_drops_exactly_the_listed_media_overlaps(
+        self, ctx: RunContext
+    ) -> None:
+        examples = load_benchmark(ctx.paths)
+        dropped = {examples[0].example_id, examples[-1].example_id}
+        write_json_atomic(ctx.paths.media_overlap_excluded, {'ids': sorted(dropped)})
+        chosen = select_items(examples, 'clean', ctx.paths)
+        assert chosen == tuple(e for e in examples if e.example_id not in dropped)
+
+    @pytest.mark.parametrize(
+        'document', [{'ids': []}, {'ids': ['a', 'a']}, {'id': ['a']}]
+    )
+    def test_clean_refuses_a_malformed_exclusion_list(
+        self, ctx: RunContext, document: dict[str, list[str]]
+    ) -> None:
+        write_json_atomic(ctx.paths.media_overlap_excluded, document)
+        with pytest.raises(ValidationError, match='exclusion list|"ids"'):
+            select_items(load_benchmark(ctx.paths), 'clean', ctx.paths)
 
     def test_an_unknown_item_set_is_rejected(self, ctx: RunContext) -> None:
         with pytest.raises(ValidationError, match='unknown item set'):

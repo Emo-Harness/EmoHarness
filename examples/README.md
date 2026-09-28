@@ -12,7 +12,7 @@ matching wrapper in `scripts/`; `scripts/run_all_fake.sh` runs the whole list.
 | 2 | `leakage_report.py` | Runs the four leakage checks over both manifests and writes `data/checksums/leakage_report.json`; `--drop` removes flagged clips. |
 | 3 | `preprocess.py` | Fills the shared clip cache under `data/derived/`, or `--verify` checks the one that exists. |
 | 5 | `preregister.py` | Draws the pre-registered subset and renders `docs/preregistration.md` from the artifacts it freezes. |
-| 4, 7 | `run_ladder.py` | Runs ladder rows (`--rows L0,L3`) over an item set (`--items full\|subset\|external:val`) and writes raw predictions; L6 is the teacher Direct upper bound. |
+| 4, 7 | `run_ladder.py` | Runs ladder rows (`--rows L0,L3`) over an item set (`--items full\|clean\|subset\|external:val`; `clean` drops the 70 benchmark items whose media also appears in a construction split) and writes raw predictions; L6 is the teacher Direct upper bound. |
 | 6 | `build_harness.py` | Runs one construction stage's Builder loop; `--freeze` records the freeze, evaluates D_ext-test once, and prints the git tag command. |
 | 5 | `calibrate_proxy_judge.py` | Measures proxy-versus-reference judge agreement and derives the Reasoning gate margin. |
 | 7 | `judge_official.py` | Writes the official judge's per-task inputs and prints its commands; `--execute` runs them. |

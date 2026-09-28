@@ -194,3 +194,14 @@ def read_subset(path: Path) -> SubsetManifest:
     if manifest.subset_hash != subset_hash(manifest.ids):
         raise ValidationError(f'{path}: subset hash does not match its id list')
     return manifest
+
+
+def read_exclusion(path: Path) -> frozenset[str]:
+    """Read an exclusion list (``{"ids": [...]}``), refusing an empty or duplicated one."""
+    document = read_json(path)
+    ids = document.get('ids') if isinstance(document, dict) else None
+    if not isinstance(ids, list) or not ids or not all(isinstance(i, str) for i in ids):
+        raise ValidationError(f'{path}: expected a non-empty "ids" list of strings')
+    if len(set(ids)) != len(ids):
+        raise ValidationError(f'{path}: duplicated ids in the exclusion list')
+    return frozenset(ids)

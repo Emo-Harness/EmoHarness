@@ -1,6 +1,8 @@
 """Loading manifests and resolving the item-set names rows are declared with.
 
-An item set is one of ``full`` (every benchmark item), ``subset`` (the
+An item set is one of ``full`` (every benchmark item), ``clean`` (every
+benchmark item except the ones whose media file also appears in a construction
+split, listed in ``data/splits/media_overlap_excluded.json``), ``subset`` (the
 pre-registered 1,000 ids), or ``external:<split>`` where the split is one of
 ``build``, ``val``, or ``ext_test``. Nothing else is accepted: a typo must fail
 at the boundary rather than silently score a different set of items.
@@ -14,11 +16,12 @@ from typing import Final
 
 from emoharness.common.errors import ValidationError
 from emoharness.data.manifest import Example, read_manifest
-from emoharness.data.splits import read_subset
+from emoharness.data.splits import read_exclusion, read_subset
 from emoharness.data.tasks import Split, Task
 from emoharness.runner.paths import ProjectPaths
 
 FULL: Final = 'full'
+CLEAN: Final = 'clean'
 SUBSET: Final = 'subset'
 EXTERNAL_PREFIX: Final = 'external:'
 EXTERNAL_SPLITS: Final[Mapping[str, Split]] = {
@@ -70,6 +73,9 @@ def select_items(
     rows = tuple(examples)
     if item_set == FULL:
         return rows
+    if item_set == CLEAN:
+        excluded = read_exclusion(paths.media_overlap_excluded)
+        return tuple(row for row in rows if row.example_id not in excluded)
     if item_set == SUBSET:
         ids = frozenset(read_subset(paths.subset).ids)
         return tuple(row for row in rows if row.example_id in ids)
@@ -77,7 +83,7 @@ def select_items(
         split = external_split(item_set)
         return tuple(row for row in rows if row.split is split)
     raise ValidationError(
-        f'unknown item set {item_set!r}; expected {FULL}, {SUBSET}, '
+        f'unknown item set {item_set!r}; expected {FULL}, {CLEAN}, {SUBSET}, '
         f'or {EXTERNAL_PREFIX}<split>'
     )
 
