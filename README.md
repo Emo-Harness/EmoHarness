@@ -154,19 +154,6 @@ poetry run mypy
 poetry run pytest -m 'not integration'
 ```
 
-## Citation
-
-A paper is in preparation. Until then, please cite the repository:
-
-```bibtex
-@misc{li2026emoharness,
-  title  = {EmoHarness: Builder-Constructed Inference-Time Harnesses for Frozen Multimodal Emotion Models},
-  author = {Fenghai Li},
-  year   = {2026},
-  howpublished = {\url{https://github.com/4R5T/EmoHarness}}
-}
-```
-
 ## License
 
 [MIT](LICENSE)
