@@ -161,24 +161,22 @@ cython_debug/
 #.idea/
 
 # EmoHarness artifacts
+# Raw media and the preprocessing cache; data/derived/reference_stats.json is the
+# one tracked exception (force-added: preprocessing reads it).
 data/raw/
 data/derived/
-results/raw_predictions/
-results/judge/
-results/construction/
-results/calibration/
-results/ledger.jsonl
+data/fake/
 *.mp4
 *.avi
 *.mkv
 *.wav
 .env
 
-# fake-mode artifacts when --root points inside the repo
-data/fake/
-results/fake/
-results/metrics/
-results/freeze.json
+# Run outputs: predictions, construction rounds, metrics, reports. Everything a
+# run writes lives under results/; the frozen harnesses the code serves live in
+# harness/ (the scaffold) and bundles/ (one per student).
+results/
 
-# packaged exports of a run (scripts/export_indist_results.py); regenerable
-results/export/
+# Local operations: logs and multi-host coordination files
+logs/
+coordination/

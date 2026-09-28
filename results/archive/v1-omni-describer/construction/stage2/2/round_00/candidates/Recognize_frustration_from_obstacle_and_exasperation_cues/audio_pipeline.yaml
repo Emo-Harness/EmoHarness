@@ -1,8 +1,0 @@
-# Audio channels the harness consumes (ADR-0004). Both are produced by the
-# preprocessing cache; the harness only decides how much of them to show.
-# channels: 'cues' is the observable-cue channel, 'opinion' the audio-model voter.
-# transcript_max_chars truncates a long transcript before it enters the record.
-channels:
-  - cues
-  - opinion
-transcript_max_chars: 2000

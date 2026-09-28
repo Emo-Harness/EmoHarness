@@ -1,8 +1,0 @@
-{
-  "version": "stage3-r1",
-  "stage": 3,
-  "parent": "c93f387efa9e72591475555aa67cdaa761d5c776f2935bb684330101611feec4",
-  "builder": "gpt-5.6-luna",
-  "created": "2026-09-12",
-  "notes": "5 accepted patch(es) over 8 round(s); stopped: max_rounds"
-}

@@ -1,8 +1,0 @@
-# Frame and clip selection policy (ADR-0011 §3).
-# face_crops.enabled adds up to max_crops face-crop images to the visual stage.
-# extra_images.enabled additionally attaches the cached 2 fps frames.
-face_crops:
-  enabled: true
-  max_crops: 2
-extra_images:
-  enabled: false
