@@ -73,6 +73,8 @@ warn_required_dynamic_aliases = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# the repo root, so tests can import the experiments package
+pythonpath = ["."]
 python_files = "test_*.py"
 addopts = "-q --cov=emoharness --cov-report=term-missing"
 markers = [
@@ -103,7 +105,7 @@ quiet-level = 3
 [tool.ruff]
 line-length = 88
 target-version = "py310"
-src = ["src", "tests", "examples"]
+src = ["src", "tests", "examples", "experiments"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "C", "B", "UP", "S", "N", "SIM", "RET", "ARG"]
@@ -121,6 +123,8 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "tests/*" = ["S101", "S311", "ARG001"]
+# Experiment drivers and reports are linear scripts: one long main() per step.
+"experiments/*" = ["C901"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
