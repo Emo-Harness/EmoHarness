@@ -16,10 +16,6 @@
 
 **EmoHarness** studies whether a stronger **Builder model** can construct a reusable inference-time harness for a smaller, frozen **Target model**. The current instantiation uses **GPT 5.6 Luna** as the Builder (an earlier run used Gemini 3.1 Pro) and **Qwen3-VL-8B** as the Target, with the goal of improving Qwen's multimodal emotion understanding without updating its weights.
 
-<p align="center">
-  <img src="../assets/emoharness_architecture.png" width="100%" alt="EmoHarness architecture for Qwen3-VL-8B"/>
-</p>
-
 ## 1. Research Question
 
 Can a strong model discover reusable emotion-understanding procedures from a small set of **seen capabilities**, encode those procedures into an executable harness, and transfer them to **held-out capabilities** that were never available during harness construction?

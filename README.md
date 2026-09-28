@@ -1,6 +1,5 @@
 # EmoHarness
 
-[![CI](https://github.com/4R5T/EmoHarness/actions/workflows/ci.yml/badge.svg)](https://github.com/4R5T/EmoHarness/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -21,32 +20,53 @@ weights?**
 ## Introduction
 
 A **harness** is a directory of prompts, routing rules, schemas and small
-verification programs that turns one call to a model into a staged pipeline:
+verification programs. It turns one question about a clip into four calls to a
+frozen student model, over evidence from fixed perception tools. The
+**Builder** (GPT 5.6 Luna) improves a harness for one student by proposing
+patches from its failures on a construction corpus drawn from outside
+MME-Emotion. It keeps only the patches that pass the gates: a local
+Recognition gain, Reasoning held above a floor, and the call budget. The student's
+weights never change.
 
-1. perceive the clip (frames, a Whisper transcript, openSMILE prosody);
-2. extract visual evidence;
-3. generate ranked hypotheses;
-4. verify them against the evidence;
-5. synthesize a five-step answer.
-
-The **Builder** (GPT 5.6 Luna) improves a harness for one **Target** model by
-proposing patches from its failures. It keeps only the patches that raise local
-Recognition without regressing Reasoning. The Target's weights never change.
-
-<p align="center">
-  <img src="assets/emoharness_architecture.png" width="100%" alt="EmoHarness architecture"/>
-</p>
+```mermaid
+flowchart LR
+    subgraph P["Perception: fixed tools, cached per clip"]
+        frames["Frames<br/>2 fps, 4 to 32"]
+        asr["Transcript<br/>faster-whisper large-v3"]
+        prosody["Prosody phrases<br/>openSMILE eGeMAPS"]
+    end
+    subgraph H["Harness bundle: four calls to the frozen student"]
+        s1["1. extract_visual<br/>visual evidence"]
+        s2["2. generate_hypotheses<br/>ranked labels"]
+        chk["cross_modal, alternative_hypotheses<br/>deterministic checks"]
+        s3["3. verify"]
+        s4["4. synthesize<br/>answer and five-step rationale"]
+    end
+    subgraph B["Construction only: the Builder, GPT 5.6 Luna"]
+        fail["Failures on the<br/>construction corpus"]
+        patch["Candidate patches<br/>to the bundle"]
+        gate{"Gates: Recognition gain,<br/>Reasoning floor, call budget"}
+    end
+    frames --> s1
+    asr --> s2
+    prosody --> s2
+    s1 --> s2 --> chk --> s3 --> s4
+    s4 -.-> fail
+    fail --> patch --> gate
+    gate -- "accepted: new bundle" --> s1
+```
 
 Methods form a ladder, so each ingredient is measured separately:
 
-| row | method |
+| row | what answers the question |
 |---|---|
-| **L0** | the bare model |
-| **L1** | + the audio evidence as text |
-| **L2** | + a handcrafted prompt |
-| **L3** | + the shared multi-call scaffold |
-| **L4**, **L5** | + the Builder's Stage 2 and Stage 3 edits |
-| **L6** | the teacher model itself |
+| **L0** | the student on the native video, one call |
+| **L1** | L0 plus the transcript and prosody as text |
+| **L2** | L1 with a frozen handcrafted prompt |
+| **L3** | the shared four-call scaffold in [`harness/`](harness/) |
+| **L4** | the Builder's Stage 2 bundle |
+| **L5** | the Builder's Stage 3 bundle, one per student |
+| **L6** | the teacher model on the same frames and audio text, as an upper bound |
 
 Four students have their own Stage 3 harness in [`bundles/`](bundles/):
 Qwen3-VL-8B, Qwen3-VL-4B, Qwen3.5-4B and Gemma-4-E4B. The research plan and
@@ -103,7 +123,7 @@ existing artifact.
 | 1 | `scripts/prepare_benchmark.sh` | `MME_EMOTION_ROOT` |
 | 2 | `scripts/prepare_external.sh`, then `scripts/leakage_report.sh` | the corpora in `configs/data/sources.yaml` |
 | 3 | `scripts/preprocess.sh` | GPU, ffmpeg |
-| 4 | `EMOHARNESS_ROWS=L0,L1,L3 scripts/run_ladder.sh --items clean` | a served student |
+| 4 | `EMOHARNESS_ROWS=L0,L1,L3 EMOHARNESS_ITEMS=clean scripts/run_ladder.sh` | a served student |
 | 5 | `scripts/preregister.sh`, `scripts/calibrate_proxy_judge.sh` | both manifests; `GEMINI_API_KEY`, `OPENAI_API_KEY` |
 | 6 | `EMOHARNESS_STAGE=3 scripts/build_harness.sh` | `OPENAI_API_KEY`, `GEMINI_API_KEY`, a served student |
 | 7 | `EMOHARNESS_ROW=L5 scripts/judge_official.sh --execute` | `OPENAI_API_KEY`, a checkout of `QwenAudio/MME-Emotion` |
@@ -125,7 +145,7 @@ Item sets:
 
 | experiment | where | finding |
 |---|---|---|
-| Per-student harnesses on MME-Emotion (5507 items) | `examples/` | L1 − L0 is +5.4 to +10.7 pp; L5 − L3 survives Holm for no student |
+| Per-student harnesses on MME-Emotion (5507 items) | `examples/`, `--items clean` | L1 − L0 is +5.4 to +10.7 pp; L5 − L3 survives Holm for no student |
 | Transfer to IntentQA / Social-IQ 2.0 | `experiments/transfer/` | no L5 − L0 gain; −11.9 and −9.6 pp on IntentQA for two students |
 | Harness emotion context as input to the bare model | `experiments/emotion_context/` | helps only through the transcript; −3 to −4 pp beyond it on Social-IQ for 3 of 4 students |
 

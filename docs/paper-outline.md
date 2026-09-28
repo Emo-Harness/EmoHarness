@@ -33,7 +33,7 @@ Working title candidates:
 - Table 4: ablations of L5 on the subset.
 - Table 5: cross-Target: Qwen2.5-VL-7B Direct and + L5 (and InternVL3.5-8B if run), plus the calibration against the published numbers.
 - Table 6: judge noise floor, proxy calibration, audio-clue-source effect, protocol gap.
-- Figure 1: architecture (assets/emoharness_architecture.png).
+- Figure 1: architecture, to be redrawn from the pipeline diagram in the README (perception, the four harness stages, the Builder loop).
 - Figure 2: round-by-round D_val and D_ext-test Rec-S for the three Stage 2 replicates and the Stage 3 run.
 - Figure 3: held-out gain against the distance factors from ADR-0001.
 - Figure 4: confusion-matrix shifts from L0 to L5 on ER-Wild and IR.
