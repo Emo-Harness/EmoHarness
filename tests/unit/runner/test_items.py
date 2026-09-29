@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from emoharness.common.errors import ValidationError
-from emoharness.common.io import write_json_atomic
+from emoharness.data.manifest import write_manifest
 from emoharness.data.tasks import Split
 from emoharness.runner.context import RunContext
 from emoharness.runner.items import (
@@ -51,24 +51,27 @@ class TestSelectItems:
             sets[i] & sets[j] == set() for i in range(3) for j in range(i + 1, 3)
         )
 
-    def test_clean_drops_exactly_the_listed_media_overlaps(
+    def test_clean_drops_benchmark_items_whose_clip_is_in_construction(
         self, ctx: RunContext
     ) -> None:
-        examples = load_benchmark(ctx.paths)
-        dropped = {examples[0].example_id, examples[-1].example_id}
-        write_json_atomic(ctx.paths.media_overlap_excluded, {'ids': sorted(dropped)})
-        chosen = select_items(examples, 'clean', ctx.paths)
-        assert chosen == tuple(e for e in examples if e.example_id not in dropped)
+        benchmark = load_benchmark(ctx.paths)
+        external = load_external(ctx.paths)
+        clip = 'f' * 64
+        examples = (
+            benchmark[0].model_copy(update={'media_hash': clip}),
+            *benchmark[1:],
+        )
+        patched = (external[0].model_copy(update={'media_hash': clip}), *external[1:])
+        write_manifest(ctx.paths.external_manifest, patched)
+        try:
+            chosen = select_items(examples, 'clean', ctx.paths)
+        finally:
+            write_manifest(ctx.paths.external_manifest, external)
+        assert chosen == examples[1:]
 
-    @pytest.mark.parametrize(
-        'document', [{'ids': []}, {'ids': ['a', 'a']}, {'id': ['a']}]
-    )
-    def test_clean_refuses_a_malformed_exclusion_list(
-        self, ctx: RunContext, document: dict[str, list[str]]
-    ) -> None:
-        write_json_atomic(ctx.paths.media_overlap_excluded, document)
-        with pytest.raises(ValidationError, match='exclusion list|"ids"'):
-            select_items(load_benchmark(ctx.paths), 'clean', ctx.paths)
+    def test_clean_is_full_when_no_clip_is_shared(self, ctx: RunContext) -> None:
+        examples = load_benchmark(ctx.paths)
+        assert select_items(examples, 'clean', ctx.paths) == examples
 
     def test_an_unknown_item_set_is_rejected(self, ctx: RunContext) -> None:
         with pytest.raises(ValidationError, match='unknown item set'):

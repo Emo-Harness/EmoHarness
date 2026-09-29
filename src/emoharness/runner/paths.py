@@ -20,7 +20,6 @@ from emoharness.common.errors import ValidationError
 BENCHMARK_MANIFEST_FILE: Final = 'mme_emotion.jsonl'
 EXTERNAL_MANIFEST_FILE: Final = 'external.jsonl'
 SUBSET_FILE: Final = 'subset_1000.json'
-MEDIA_OVERLAP_FILE: Final = 'media_overlap_excluded.json'
 EXTERNAL_SPLITS_FILE: Final = 'external_splits.json'
 BENCHMARK_CHECKSUM_FILE: Final = 'mme_emotion.sha256'
 BENCHMARK_REPORT_FILE: Final = 'mme_emotion_report.json'
@@ -176,10 +175,6 @@ class ProjectPaths(BaseModel):
     @property
     def subset(self) -> Path:
         return self.splits / SUBSET_FILE
-
-    @property
-    def media_overlap_excluded(self) -> Path:
-        return self.splits / MEDIA_OVERLAP_FILE
 
     @property
     def benchmark_checksums(self) -> Path:

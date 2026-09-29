@@ -1,8 +1,9 @@
 """Loading manifests and resolving the item-set names rows are declared with.
 
 An item set is one of ``full`` (every benchmark item), ``clean`` (every
-benchmark item except the ones whose media file also appears in a construction
-split, listed in ``data/splits/media_overlap_excluded.json``), ``subset`` (the
+benchmark item whose media file does not also appear in the construction
+manifest: the ids differ but the clip is the same, so scoring it would evaluate
+on video the Builder has seen), ``subset`` (the
 pre-registered 1,000 ids), or ``external:<split>`` where the split is one of
 ``build``, ``val``, or ``ext_test``. Nothing else is accepted: a typo must fail
 at the boundary rather than silently score a different set of items.
@@ -16,7 +17,7 @@ from typing import Final
 
 from emoharness.common.errors import ValidationError
 from emoharness.data.manifest import Example, read_manifest
-from emoharness.data.splits import read_exclusion, read_subset
+from emoharness.data.splits import read_subset
 from emoharness.data.tasks import Split, Task
 from emoharness.runner.paths import ProjectPaths
 
@@ -74,8 +75,8 @@ def select_items(
     if item_set == FULL:
         return rows
     if item_set == CLEAN:
-        excluded = read_exclusion(paths.media_overlap_excluded)
-        return tuple(row for row in rows if row.example_id not in excluded)
+        seen = {e.media_hash for e in load_external(paths) if e.media_hash}
+        return tuple(row for row in rows if row.media_hash not in seen)
     if item_set == SUBSET:
         ids = frozenset(read_subset(paths.subset).ids)
         return tuple(row for row in rows if row.example_id in ids)
