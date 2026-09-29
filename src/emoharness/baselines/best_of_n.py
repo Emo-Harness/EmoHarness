@@ -1,4 +1,4 @@
-"""Best-of-n test-time-scaling control (ADR-0009 E3): n samples, majority vote."""
+"""Best-of-n test-time-scaling control: n samples, majority vote."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ def majority_vote(
 
     ``label_set`` decides which samples count as the same answer, so two
     spellings of one candidate vote together. The winning sample's verbatim
-    labels come back unmodified (ADR-0009 E3).
+    labels come back unmodified.
     """
     if not samples:
         raise ValidationError('majority_vote requires at least one sample')
@@ -64,7 +64,7 @@ def run_best_of_n(
     row: str,
     cost_fn: Callable[[TargetResponse], float] | None = None,
 ) -> PredictionRecord:
-    """Issue n samples over identical inputs, vote, and report the winner (ADR-0009 E3).
+    """Issue n samples over identical inputs, vote, and report the winner.
 
     Each sample is a copy of `request` with `temperature`, `top_p`, and one seed
     from `seeds` (default `0..n-1`, matching best-of-4's seeds 0-3). A sample

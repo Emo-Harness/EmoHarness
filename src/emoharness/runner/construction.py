@@ -4,7 +4,7 @@
 ``evaluate`` as parameters. This module supplies them: the harness runs on
 D_build to produce the failure clusters a packet is built from, and on D_val to
 produce the Recognition objective, the proxy Reasoning gate, the regression rate,
-and the call and latency budgets the other gates read (ADR-0005, ADR-0006).
+and the call and latency budgets the other gates read.
 """
 
 from __future__ import annotations
@@ -352,7 +352,7 @@ def make_evaluate(
 
 
 def forbidden_ids(ctx: RunContext) -> tuple[str, ...]:
-    """Every benchmark example id and video id, for the packet firewall (ADR-0012)."""
+    """Every benchmark example id and video id, for the packet firewall."""
     try:
         examples = load_benchmark(ctx.paths)
     except ValidationError:
@@ -485,7 +485,7 @@ def stamp_manifest(result: LoopResult, parent_hash: str, builder_id: str) -> Pat
     """Rewrite the final bundle's manifest with the construction-stage provenance.
 
     The Builder may not edit ``manifest.json`` (it is outside every stage's globs),
-    so the loop records stage, parent hash, and Builder here (ADR-0006 §7).
+    so the loop records stage, parent hash, and Builder here.
     """
     accepted = tuple(r.accepted for r in result.rounds if r.accepted is not None)
     notes = (
@@ -506,7 +506,7 @@ def stamp_manifest(result: LoopResult, parent_hash: str, builder_id: str) -> Pat
 
 
 def evaluate_external_test(bundle_dir: Path, ctx: RunContext) -> MethodScores:
-    """The once-per-frozen-stage D_ext-test number (ADR-0012 §firewall)."""
+    """The once-per-frozen-stage D_ext-test number."""
     from emoharness.runner.items import load_external
 
     examples = select_items(load_external(ctx.paths), EXT_TEST_ITEMS, ctx.paths)

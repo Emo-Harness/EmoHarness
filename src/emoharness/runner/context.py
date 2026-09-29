@@ -6,7 +6,7 @@ flag here is the one place that chooses between them. Every factory returns a
 fresh object, so callers hoist them out of loops. The Target factories always
 wrap their client in a :class:`CachedTarget` over ``data/derived/calls/``: that
 cache is what lets a Builder round reuse the stages its patch did not touch, and
-what guarantees every row sees identical inputs (ADR-0006 §5).
+what guarantees every row sees identical inputs.
 """
 
 from __future__ import annotations
@@ -75,7 +75,7 @@ JUDGE_KEY_ENV: Final[Mapping[str, str]] = {
 
 
 class CalibrationSpec(BaseModel):
-    """The proxy judge's calibration plan (ADR-0007 §3)."""
+    """The proxy judge's calibration plan."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

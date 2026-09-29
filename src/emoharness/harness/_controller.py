@@ -1,4 +1,4 @@
-"""Output controller: what is emitted, in what shape (ADR-0010).
+"""Output controller: what is emitted, in what shape.
 
 Implementation detail of the harness; ``HarnessPipeline.run`` is the only caller.
 Human-written and frozen for the Builder. Every rule here is derived from the

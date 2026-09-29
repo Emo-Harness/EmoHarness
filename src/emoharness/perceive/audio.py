@@ -172,7 +172,7 @@ class NullDiarizer:
 
     ``dominant_speaker`` then finds nobody and ``subject_transcript`` falls back
     to the whole transcript, which is the right answer for single-utterance
-    clips and the documented degradation for the rest (ADR-0004 §4).
+    clips and the documented degradation for the rest.
     """
 
     def diarize(self, _wav: Path) -> tuple[SpeechSegment, ...]:

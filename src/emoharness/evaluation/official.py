@@ -1,4 +1,4 @@
-"""Wrappers around the official MME-Emotion scoring scripts (docs/benchmark-facts.md).
+"""Wrappers around the official MME-Emotion scoring scripts.
 
 This module is the only place in the harness allowed to reference the official
 `audio_clue/*.json` files, and only by forwarding a path through `--audio_json`
@@ -137,10 +137,10 @@ def judge_cost_estimate(
 ) -> float:
     """Rough judge cost in USD.
 
-    Defaults are the midpoint of docs/benchmark-facts.md's estimate (about
+    Defaults are the midpoint of a pre-run estimate (about
     6-12k input tokens and $0.02-0.035 per item); replace both with
     ledger-measured values from the first 100 items before trusting a full-run
-    estimate (ADR-0009's cost model and cut line).
+    estimate.
     """
     if n_items < 0:
         raise ValidationError('judge_cost_estimate requires a non-negative item count')

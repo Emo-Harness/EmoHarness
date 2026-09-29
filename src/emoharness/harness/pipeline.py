@@ -1,4 +1,4 @@
-"""The four-stage inference pipeline (README §4.3, ADR-0011).
+"""The four-stage inference pipeline.
 
 One item costs four Target calls when nothing goes wrong and never more than the
 hard cap, retries included. When the cap is reached the remaining model stages are
@@ -79,7 +79,7 @@ STEP_TITLES_BLOCK: Final = '\n'.join(
 
 
 class PipelineConfig(BaseModel):
-    """Decoding and budget settings shared by every stage (ADR-0011)."""
+    """Decoding and budget settings shared by every stage."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

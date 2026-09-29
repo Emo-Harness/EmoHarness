@@ -1,4 +1,4 @@
-"""The pre-registered tests, computed from raw predictions (ADR-0012, ADR-0013).
+"""The pre-registered tests, computed from raw predictions.
 
 Every test is reported whatever its outcome, including a missing row: a test that
 could not be computed says so rather than disappearing. Unadjusted CIs and
@@ -16,7 +16,7 @@ from emoharness.evaluation.bootstrap import BootstrapResult, gap_closed, holm_ad
 from emoharness.runner.items import FULL, SUBSET
 from emoharness.runner.results import RowData, RowIndex
 
-#: ADR-0012 H3 tiers. They live here rather than in ``common.constants`` because
+#: The pre-registered H3 tiers. They live here rather than in ``common.constants`` because
 #: they are reporting thresholds for this analysis, not inference-time protocol.
 GAP_TIER_1: Final = 0.25
 GAP_TIER_2: Final = 0.5

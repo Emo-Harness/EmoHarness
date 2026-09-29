@@ -1,6 +1,6 @@
 """Target configuration: decoding, video sampling, call budget, and pricing.
 
-Mirrors ``configs/target/*.yaml`` (ADR-0011). The file is read with
+Mirrors ``configs/target/*.yaml``. The file is read with
 :func:`emoharness.common.config.load_model`, which expands ``${VAR}`` /
 ``${VAR:-default}`` references against the environment so a single committed
 config can point at different endpoints per machine.
@@ -42,7 +42,7 @@ class DecodingConfig(BaseModel):
 
 
 class VideoConfig(BaseModel):
-    """Frame sampling for the video processor (ADR-0011)."""
+    """Frame sampling for the video processor."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -62,7 +62,7 @@ class VideoConfig(BaseModel):
 
 
 class CallBudget(BaseModel):
-    """Per-item Target-call budget (ADR-0011)."""
+    """Per-item Target-call budget."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

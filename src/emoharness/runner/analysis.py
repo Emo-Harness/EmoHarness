@@ -49,7 +49,7 @@ _LOGGER = get_logger(__name__)
 
 
 class LadderEntry(BaseModel):
-    """One row of the main table (ADR-0009): scores, budget, and where they came from."""
+    """One row of the main table: scores, budget, and where they came from."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -144,7 +144,7 @@ def ladder_markdown(entries: Sequence[LadderEntry]) -> str:
 
 
 def per_task_report(rows: Sequence[RowData]) -> Mapping[str, Any]:
-    """Per-task Recognition and item count for every row (ADR-0013 §8)."""
+    """Per-task Recognition and item count for every row."""
     report: dict[str, Any] = {}
     for data in rows:
         board = data.scoreboard()
@@ -168,7 +168,7 @@ def _task_counts(board: Scoreboard) -> Mapping[Task, int]:
 
 
 def multilabel_report(rows: Sequence[RowData]) -> Mapping[str, Any]:
-    """Precision, recall, and F1 on the multi-label tasks (ADR-0013 §7)."""
+    """Precision, recall, and F1 on the multi-label tasks."""
     report: dict[str, Any] = {}
     for data in rows:
         board = data.scoreboard()
@@ -188,7 +188,7 @@ def multilabel_report(rows: Sequence[RowData]) -> Mapping[str, Any]:
 
 
 def cost_report(ctx: RunContext, entries: Sequence[LadderEntry]) -> Mapping[str, Any]:
-    """The ledger, grouped every way the budget table needs (ADR-0013 §10)."""
+    """The ledger, grouped every way the budget table needs."""
     ledger = read_entries(ctx.ledger)
     grouped = {
         f'by_{key}': {

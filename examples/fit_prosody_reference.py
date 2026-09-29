@@ -4,8 +4,8 @@
     python examples/fit_prosody_reference.py --items external:build
 
 ``describe_prosody`` turns a clip's eGeMAPS functionals into phrases such as
-"high pitch" by z-scoring them against corpus means and standard deviations
-(ADR-0004 §2). Those statistics have to exist before the shared cache is
+"high pitch" by z-scoring them against corpus means and standard deviations.
+Those statistics have to exist before the shared cache is
 filled, or every cached clip carries an empty prosody list. This step extracts
 each construction clip's audio into the cache's audio slot (so ``preprocess``
 reuses it), runs openSMILE, and writes ``configs/preprocess.yaml``'s

@@ -1,4 +1,4 @@
-"""Phase 5: measure how well the proxy judge tracks the reference judge (ADR-0007).
+"""Phase 5: measure how well the proxy judge tracks the reference judge.
 
     python examples/calibrate_proxy_judge.py --row L3 --items external:val
     python examples/calibrate_proxy_judge.py --row L3 --items subset --fake

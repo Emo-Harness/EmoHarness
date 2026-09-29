@@ -1,6 +1,6 @@
 """The per-round verifier: the Builder's model reviewing the Builder's patches.
 
-One call per round (ADR-0006 §8, added 2026-09-11). The verifier sees the
+One call per round. The verifier sees the
 current harness files, the failure clusters by key and size, and every
 candidate as a rationale plus a unified diff. It answers with one verdict per
 candidate; a candidate it does not approve is never applied or evaluated, and

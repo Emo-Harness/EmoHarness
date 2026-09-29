@@ -1,4 +1,4 @@
-# The method ladder (ADR-0009). Rows carry the main claims; item sets are 'full' or 'subset'.
+# The method ladder. Rows carry the main claims; item sets are 'full' or 'subset'.
 rows:
   L0: {method: direct, inputs: video, calls: 1, item_set: full, priority: P0}
   L1: {method: direct_audio, inputs: video+audio_text, calls: 1, item_set: subset, priority: P0}

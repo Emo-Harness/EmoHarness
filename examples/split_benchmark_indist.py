@@ -5,7 +5,7 @@
 
 This is the original README's protocol (build 10% / val 10% of the three seen
 task families, test on the rest), kept as a same-distribution check of the
-Builder loop. It is *not* the pre-registered protocol of ADR-0001/ADR-0003,
+Builder loop. It is *not* the pre-registered protocol,
 whose construction data comes from outside MME-Emotion; scores from a run
 prepared this way are not leaderboard-comparable and must be labelled as
 in-distribution wherever they are reported.
@@ -125,8 +125,8 @@ def split_benchmark(
             'seed': seed,
             'per_kind': dict(per_kind),
             'sources': [INDIST_ORIGIN],
-            'protocol': 'in-distribution (original README 10/10/80); '
-            'not ADR-0001/ADR-0003',
+            'protocol': 'in-distribution (build/val carved from seen tasks); '
+            'not the pre-registered external-corpus protocol',
             **split_summary(assigned),
         },
     )

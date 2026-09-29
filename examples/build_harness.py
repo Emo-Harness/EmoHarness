@@ -5,7 +5,7 @@
     python examples/build_harness.py --stage 2 --fake --root /tmp/emoharness-fake
 
 Stage 2 starts from the Stage 1 scaffold; Stage 3 starts from the first
-completed Stage 2 replicate, declared before the runs start (ADR-0006 §6).
+completed Stage 2 replicate, declared before the runs start.
 ``--freeze`` writes ``results/freeze.json``, evaluates D_ext-test once, and
 prints the git tag command to run.
 """

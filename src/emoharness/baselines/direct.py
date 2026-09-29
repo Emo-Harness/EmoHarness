@@ -1,8 +1,8 @@
 """L0-L2 single-call baselines: Direct, Direct+audio, and the frozen handcrafted prompt.
 
 Every row here issues exactly one Target call with the official prompt or a
-strict extension of it (ADR-0009's ladder). L2's prompt file is written once,
-before any benchmark run, and frozen at pre-registration (ADR-0009).
+strict extension of it (the method ladder). L2's prompt file is written once,
+before any benchmark run, and frozen at pre-registration.
 """
 
 from __future__ import annotations

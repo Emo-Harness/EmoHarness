@@ -5,7 +5,7 @@
     python examples/preprocess.py --fake --root /tmp/emoharness-fake
 
 Every method downstream reads these entries, so the cache is what makes the
-ladder's "byte-identical inputs" claim true (ADR-0009).
+ladder's "byte-identical inputs" claim true.
 """
 
 from __future__ import annotations

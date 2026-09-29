@@ -1,4 +1,4 @@
-"""Adapter protocol, shared CSV/label helpers, and the origin registry (ADR-0003).
+"""Adapter protocol, shared CSV/label helpers, and the origin registry.
 
 Every external construction source is loaded into placeholder-split
 ``Example``s: ``task`` is always ``None``, ``kind`` is the seen capability kind

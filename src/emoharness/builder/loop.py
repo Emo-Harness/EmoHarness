@@ -1,4 +1,4 @@
-"""The controlled construction loop (ADR-0006 §1, §4, §7, §8).
+"""The controlled construction loop.
 
 One Builder call per round, every candidate validated before it is written, the
 survivors reviewed by the verifier (the Builder's own model, asked whether each
@@ -75,7 +75,7 @@ COST_FILE: Final = 'cost.json'
 LOOP_RESULT_FILE: Final = 'loop_result.json'
 STOP_EARLY: Final = 'early_stop'
 STOP_MAX_ROUNDS: Final = 'max_rounds'
-#: The Builder answered continue_search: false (ADR-0006 §10).
+#: The Builder answered continue_search: false.
 STOP_BUILDER: Final = 'builder_stopped'
 _SAFE_CHARS: Final = frozenset(
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-'
@@ -294,7 +294,7 @@ def _run_rounds(state: _State, ctx: _Context) -> tuple[_State, str]:
 
     Who may say stop depends on ``autonomous_stop``. With it set the Builder
     ends the stage itself, which is the part of "can a model build a harness"
-    that a fixed round budget answers for it (ADR-0006 §10); the acceptance
+    that a fixed round budget answers for it; the acceptance
     gates stay ours either way. With it unset the loop stops after
     ``early_stop_rounds`` rounds in which no candidate was promoted.
     """

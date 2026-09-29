@@ -1,5 +1,5 @@
-# Proxy judge for the Reasoning gate (ADR-0007). This run scores the gate with
-# GPT 5.6 Luna over the OpenAI API (no Gemini key on this box); ADR-0007's
+# Proxy judge for the Reasoning gate. This run scores the gate with
+# GPT 5.6 Luna over the OpenAI API (no Gemini key on this box); the
 # default is Gemini 3 Flash (`provider: gemini`, `model_id: gemini-3-flash`,
 # `api_key_env: GEMINI_API_KEY`), a different family from the Builder.
 # `reasoning_effort: none` keeps temperature 0 legal on the GPT-5 family.

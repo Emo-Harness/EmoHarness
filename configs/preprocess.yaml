@@ -1,4 +1,4 @@
-# Shared preprocessing cache (ADR-0004 as amended 2026-09-11, ADR-0011).
+# Shared preprocessing cache.
 # Fixed perception tools: ffmpeg frame sampling, faster-whisper
 # transcription with language detection, and openSMILE eGeMAPS prosody
 # functionals turned into phrases against fitted reference statistics.

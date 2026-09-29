@@ -3,7 +3,7 @@
 The benchmark side builds ``data/manifests/mme_emotion.jsonl`` plus its checksum
 and annotation report; the construction side loads whichever external corpora are
 actually present, assigns the three splits by source id, and reports per-source
-label histograms (ADR-0003). A corpus whose root is missing is skipped with a
+label histograms. A corpus whose root is missing is skipped with a
 warning rather than failing the run: CREMA-D standing in for IEMOCAP is the
 declared plan, not an accident.
 """
@@ -68,7 +68,7 @@ class BenchmarkSource(BaseModel):
 
 
 class SplitPlan(BaseModel):
-    """Target sizes per seen capability kind, and the assignment seed (ADR-0003)."""
+    """Target sizes per seen capability kind, and the assignment seed."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

@@ -6,7 +6,7 @@ not decided here either: callers pass in a :data:`ClipPreprocessor`, and
 ``RunContext.clip_preprocessor`` is what chooses. Everything downstream - the
 harness, the single-call rows, the leakage pHashes, the judge frames - reads the
 same :class:`PreprocessCache` entries, which is what makes the ladder's
-"byte-identical inputs" claim true (ADR-0009).
+"byte-identical inputs" claim true.
 """
 
 from __future__ import annotations

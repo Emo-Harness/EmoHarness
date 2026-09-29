@@ -1,4 +1,4 @@
-# Builder / teacher (ADR-0005, ADR-0006). GPT 5.6 Luna over the OpenAI
+# Builder / teacher. GPT 5.6 Luna over the OpenAI
 # chat-completions API; `provider: gemini` selects the alternative client.
 # GPT-5 family: `reasoning_effort` is sent and, since it is not `none`, no
 # temperature (the API rejects one). Pricing measured 2026-09-08 on the API:
@@ -15,17 +15,17 @@ max_rounds_per_stage: 8
 # under it (2026-09-11) and all three replicates hit it after 2 to 4 rounds;
 # from 2026-09-12 the Builder ends the stage itself by answering
 # continue_search: false, so "knowing when to stop" is measured rather than
-# decided for it (ADR-0006 §10). The round cap and the gates are unchanged.
+# decided for it. The round cap and the gates are unchanged.
 early_stop_rounds: 2
 autonomous_stop: true
 # 20 samples x 4 frames = 80 keyframes per packet (~30k image tokens at 640 px)
 packet: {max_failures_per_cluster: 5, max_keyframe_samples: 20, max_frames_per_sample: 4, target_input_tokens: 100000}
-# max_mean_calls 4.5: ADR-0011 expects 4 calls per item with one retry per stage
+# max_mean_calls 4.5: the harness expects 4 calls per item with one retry per stage
 # inside a hard cap of 6; a gate at exactly 4.000 rejects any candidate that ever
 # retried (4.005 on D_val rejected every round-0 candidate on 2026-09-08).
 gates: {regression_rate_limit: 0.05, reasoning_floor_points: 2.0, gate_sample_size: 200, max_mean_calls: 4.5}
 # The verifier is this same model asked, once per round, whether each valid
 # candidate is a general reading rule or an overfit, a label prior, or a
-# contract break; unapproved candidates are never evaluated (ADR-0006 §8).
+# contract break; unapproved candidates are never evaluated.
 verifier: {enabled: true, reasoning_effort: high}
 pricing_usd_per_million: {input: 0.2, output: 1.2}

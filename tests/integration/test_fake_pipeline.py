@@ -1,6 +1,6 @@
 """Every entry point, in phase order, with fakes, into one throwaway project root.
 
-This is the acceptance test for Phase 0 in ``docs/plan.md``: the whole pipeline
+This is the acceptance test for Phase 0: the whole pipeline
 runs end to end without a GPU, without the benchmark, and without an API key.
 """
 

@@ -1,7 +1,7 @@
 """The public MME-Emotion prompt grammar: render a prompt, parse a prompt.
 
 The harness never receives a task name. Everything it may know about the item
-comes from parsing the prompt with this module (ADR-0001, ADR-0010).
+comes from parsing the prompt with this module.
 """
 
 from __future__ import annotations

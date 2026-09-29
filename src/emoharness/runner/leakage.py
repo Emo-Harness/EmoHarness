@@ -126,7 +126,7 @@ def leakage_sweep(
 
 
 def drop_flagged_examples(ctx: RunContext, report: LeakageReport) -> Path:
-    """Rewrite the construction manifest without any flagged clip (ADR-0003)."""
+    """Rewrite the construction manifest without any flagged clip."""
     kept = drop_flagged(load_external(ctx.paths), report)
     write_manifest(ctx.paths.external_manifest, kept)
     _LOGGER.info('dropped %d flagged clips', len(report.flagged_construction_ids()))

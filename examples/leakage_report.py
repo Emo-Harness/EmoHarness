@@ -1,4 +1,4 @@
-"""Phase 2 gate: the four construction-versus-benchmark leakage checks (ADR-0003).
+"""Phase 2 gate: the four construction-versus-benchmark leakage checks.
 
     python examples/leakage_report.py --drop
     python examples/leakage_report.py --fake --root /tmp/emoharness-fake

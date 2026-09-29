@@ -17,7 +17,7 @@ MODEL="${EMOHARNESS_STUDENT_MODEL:-Qwen/Qwen3-VL-8B-Instruct}"
 PORT="${VLLM_PORT:-8000}"
 # Triton JIT-compiles a small CUDA helper against Python.h; the system
 # python3.12 has no dev headers and we have no root, so point gcc at the
-# libpython3.12-dev headers extracted under ~/.local (see docs/run-indist.md).
+# libpython3.12-dev headers extracted under ~/.local.
 HDR="${EMOHARNESS_PY_HEADERS:-${HOME}/.local/python3.12-headers/usr/include}"
 export CPATH="${HDR}/python3.12:${HDR}${CPATH:+:${CPATH}}"
 # The multimodal processor cache is off by default: it buys nothing when every

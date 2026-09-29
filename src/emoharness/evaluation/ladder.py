@@ -1,4 +1,4 @@
-"""The method ladder (ADR-0009): `configs/experiments/ladder.yaml` as typed objects.
+"""The method ladder: `configs/experiments/ladder.yaml` as typed objects.
 
 Every name a row can carry is a closed set, so a misspelt method, input, item set,
 or priority fails when the ladder is loaded rather than halfway through a run that
@@ -49,7 +49,7 @@ class RowSpec(BaseModel):
 
 
 class SubsetSpec(BaseModel):
-    """The pre-registered subset parameters shared by every 'subset' row (ADR-0013 §3)."""
+    """The pre-registered subset parameters shared by every 'subset' row."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

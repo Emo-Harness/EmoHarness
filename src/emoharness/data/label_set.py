@@ -4,7 +4,7 @@
 what the project does with the candidate list that grammar yields — canonical
 spelling, answer parsing, and the local Recognition and PRF scores. It reads the
 prompt and nothing else: a task name never reaches it, so a held-out wording is
-handled by the same code as a seen one (ADR-0001, ADR-0010).
+handled by the same code as a seen one.
 
 Normalization exists only to compare a prediction with the gold labels. Emitted
 answers are always the verbatim candidate strings the prompt lists.
@@ -111,7 +111,7 @@ class LabelSet(BaseModel):
 
     @property
     def is_multi_label(self) -> bool:
-        """Whether an answer may name more than one label (ADR-0010 §2).
+        """Whether an answer may name more than one label.
 
         Decided by the prompt's quantifier alone, never by a task name, so a
         held-out wording is classified by the same rule as a seen one.
@@ -153,7 +153,7 @@ class LabelSet(BaseModel):
         return len(_normalized(predicted) & _normalized(gold))
 
     def recognition(self, predicted: Iterable[str], gold: Iterable[str]) -> float:
-        """Official Recognition score, computed locally (docs/benchmark-facts.md).
+        """Official Recognition score, computed locally.
 
         Single-label: 1.0 when the first predicted label matches any gold label
         after normalization, else 0.0. Multi-label: the official C/K — the size of
@@ -171,7 +171,7 @@ class LabelSet(BaseModel):
         return 1.0 if first in _normalized(gold_labels) else 0.0
 
     def prf(self, predicted: Iterable[str], gold: Iterable[str]) -> PRF:
-        """Local secondary metric (ADR-0013 §7): precision, recall, F1 after normalization."""
+        """Local secondary metric: precision, recall, F1 after normalization."""
         predicted_set, gold_set = _normalized(predicted), _normalized(gold)
         correct = len(predicted_set & gold_set)
         precision = correct / len(predicted_set) if predicted_set else 0.0

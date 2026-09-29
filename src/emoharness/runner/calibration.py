@@ -1,4 +1,4 @@
-"""Calibrating the proxy judge against the reference judge (ADR-0007).
+"""Calibrating the proxy judge against the reference judge.
 
 The Reasoning gate is only allowed to block a Builder candidate if the proxy
 that scores it agrees with the official judge often enough. This module scores

@@ -4,7 +4,7 @@ The official scripts are executed as subprocesses, never reimplemented: this
 module writes the per-task response files they read, builds their argument
 lists, and parses their output back into ``StepScores``. The judge's own
 evidence directory is only ever named as a command-line argument; nothing here
-opens it (ADR-0004, and a test in ``tests/data_integrity`` asserts it).
+opens it, and a test in ``tests/data_integrity`` asserts that.
 """
 
 from __future__ import annotations

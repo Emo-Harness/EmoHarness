@@ -2,8 +2,8 @@
 
 Assumes ``label.csv`` at the corpus root with columns ``video_id, clip_id,
 label`` (a continuous score in [-1, 1]), and clips at
-``<root>/Raw/<video_id>/<clip_id>.mp4``. Collapsed the same way as MOSEI
-(ADR-0003): score > 0 positive, score < 0 negative, score == 0 neutral.
+``<root>/Raw/<video_id>/<clip_id>.mp4``. Collapsed the same way as MOSEI:
+score > 0 positive, score < 0 negative, score == 0 neutral.
 """
 
 from __future__ import annotations

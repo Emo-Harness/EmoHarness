@@ -48,7 +48,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         '--resamples',
         type=int,
         default=DEFAULT_RESAMPLES,
-        help='bootstrap resamples (ADR-0013 uses 10,000)',
+        help='bootstrap resamples (the reported tables use 10,000)',
     )
     args = parser.parse_args(argv)
 

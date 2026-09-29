@@ -1,7 +1,7 @@
 """Project-wide constants.
 
 Values that experiments may change live in ``configs/``; this module holds facts
-about the benchmark protocol and fixed design decisions (see docs/adr/).
+about the benchmark protocol and fixed design decisions.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ OFFICIAL_SYNONYMS: Final[Mapping[str, str]] = {
     'surprised': 'surprise',
 }
 
-# Output controller (ADR-0010).
+# Output controller.
 STEP_TITLES: Final[tuple[str, ...]] = (
     'Setting and context',
     'Facial and bodily cues',
@@ -52,16 +52,16 @@ MULTILABEL_CAP: Final = 3
 #: How a numbered step is introduced, wherever one is written, counted, or rated.
 STEP_PREFIX: Final = 'Step'
 
-# Per-item Target-call budget (ADR-0011).
+# Per-item Target-call budget.
 CALL_BUDGET_EXPECTED: Final = 4
 CALL_BUDGET_HARD_CAP: Final = 6
 RETRIES_PER_STAGE: Final = 1
 
-# Pre-registered subset (ADR-0013).
+# Pre-registered subset.
 SUBSET_SIZE_PER_TASK: Final = 125
 SUBSET_SEED: Final = 20260907
 
-# Harness bundle layout and Builder permissions (ADR-0005).
+# Harness bundle layout and Builder permissions.
 HARNESS_BUNDLE_DIR: Final = 'harness'
 HARNESS_MANIFEST_FILE: Final = 'manifest.json'
 STAGE_EDITABLE_GLOBS: Final[Mapping[int, tuple[str, ...]]] = {
@@ -76,12 +76,12 @@ REGRESSION_RATE_LIMIT: Final = 0.05
 REASONING_GATE_FLOOR_POINTS: Final = 2.0
 GATE_SAMPLE_SIZE: Final = 200
 
-# Leakage thresholds (ADR-0003).
+# Leakage thresholds.
 PHASH_HAMMING_THRESHOLD: Final = 8
 TRANSCRIPT_JACCARD_THRESHOLD: Final = 0.8
 TRANSCRIPT_MIN_WORDS: Final = 5
 
-# Video protocol (ADR-0011).
+# Video protocol.
 VIDEO_FPS: Final = 2.0
 VIDEO_MIN_FRAMES: Final = 4
 VIDEO_MAX_FRAMES: Final = 32

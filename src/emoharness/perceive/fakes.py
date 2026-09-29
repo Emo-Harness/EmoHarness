@@ -33,7 +33,7 @@ FRAME_BLOCKS: Final = 8
 FRAME_SIZE: Final = 64
 
 # Deliberately free of emotion words: the transcript is evidence, never a label
-# hint (ADR-0004).
+# hint.
 _SUBJECTS: Final[tuple[str, ...]] = (
     'the speaker',
     'the woman on the left',

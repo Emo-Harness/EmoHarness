@@ -23,7 +23,7 @@ SET = ('anger', 'Happiness', 'sadness', 'neutral')
 SINGLE = LabelSet.from_labels(SET)
 MULTI = LabelSet.from_labels(SET, Quantifier.MULTIPLE, 'emotions')
 
-# The official ML-ER and FG-ER prompts' own worked examples (docs/benchmark-facts.md).
+# The official ML-ER and FG-ER prompts' own worked examples.
 ML_ER_PREDICTED = (
     'disappointment',
     'fear',

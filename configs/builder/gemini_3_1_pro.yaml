@@ -1,4 +1,4 @@
-# Alternative Builder provider (ADR-0005, ADR-0006): Gemini instead of the
+# Alternative Builder provider: Gemini instead of the
 # default GPT 5.6 Luna teacher. Point ProjectPaths.builder_config here to use it.
 provider: gemini
 model_id: gemini-3.1-pro

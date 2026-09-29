@@ -2,7 +2,7 @@
 
 Every row goes through the same Target wrapper and the same preprocessing cache,
 so the adjacent differences the ladder claims to isolate really are the only
-differences (ADR-0009). Harness rows additionally persist their ``HarnessOutput``
+differences. Harness rows additionally persist their ``HarnessOutput``
 records beside the predictions, because the Builder loop diagnoses failures from
 the evidence and stage traces those records carry, not from the labels.
 """

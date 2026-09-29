@@ -1,4 +1,4 @@
-"""Canonical example record shared by benchmark and external data (README §5.3)."""
+"""Canonical example record shared by benchmark and external data."""
 
 from __future__ import annotations
 

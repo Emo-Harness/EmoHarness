@@ -1,4 +1,4 @@
-"""External construction source adapters and the origin registry (ADR-0003)."""
+"""External construction source adapters and the origin registry."""
 
 from __future__ import annotations
 

@@ -1,7 +1,7 @@
-"""The regression set: items some accepted harness once solved (README §4.1).
+"""The regression set: items some accepted harness once solved.
 
 The set only grows. A candidate that stops solving items already in it is charged a
-regression rate, which Gate 2 caps (ADR-0005).
+regression rate, which Gate 2 caps.
 """
 
 from __future__ import annotations

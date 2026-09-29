@@ -1,4 +1,4 @@
-# Construction corpus sources (ADR-0003). Paths are filled in after download.
+# Construction corpus sources. Paths are filled in after download.
 benchmark:
   origin: mme_emotion
   hf_repo: Karl28/MME-Emotion

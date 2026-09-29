@@ -17,7 +17,7 @@ from emoharness.runner.cli import announce, build_parser, context_from, guard
 from emoharness.runner.ingest import prepare_external
 from emoharness.runner.items import EXTERNAL_SPLITS
 
-#: Split targets for --fake: the 150/150/100 ratio of ADR-0003, scaled to a
+#: Split targets for --fake: the default 150/150/100 split ratio, scaled to a
 #: corpus of a few dozen clips. A target that can never be reached would starve
 #: the splits below it.
 FAKE_PER_KIND: Mapping[str, int] = {'build': 6, 'val': 6, 'ext_test': 4}

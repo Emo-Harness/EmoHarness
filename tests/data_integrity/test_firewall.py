@@ -1,4 +1,4 @@
-"""Static firewall checks (ADR-0004, ADR-0010, ADR-0012).
+"""Static firewall checks.
 
 These tests read source files, never data. They fail when a module could read the
 benchmark's judge-side audio clues or branch on a benchmark task name at inference.

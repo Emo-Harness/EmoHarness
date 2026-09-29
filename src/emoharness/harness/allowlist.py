@@ -1,6 +1,6 @@
 """Static safety check for the pure functions the Builder may write at Stage 3.
 
-ADR-0005 lets the Builder edit ``harness/verification/*.py``. Those files are read
+The Builder may edit ``harness/verification/*.py``. Those files are read
 as text and executed here, so they are first parsed and checked against a closed
 list of AST nodes, a closed list of callable builtins, and a size limit. Anything
 outside the list is a violation and the file is rejected; nothing is repaired.

@@ -1,6 +1,6 @@
 """Layout of the harness bundle and the frozen models mirroring its YAML files.
 
-The bundle is the artifact the Builder edits (ADR-0005). Every file in it is
+The bundle is the artifact the Builder edits. Every file in it is
 declared here so that a missing or misspelled path fails at load time rather than
 in the middle of a run.
 """
@@ -63,7 +63,7 @@ REQUIRED_PLACEHOLDERS: Final[Mapping[str, tuple[str, ...]]] = {
 
 
 class BundleManifest(BaseModel):
-    """Provenance of one harness version (ADR-0006 §7)."""
+    """Provenance of one harness version."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

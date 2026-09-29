@@ -1,4 +1,4 @@
-# Target serving (ADR-0011). Served by vLLM with an OpenAI-compatible endpoint.
+# Target serving. Served by vLLM with an OpenAI-compatible endpoint.
 model_id: Qwen/Qwen3-VL-8B-Instruct
 endpoint: ${VLLM_ENDPOINT:-http://127.0.0.1:8000/v1}
 decoding: {temperature: 0.0, top_p: 1.0, seed: 0, max_tokens: 1024}

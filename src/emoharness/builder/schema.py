@@ -1,4 +1,4 @@
-"""Builder proposal contract (ADR-0006). The Builder returns JSON matching these models."""
+"""Builder proposal contract. The Builder returns JSON matching these models."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ class BuilderProposal(BaseModel):
     continue_search: bool = Field(
         default=True,
         description='whether the Builder has further directions worth a round; '
-        'honoured only when BuilderConfig.autonomous_stop is set (ADR-0006 §10)',
+        'honoured only when BuilderConfig.autonomous_stop is set',
     )
     stop_reason: str = Field(
         default='', description='why the Builder would stop, in its own words'

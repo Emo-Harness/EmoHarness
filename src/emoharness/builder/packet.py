@@ -1,10 +1,10 @@
-"""The diagnosis packet: what the Builder sees in one round (ADR-0006 §3).
+"""The diagnosis packet: what the Builder sees in one round.
 
 Text first. The packet carries the harness files verbatim, the confusion matrix and
 cluster counts measured on the construction set, and a bounded number of failure
 records; only a sampled subset carries keyframes, and videos are never sent.
 
-The wording never names a held-out capability (ADR-0005, ADR-0012): the Builder is
+The wording never names a held-out capability: the Builder is
 told the seen request wording and nothing else about the benchmark.
 """
 
@@ -333,7 +333,7 @@ def _render_sample(
 #: stage had unlocked, so the packet was not telling it what they are. This
 #: block describes their contract and their effect and stops there: which rule
 #: to change is the Builder's to decide, and naming a direction here would be
-#: doing its work for it (ADR-0006 §11).
+#: doing its work for it.
 _VERIFICATION_NOTE: Final = """## The two verification functions
 
 Both are pure Python, read as text and run on the stage's JSON, so editing them
@@ -368,7 +368,7 @@ _TOKEN: Final = re.compile(r'[A-Za-z0-9_\-]+')
 
 
 def assert_no_forbidden_ids(text: str, forbidden_ids: Iterable[str]) -> None:
-    """Raise if any benchmark id reached the Builder's input (ADR-0012 §firewall).
+    """Raise if any benchmark id reached the Builder's input.
 
     Ids are matched as whole tokens. An id that is not itself one token (a file
     name with its suffix) is matched as a substring instead.

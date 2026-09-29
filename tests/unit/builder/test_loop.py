@@ -339,7 +339,7 @@ def test_the_firewall_also_covers_keyframe_paths(
     assert builder.calls == ()
 
 
-# --- the verifier, the load check, and the cost record (ADR-0006 §8) -------------
+# --- the verifier, the load check, and the cost record -------------
 
 
 def _vetoing(approved: tuple[str, ...], vetoed: tuple[str, ...]) -> FakeVerifier:
@@ -556,7 +556,7 @@ def test_rounds_without_a_ledger_record_an_empty_cost(
     assert result.total_cost.by_role == {}
 
 
-# --- who ends the stage (ADR-0006 §10) ------------------------------------------
+# --- who ends the stage ------------------------------------------
 
 
 def _stopping_builder(*flags: bool) -> FakeBuilder:

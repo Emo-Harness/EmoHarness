@@ -3,7 +3,7 @@
 Implementation detail of the harness; ``HarnessPipeline.run`` is the only caller.
 Every Target answer is untrusted text: it is stripped of code fences, parsed as
 one JSON object, and coerced into the frozen models. A stage that fails to parse
-is retried once with a stricter reminder (ADR-0011 §4-5); the failure count ends
+is retried once with a stricter reminder; the failure count ends
 up in the stage trace so that parse-failure rates appear in the results.
 """
 

@@ -1,4 +1,4 @@
-"""Read, hash, and copy the harness bundle the Builder edits (ADR-0005, ADR-0006).
+"""Read, hash, and copy the harness bundle the Builder edits.
 
 A bundle is a directory of plain files. Loading it validates that every required
 file exists, that the YAML matches the frozen config models, and that each prompt
@@ -97,7 +97,7 @@ class HarnessBundle(BaseModel):
         return directory_hash(self.root)
 
     def editable_paths(self, stage: int) -> tuple[str, ...]:
-        """Relative paths the Builder may replace at ``stage`` (ADR-0005)."""
+        """Relative paths the Builder may replace at ``stage``."""
         if stage not in STAGE_EDITABLE_GLOBS:
             raise ValidationError(f'unknown harness stage {stage!r}')
         found = {

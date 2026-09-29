@@ -71,7 +71,7 @@ Example Output:
 
 # Mirrors eval_cot_gpt4o.py for ML-ER (last step scored C/K). FG-ER's own script
 # carries a differently-worded C/K prompt with its own examples; this constant
-# uses the ML-ER wording, which docs/benchmark-facts.md also quotes.
+# uses the ML-ER wording.
 JUDGE_MULTI_LABEL_SCORE_PROMPT: Final = """I will first give you some ground truth information about the emotions in a video: visual clue, audio clue, and emotion labels. I will also give you a model prediction. Please help me rate the performance of the prediction.
 
 Rating Requirements:
@@ -187,9 +187,9 @@ def _judge_cost(
 class OpenAIStepScorer:
     """Scores one item through an OpenAI-compatible chat endpoint; logs a `LedgerEntry`.
 
-    Used for the proxy judge (ADR-0007) or for ad hoc GPT-4o scoring outside the
+    Used for the proxy judge or for ad hoc GPT-4o scoring outside the
     official scripts. `multi_label` picks the prompt template for every call
-    made by this instance; the ADR-0007 gate only ever scores D_val, which is
+    made by this instance; the proxy-judge gate only ever scores D_val, which is
     single-label, so its scorer instances never need to set it.
     `openai` is imported lazily so importing this module never requires it, and
     the real network call is never exercised by tests (engineering.md).
@@ -337,7 +337,7 @@ class GeminiStepScorer:
 
 
 class CalibrationReport(BaseModel):
-    """Proxy-vs-reference judge agreement summary (ADR-0007 §3)."""
+    """Proxy-vs-reference judge agreement summary."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 

@@ -1,4 +1,4 @@
-"""Promotion gates (ADR-0005 §objective). A candidate is promoted or it is not.
+"""Promotion gates. A candidate is promoted or it is not.
 
 Recognition is the objective; reasoning, the regression set, calls, and latency are
 non-regression gates. Every rejection carries a reason so provenance can explain it.

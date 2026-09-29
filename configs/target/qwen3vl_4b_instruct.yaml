@@ -1,4 +1,4 @@
-# Calibration and cross-Target model (ADR-0009 E6-lite). Served by vLLM with an
+# Calibration and cross-Target model. Served by vLLM with an
 # OpenAI-compatible endpoint, exactly like the 8B Target under test.
 model_id: Qwen/Qwen3-VL-4B-Instruct
 endpoint: ${VLLM_ENDPOINT:-http://127.0.0.1:8000/v1}

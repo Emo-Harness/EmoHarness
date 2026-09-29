@@ -1,4 +1,4 @@
-"""Construction-vs-benchmark leakage checks (ADR-0003): four independent gates.
+"""Construction-vs-benchmark leakage checks: four independent gates.
 
 One way in, one way out: gather every id, hash, pHash, and transcript into a
 :class:`LeakageInputs`, call :func:`run_leakage_checks`, get back one
@@ -6,8 +6,7 @@ One way in, one way out: gather every id, hash, pHash, and transcript into a
 
 ``phash_image`` is the only place ``PIL`` and ``imagehash`` are needed, and it
 imports both lazily inside the function (as does the private ``_hamming``
-helper), so importing this module never pulls in the image stack (candidate 6,
-docs/architecture-review-2026-09-07.md): a ``--fake`` run that never computes a
+helper), so importing this module never pulls in the image stack: a ``--fake`` run that never computes a
 pHash never pays for them.
 """
 
@@ -71,7 +70,7 @@ class LeakageReport(BaseModel):
 
 
 class LeakageThresholds(BaseModel):
-    """Threshold knobs for the pHash and transcript checks (ADR-0003)."""
+    """Threshold knobs for the pHash and transcript checks."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -83,7 +82,7 @@ class LeakageThresholds(BaseModel):
 
 
 class LeakageInputs(BaseModel):
-    """Everything one leakage sweep needs, gathered up front (ADR-0003).
+    """Everything one leakage sweep needs, gathered up front.
 
     ``media_hashes``, ``phashes``, and ``transcripts`` are keyed by example id
     across both sides; an id missing from one of them simply has nothing to
@@ -152,7 +151,7 @@ def _check_phashes(
 
     Brute force over every (construction id, benchmark id, frame, frame)
     combination: O(|construction| * |benchmark| * frames_c * frames_b) hamming
-    comparisons. This matches ADR-0003's "all pairs" method and is fine at the
+    comparisons. This is the "all pairs" method and is fine at the
     corpus sizes it specifies (hundreds to low thousands of clips, up to
     ~10 frames each); bucket hashes by prefix first if this ever needs to run
     at a larger scale.
@@ -252,7 +251,7 @@ def _check_source_ids(
     """Flag construction/benchmark pairs that share a source id under ``rules``.
 
     ``rules`` maps a construction ``origin`` to the benchmark tasks it must be
-    compared against, per ADR-0003's source-id leakage table.
+    compared against, per the source-id leakage table.
     """
     index = _index_benchmark_by_task_and_source(benchmark_examples)
     return tuple(

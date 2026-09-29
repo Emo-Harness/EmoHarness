@@ -7,7 +7,7 @@
 Without ``--execute`` nothing is run: the per-task response files are written and
 the three official commands are printed for review, so the ledger can be checked
 before any paid call. The judge's own evidence directory is passed through as an
-argument and never opened here (ADR-0004).
+argument and never opened here.
 """
 
 from __future__ import annotations

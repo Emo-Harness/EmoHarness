@@ -17,7 +17,7 @@ from emoharness.builder.packet import (
 from emoharness.common.errors import LeakageError
 
 Record = Callable[..., FailureRecord]
-# Held-out capability names the Builder must never be shown (ADR-0005, ADR-0012).
+# Held-out capability names the Builder must never be shown.
 FORBIDDEN_WORDS = ('multi-label', 'multilabel', 'fine-grained', 'intent', 'noise')
 LIMITS = PacketLimits(
     max_failures_per_cluster=5,
@@ -213,7 +213,7 @@ def test_round_robin_continues_when_a_cluster_runs_out(
     ]
 
 
-# --- the Stage 3 note about the verification functions (ADR-0006 §11) -----------
+# --- the Stage 3 note about the verification functions -----------
 
 
 def _files_with_verification() -> dict[str, str]:

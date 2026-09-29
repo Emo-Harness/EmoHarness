@@ -3,7 +3,7 @@
 Assumes a normalized ``mosei_labels.csv`` at the corpus root with columns
 ``video_id, segment_id, sentiment, path``: ``sentiment`` is the native
 [-3, 3] CMU Multimodal SDK score and ``path`` is the clip location relative to
-the corpus root. ADR-0003 forbids storing the 7-level score in the manifest,
+the corpus root. The 7-level score is never stored in the manifest,
 so only the collapsed 3-class label is kept; ``metadata['collapsed_from']``
 records the source scale for provenance.
 """

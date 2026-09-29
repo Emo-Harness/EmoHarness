@@ -1,4 +1,4 @@
-# Teacher Direct upper bound (ADR-0008). The OpenAI API takes images, not video,
+# Teacher Direct upper bound. The OpenAI API takes images, not video,
 # so the row runs the matched protocol: the shared cache's sampled frames plus
 # the audio-evidence text appended to the official prompt.
 # GPT-5 family request spelling (`api_flavor: openai_reasoning`): the API wants

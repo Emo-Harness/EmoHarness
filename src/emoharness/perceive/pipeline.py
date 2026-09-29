@@ -45,7 +45,7 @@ class PerceptionTools:
     """Dependency-injection point: the deterministic audio tools, plus config.
 
     A transcriber, a prosody feature extractor, and a diarizer; nothing here
-    forms an opinion about the clip (ADR-0004, amended 2026-09-11).
+    forms an opinion about the clip.
     """
 
     transcriber: Transcriber

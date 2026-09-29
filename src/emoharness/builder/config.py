@@ -1,4 +1,4 @@
-"""Builder configuration, mirroring ``configs/builder/*.yaml`` (ADR-0005, ADR-0006).
+"""Builder configuration, mirroring ``configs/builder/*.yaml``.
 
 Defaults come from :mod:`emoharness.common.constants` wherever the protocol fixes a
 value. Three numbers have no constant because they are budget knobs rather than
@@ -53,7 +53,7 @@ class PacketLimits(BaseModel):
 
 
 class GateThresholds(BaseModel):
-    """The promotion thresholds an experiment may tune (ADR-0005, ADR-0007)."""
+    """The promotion thresholds an experiment may tune."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -69,7 +69,7 @@ class GateThresholds(BaseModel):
 
 
 class VerifierConfig(BaseModel):
-    """The per-round reviewer of the Builder's proposals (ADR-0006 §8).
+    """The per-round reviewer of the Builder's proposals.
 
     The verifier is the Builder's own model asked a different question: whether
     each candidate is a general reading rule or an overfit, a label prior, or a
@@ -129,7 +129,7 @@ class BuilderConfig(BaseModel):
         default=False,
         description='let the Builder end the stage by answering '
         'continue_search: false, instead of stopping it after '
-        'early_stop_rounds rounds without an acceptance (ADR-0006 §10). The '
+        'early_stop_rounds rounds without an acceptance. The '
         'round cap still applies, and the gates stay ours either way.',
     )
     selection_protocol: Literal['current', 'macro_feedback'] = 'current'

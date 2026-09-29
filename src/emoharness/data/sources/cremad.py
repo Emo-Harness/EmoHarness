@@ -3,7 +3,7 @@
 Assumes the official ``VideoFlash`` layout: files named
 ``<actor_id>_<sentence>_<code>_<level>.flv`` (or ``.mp4``), e.g.
 ``1001_DFA_ANG_XX.flv``. Used in place of IEMOCAP sessions 1-4 when the
-IEMOCAP license has not arrived by milestone M2 (ADR-0003).
+IEMOCAP license has not arrived by milestone M2.
 """
 
 from __future__ import annotations

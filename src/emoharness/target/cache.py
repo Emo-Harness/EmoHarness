@@ -1,4 +1,4 @@
-"""Content-addressed Target-call cache (ADR-0006).
+"""Content-addressed Target-call cache.
 
 Every Target call is keyed by model id, decoding parameters, prompt text, and
 media content hashes rather than media paths, so identical media reached via

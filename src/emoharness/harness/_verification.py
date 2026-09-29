@@ -1,7 +1,7 @@
 """Cross-modal verification: the built-in rule and the bundle's replacement for it.
 
 Implementation detail of the harness; ``HarnessPipeline.run`` is the only caller.
-ADR-0005 gives the Stage 1 scaffold exactly one deterministic check, a cross-modal
+The Stage 1 scaffold has exactly one deterministic check, a cross-modal
 agreement flag with no conflict-resolution rule. The same rule exists twice: once
 here in Python, and once as a plain-dict function inside the bundle that the
 Builder may rewrite at Stage 3. The bundle version wins when it runs; when it

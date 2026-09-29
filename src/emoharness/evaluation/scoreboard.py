@@ -2,8 +2,8 @@
 
 A scoreboard is built once from whatever that row produced — raw predictions,
 harness outputs, or the official judge's per-step ratings — and then answers
-every question about it: the flat mean the Builder optimizes (ADR-0005), the
-per-task macros and their bootstrap intervals (ADR-0013), the official
+every question about it: the flat mean the Builder optimizes, the
+per-task macros and their bootstrap intervals, the official
 Rec/Rea/CoT aggregates, and the multi-label breakdown. Nothing downstream
 re-derives a score from labels.
 
@@ -43,7 +43,7 @@ class ItemScore(BaseModel):
     """What one item scored, whoever scored it.
 
     ``reasoning`` and ``num_steps`` are only filled by the official judge, and
-    ``prf`` only for multi-label items, where ADR-0013 §7 asks for it.
+    ``prf`` only for multi-label items, where the analysis plan asks for it.
     """
 
     model_config = ConfigDict(frozen=True, extra='forbid')
@@ -122,7 +122,7 @@ class Scoreboard(BaseModel):
         return frozenset(self.items)
 
     def mean(self) -> float | None:
-        """Flat mean Recognition over every item; the Builder's objective (ADR-0005)."""
+        """Flat mean Recognition over every item; the Builder's objective."""
         return mean_or_none(item.recognition for item in self.items.values())
 
     def by_task(self) -> Mapping[Task, float]:
@@ -165,7 +165,7 @@ class Scoreboard(BaseModel):
         )
 
     def ci(self, resamples: int, seed: int = SUBSET_SEED) -> tuple[float, float] | None:
-        """95% bootstrap interval for the macro, resampled within task (ADR-0013 §2)."""
+        """95% bootstrap interval for the macro, resampled within task."""
         scored = {i: s for i, s in self.items.items() if s.task is not None}
         if not scored:
             return None
@@ -186,7 +186,7 @@ class Scoreboard(BaseModel):
 
         Items are paired by id and resampled within their stratum — the task when
         there is one, else the capability kind, else one pooled stratum — and each
-        resample's statistic is the macro over strata (ADR-0013 §2).
+        resample's statistic is the macro over strata.
         """
         shared = tuple(i for i in self.items if i in other.items)
         if not shared:
@@ -226,7 +226,7 @@ class Scoreboard(BaseModel):
         )
 
     def multilabel(self) -> Mapping[Task, PRF]:
-        """Mean precision, recall, and F1 per task over the multi-label items (ADR-0013 §7).
+        """Mean precision, recall, and F1 per task over the multi-label items.
 
         Only multi-label items carry a `prf`, so this is exactly the multi-label
         breakdown; a task with no such item is absent rather than zero.

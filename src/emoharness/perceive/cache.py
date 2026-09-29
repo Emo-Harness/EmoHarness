@@ -66,7 +66,7 @@ class PreprocessConfig(BaseModel):
 
     The code-only profile uses frame sampling and openSMILE. The separate
     ASR profile also invokes Whisper; it is not a code-only tool. An audio-language model used to add a description and an
-    opinion channel; that was removed on 2026-09-11 (ADR-0004 amendment).
+    opinion channel; that was removed on 2026-09-11.
     """
 
     model_config = ConfigDict(frozen=True, extra='forbid')

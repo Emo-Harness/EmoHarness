@@ -28,7 +28,7 @@ DEFAULT_PER_SOURCE: Final = 4
 DEFAULT_SEED: Final = 20260907
 MEDIA_BYTES: Final = 96
 
-#: Candidate lists in the spirit of each MME-Emotion task (docs/benchmark-facts.md).
+#: Candidate lists in the spirit of each MME-Emotion task.
 TASK_LABELS: Final[Mapping[Task, tuple[str, ...]]] = {
     Task.ER_LAB: (
         'anger',
@@ -257,8 +257,8 @@ def make_fake_external(
     """Write tiny MELD, CMU-MOSEI, CH-SIMS, and CREMA-D trees under ``root``.
 
     Returns the per-origin corpus roots, in the shape ``configs/data/sources.yaml``
-    expects. IEMOCAP is deliberately absent: CREMA-D is its declared fallback
-    (ADR-0003), so a run with neither licence still exercises the whole path.
+    expects. IEMOCAP is deliberately absent: CREMA-D is its declared fallback,
+    so a run with neither licence still exercises the whole path.
     """
     roots = {origin: root / origin for origin in ('meld', 'mosei', 'chsims', 'cremad')}
     _write_meld(roots['meld'], per_source, seed)

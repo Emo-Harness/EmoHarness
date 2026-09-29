@@ -1,11 +1,11 @@
-"""MME-Emotion benchmark ingestion (docs/benchmark-facts.md, ADR-0003).
+"""MME-Emotion benchmark ingestion.
 
 The HF dataset ships one JSON annotation file per task,
 ``<root>/<Task.value>.json``, each a list of
 ``{"video_id": ..., "label": ..., "label_set": [...]}`` objects, plus the
 referenced video files at ``<root>/<video_id>``. This module never reads the
-official judge's audio evidence directory shipped alongside the videos
-(ADR-0004): only the per-task JSON files, ``*.zip`` archives, and video paths
+official judge's audio evidence directory shipped alongside the videos:
+only the per-task JSON files, ``*.zip`` archives, and video paths
 named by ``video_id`` are touched.
 """
 
@@ -29,7 +29,7 @@ from emoharness.data.prompt_template import render_prompt_for_task
 from emoharness.data.tasks import Split, Task
 
 _ALL_TASKS: Final[tuple[Task, ...]] = tuple(Task)
-# The official judge's audio evidence directory name; never read from here (ADR-0004).
+# The official judge's audio evidence directory name; never read from here.
 _AUDIO_EVIDENCE_DIR: Final = 'audio_clue'
 _DIA_UTT_RE: Final = re.compile(r'dia_(\d+)_utt_(\d+)')
 _IEMOCAP_RE: Final = re.compile(r'^Ses\d{2}[A-Za-z]_')

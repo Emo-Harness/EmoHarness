@@ -1,4 +1,4 @@
-"""Deterministic failure clustering for the diagnosis packet (ADR-0006 §3).
+"""Deterministic failure clustering for the diagnosis packet.
 
 Failures are grouped by the (gold, predicted) pair and an evidence-conflict flag.
 Nothing here reads a task name, a split, or a benchmark id: the input is whatever

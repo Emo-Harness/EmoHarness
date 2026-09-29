@@ -1,11 +1,11 @@
-"""Gemini teacher client: native-video and matched-protocol upper bounds (ADR-0008).
+"""Gemini teacher client: native-video and matched-protocol upper bounds.
 
 Gemini is the alternative teacher provider, and the only one that can take a
 clip as native video; the default teacher answers over the OpenAI-compatible
 client instead (:mod:`emoharness.target.openai_compat`). Lazily imports ``google.genai`` so the rest of the package works without the
 optional ``api`` dependency group installed. Request bodies are built as plain
 dicts matching the Gemini API shape, so tests exercise request building with a
-fake client and never the real SDK (ADR-0008 point 4: responses are logged
+fake client and never the real SDK (responses are logged
 with response ids because the API is not fully deterministic).
 """
 
@@ -44,7 +44,7 @@ GenAIClientFactory = Callable[[], Any]
 
 
 class GeminiConfig(BaseModel):
-    """Gemini teacher call parameters (ADR-0011 point 8: temperature 0)."""
+    """Gemini teacher call parameters (temperature 0)."""
 
     model_config = ConfigDict(frozen=True, extra='forbid', protected_namespaces=())
 

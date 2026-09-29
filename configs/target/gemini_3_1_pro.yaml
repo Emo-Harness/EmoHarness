@@ -1,4 +1,4 @@
-# Alternative teacher provider (ADR-0008): Gemini Direct, the only path that can
+# Alternative teacher provider: Gemini Direct, the only path that can
 # take native video. Pricing is a placeholder; confirm before Phase 7.
 provider: gemini
 model_id: gemini-3.1-pro

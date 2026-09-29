@@ -1,4 +1,4 @@
-"""Paired bootstrap CIs, Holm correction, and pre-registered detectable effects (ADR-0013)."""
+"""Paired bootstrap CIs, Holm correction, and pre-registered detectable effects."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ Stratum = Hashable
 
 
 class BootstrapResult(BaseModel):
-    """95% paired bootstrap CI and two-sided p-value for one difference (ADR-0013 §2)."""
+    """95% paired bootstrap CI and two-sided p-value for one difference."""
 
     model_config = ConfigDict(frozen=True, extra='forbid')
 
@@ -40,7 +40,7 @@ def paired_bootstrap(
 
     Item ids shared by `a` and `b` are grouped by `strata`; every resample
     draws, independently within each stratum, as many ids with replacement as
-    that stratum has, so stratum proportions are preserved (ADR-0013 §2). A
+    that stratum has, so stratum proportions are preserved. A
     stratum is a task on the benchmark and a capability kind on construction
     data; any hashable key works, and one pooled key reduces this to an
     unstratified paired bootstrap. Each resample's statistic is the macro
@@ -107,7 +107,7 @@ def _two_sided_p_value(resamples: FloatArray, estimate: float) -> float:
 
 
 def holm_adjust(p_values: Mapping[str, float]) -> Mapping[str, float]:
-    """Holm-Bonferroni step-down adjustment (ADR-0013 §6); monotone by construction."""
+    """Holm-Bonferroni step-down adjustment; monotone by construction."""
     names = list(p_values)
     order = sorted(range(len(names)), key=lambda i: p_values[names[i]])
     total = len(names)
@@ -121,7 +121,7 @@ def holm_adjust(p_values: Mapping[str, float]) -> Mapping[str, float]:
 
 
 def detectable_effect(n_items: int, discordance: float, power_z: float = 2.8) -> float:
-    """Minimum detectable paired accuracy difference, in points (ADR-0013 §4)."""
+    """Minimum detectable paired accuracy difference, in points."""
     if n_items <= 0:
         raise ValidationError('detectable_effect requires a positive item count')
     return power_z * math.sqrt(discordance / n_items) * 100.0
@@ -130,7 +130,7 @@ def detectable_effect(n_items: int, discordance: float, power_z: float = 2.8) ->
 def gap_closed(base: float, method: float, upper: float) -> float | None:
     """Gap Closed = (method - base) / (upper - base); None when the denominator isn't positive.
 
-    ADR-0012 H3 defines this only when the upper bound beats the baseline.
+    Hypothesis H3 defines this only when the upper bound beats the baseline.
     """
     denominator = upper - base
     if denominator <= 0:

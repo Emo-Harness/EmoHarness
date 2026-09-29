@@ -5,7 +5,7 @@
 
 The document is generated from the artifacts it freezes, so its hashes always
 match the files on disk. Commit it and tag ``prereg-v1`` before the first
-Builder round (ADR-0012). With ``--fake`` it is written to
+Builder round. With ``--fake`` it is written to
 ``results/fake/preregistration.md`` instead, so a smoke run never touches docs.
 """
 

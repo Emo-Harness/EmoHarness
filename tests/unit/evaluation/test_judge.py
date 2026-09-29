@@ -35,7 +35,7 @@ def test_prompt_constants_carry_the_official_placeholders_and_examples() -> None
         assert '{audio_clue}' in template
         assert '{label}' in template
         assert '{steps}' in template
-    # The ML-ER prompt's own worked example (docs/benchmark-facts.md).
+    # The ML-ER prompt's own worked example.
     assert 'the rating should be 3/3' in JUDGE_MULTI_LABEL_SCORE_PROMPT
 
 

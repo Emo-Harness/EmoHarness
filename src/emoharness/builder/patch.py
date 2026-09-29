@@ -1,4 +1,4 @@
-"""Patch permissions and application (ADR-0005 §permissions, ADR-0006 §2).
+"""Patch permissions and application.
 
 A candidate patch is a set of full-file replacements. It is checked against the
 stage's editable globs, against the files the bundle actually has, and - for
