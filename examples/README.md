@@ -1,6 +1,6 @@
 # Entry points
 
-One runnable step per file, in phase order (`docs/plan.md`). Every one takes
+One runnable step per file, in phase order. Every one takes
 `--root` (where `data/` and `results/` live), `--fake` (run with fakes: no GPU,
 no data, no API keys), and `--force` (overwrite existing artifacts). Each has a
 matching wrapper in `scripts/`; `scripts/run_all_fake.sh` runs the whole list.
@@ -8,11 +8,13 @@ matching wrapper in `scripts/`; `scripts/run_all_fake.sh` runs the whole list.
 | Phase | Step | What it does |
 |---|---|---|
 | 1 | `prepare_benchmark.py` | Builds `data/manifests/mme_emotion.jsonl`, its `.sha256` checksums, and its annotation report; `--fake` generates a synthetic MME-Emotion tree under `data/fake/` first. |
-| 2 | `prepare_external.py` | Loads whichever construction corpora are present, assigns build/val/ext-test by source id, and reports per-source label histograms. |
+| 2 | `split_benchmark_indist.py` | Carves build/val/ext_test out of the benchmark's seen tasks and rewrites the benchmark manifest without them: the in-distribution construction split the four bundles were built with. Run it after `prepare_benchmark.py`. |
+| 2 | `prepare_external.py` | The alternative to `split_benchmark_indist.py`: loads whichever external construction corpora are present, assigns build/val/ext-test by source id, and reports per-source label histograms. |
 | 2 | `leakage_report.py` | Runs the four leakage checks over both manifests and writes `data/checksums/leakage_report.json`; `--drop` removes flagged clips. |
+| 3 | `fit_prosody_reference.py` | Fits the eGeMAPS reference statistics that preprocessing turns into prosody phrases; run it before `preprocess.py`. |
 | 3 | `preprocess.py` | Fills the shared clip cache under `data/derived/`, or `--verify` checks the one that exists. |
 | 5 | `preregister.py` | Draws the pre-registered subset and renders `docs/preregistration.md` from the artifacts it freezes. |
-| 4, 7 | `run_ladder.py` | Runs ladder rows (`--rows L0,L3`) over an item set (`--items full\|clean\|subset\|external:val`; `clean` drops the 70 benchmark items whose media also appears in a construction split) and writes raw predictions; L6 is the teacher Direct upper bound. |
+| 4, 7 | `run_ladder.py` | Runs ladder rows (`--rows L0,L3`) over an item set (`--items full\|clean\|subset\|external:val`; `clean` drops the benchmark items whose clip also appears in the construction manifest) and writes raw predictions; L6 is the teacher Direct upper bound. |
 | 6 | `build_harness.py` | Runs one construction stage's Builder loop; `--freeze` records the freeze, evaluates D_ext-test once, and prints the git tag command. |
 | 5 | `calibrate_proxy_judge.py` | Measures proxy-versus-reference judge agreement and derives the Reasoning gate margin. |
 | 7 | `judge_official.py` | Writes the official judge's per-task inputs and prints its commands; `--execute` runs them. |
@@ -23,9 +25,10 @@ matching wrapper in `scripts/`; `scripts/run_all_fake.sh` runs the whole list.
 `--fake` needs none. A real run reads `OPENAI_API_KEY` for the Builder
 (`build_harness.py`), for the teacher row L6 (`run_ladder.py`), and for the
 official judge (`judge_official.py`); `OPENAI_ENDPOINT` overrides the base URL
-of the first two. `GEMINI_API_KEY` is needed only by the proxy judge
-(`calibrate_proxy_judge.py` and the Reasoning gate inside `build_harness.py`),
-or when a Builder or teacher config selects `provider: gemini`. `VLLM_ENDPOINT`
+of the first two. The proxy judge
+(`calibrate_proxy_judge.py` and the Reasoning gate inside `build_harness.py`)
+also reads `OPENAI_API_KEY` as configured; `GEMINI_API_KEY` is needed only
+when a Builder, proxy-judge or teacher config selects `provider: gemini`. `VLLM_ENDPOINT`
 points at the served Target.
 
 Order matters: `leakage_report.py` reads the preprocessing cache, so run

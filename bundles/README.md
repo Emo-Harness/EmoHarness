@@ -26,9 +26,14 @@ Check a bundle:
 python -c "from pathlib import Path; from emoharness.harness.loader import load_bundle; print(load_bundle(Path('bundles/qwen3vl_4b')).content_hash())"
 ```
 
-Rebuild one (with the student served by `scripts/serve_student.sh`,
-`OPENAI_API_KEY` set, and the external corpus prepared; this makes paid
-Builder calls):
+Rebuild one. This makes paid Builder calls, and needs:
+
+- the student served by `scripts/serve_student.sh`;
+- `OPENAI_API_KEY` set;
+- the construction split from phase 2 of the README.
+
+The original builds read `external_v3.jsonl`, which is `external.jsonl` minus
+one clip (`mme_er_wild_test_dia190_utt4`).
 
 ```bash
 EMOHARNESS_BUILDER_CONFIG=v3_full.yaml EMOHARNESS_EXTERNAL_MANIFEST=external_v3.jsonl \

@@ -23,8 +23,9 @@ comparison family.
 
 ## 1. Main evaluation: MME-Emotion, 5507 items
 
-The item set is `clean`, which is every benchmark item minus the 70 whose media
-file also appears in a construction split (`data/splits/media_overlap_excluded.json`).
+The item set is `clean`, which is every benchmark item minus the 70 whose clip
+also appears in the construction split. It is computed from the two
+manifests.
 
 ```bash
 # one student at a time

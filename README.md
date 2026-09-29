@@ -11,12 +11,14 @@ weights?**
 
 A **harness** is a directory of prompts, routing rules, schemas and small
 verification programs. It turns one question about a clip into four calls to a
-frozen student model, over evidence from fixed perception tools. The
-**Builder** (GPT 5.6 Luna) improves a harness for one student by proposing
-patches from its failures on a construction corpus drawn from outside
-MME-Emotion. It keeps only the patches that pass the gates: a local
-Recognition gain, Reasoning held above a floor, and the call budget. The
-student's weights never change.
+frozen student model, over evidence from fixed perception tools: frames,
+a Whisper transcript and openSMILE prosody. The **Builder** (GPT 5.6 Luna)
+improves a harness for one student by proposing patches from the student's
+failures on a construction split: build and val items carved out of
+MME-Emotion's seen tasks. It keeps only the patches that pass the gates: a
+local Recognition gain, Reasoning held above a floor, and the call budget.
+The student's weights never change. Evaluation uses the rest of the
+benchmark.
 
 Methods form a ladder, so each ingredient is measured separately:
 
@@ -31,9 +33,7 @@ Methods form a ladder, so each ingredient is measured separately:
 | **L6** | the teacher model on the same frames and audio text, as an upper bound |
 
 Four students have their own Stage 3 harness in [`bundles/`](bundles/):
-Qwen3-VL-8B, Qwen3-VL-4B, Qwen3.5-4B and Gemma-4-E4B. The research plan and
-design decisions are in [`docs/research-plan.md`](docs/research-plan.md) and
-[`docs/adr/`](docs/adr/).
+Qwen3-VL-8B, Qwen3-VL-4B, Qwen3.5-4B and Gemma-4-E4B.
 
 ## Installation
 
@@ -55,8 +55,8 @@ register. Point `EMOHARNESS_VLLM_VENV` at it.
 | variable | used for |
 |---|---|
 | `VLLM_ENDPOINT` | the served student (default `http://127.0.0.1:8000/v1`) |
-| `OPENAI_API_KEY` | the Builder and teacher (GPT 5.6 Luna), and the official MME-Emotion judge |
-| `GEMINI_API_KEY` | the proxy judge behind the Reasoning gate |
+| `OPENAI_API_KEY` | the Builder, the teacher and the proxy judge (all GPT 5.6 Luna), and the official MME-Emotion judge |
+| `GEMINI_API_KEY` | only when a config selects `provider: gemini` |
 | `MME_EMOTION_ROOT` | the downloaded MME-Emotion tree |
 
 Serve a student:
@@ -83,25 +83,28 @@ existing artifact.
 | phase | command | needs |
 |---|---|---|
 | 1 | `scripts/prepare_benchmark.sh` | `MME_EMOTION_ROOT` |
-| 2 | `scripts/prepare_external.sh`, then `scripts/leakage_report.sh` | the corpora in `configs/data/sources.yaml` |
-| 3 | `scripts/preprocess.sh` | GPU, ffmpeg |
+| 2 | `python examples/split_benchmark_indist.py`, then `scripts/leakage_report.sh` | the phase 1 manifest |
+| 3 | `python examples/fit_prosody_reference.py`, then `scripts/preprocess.sh` | GPU, ffmpeg |
 | 4 | `EMOHARNESS_ROWS=L0,L1,L3 EMOHARNESS_ITEMS=clean scripts/run_ladder.sh` | a served student |
-| 5 | `scripts/preregister.sh`, `scripts/calibrate_proxy_judge.sh` | both manifests; `GEMINI_API_KEY`, `OPENAI_API_KEY` |
-| 6 | `EMOHARNESS_STAGE=3 scripts/build_harness.sh` | `OPENAI_API_KEY`, `GEMINI_API_KEY`, a served student |
+| 5 | `scripts/preregister.sh`, `scripts/calibrate_proxy_judge.sh` | both manifests; `OPENAI_API_KEY` |
+| 6 | `EMOHARNESS_STAGE=3 scripts/build_harness.sh` | `OPENAI_API_KEY`, a served student |
 | 7 | `EMOHARNESS_ROW=L5 scripts/judge_official.sh --execute` | `OPENAI_API_KEY`, a checkout of `QwenAudio/MME-Emotion` |
 | 8 | `scripts/analyze.sh` | nothing |
+
+Phase 2 carves the construction split out of the benchmark; this is the
+protocol the four bundles were built with. `scripts/prepare_external.sh`
+instead builds it from external corpora (`configs/data/sources.yaml`).
 
 Item sets:
 
 | set | items |
 |---|---|
 | `full` | every benchmark item |
-| `clean` | every benchmark item except the 70 whose media also appears in a construction split |
+| `clean` | every benchmark item whose clip is not also in the construction split (5507 of 5577) |
 | `subset` | the 1,000 pre-registered items |
 | `external:<split>` | one construction split |
 
-[`examples/README.md`](examples/README.md) documents each step, and
-[`docs/run-indist.md`](docs/run-indist.md) records a complete run.
+[`examples/README.md`](examples/README.md) documents each step.
 
 ## Experiments
 
@@ -131,21 +134,19 @@ EmoHarness/
 ├── harness/           # the shared Stage 1 scaffold
 ├── bundles/           # the four frozen per-student Stage 3 harnesses
 ├── configs/           # builder, target, data, ladder and preprocessing configs
-├── data/              # manifests, splits, checksums (raw media is not tracked)
 ├── examples/          # one entry point per pipeline phase
 ├── scripts/           # wrappers for examples/, serving, end-to-end drivers
 ├── experiments/       # the out-of-distribution evaluations
-├── tests/             # unit and integration tests, all on fakes
-└── docs/              # research plan, ADRs, engineering notes, run records
+└── tests/             # unit and integration tests, all on fakes
 ```
 
-Run outputs go to `results/`, which is not tracked by git.
+The steps write `data/` (manifests, splits, the preprocessing cache) and
+`results/` (predictions, construction rounds, reports); neither is tracked by git.
 
 ## Contributing
 
-Read [`docs/engineering.md`](docs/engineering.md) before writing code and
-[`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request, and run
-the same checks as CI:
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request, and
+run the same checks as CI:
 
 ```bash
 poetry run ruff check src tests examples experiments

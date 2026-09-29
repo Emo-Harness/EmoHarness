@@ -1,9 +1,0 @@
-# Cross-Target size sweep (ADR-0009 E6-lite): the smallest Qwen3-VL dense model,
-# served by vLLM exactly like the 8B Target under test. Same decoding, same video
-# protocol, so a size curve isolates capacity and nothing else.
-model_id: Qwen/Qwen3-VL-2B-Instruct
-endpoint: ${VLLM_ENDPOINT:-http://127.0.0.1:8000/v1}
-decoding: {temperature: 0.0, top_p: 1.0, seed: 0, max_tokens: 1024}
-video: {fps: 2.0, min_frames: 4, max_frames: 32}
-call_budget: {expected: 4, hard_cap: 6, retries_per_stage: 1}
-pricing_usd_per_million: {input: 0.0, output: 0.0}   # local serving; GPU time is tracked separately

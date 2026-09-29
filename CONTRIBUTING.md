@@ -1,3 +1,50 @@
 # Contributing
 
-Read `docs/engineering.md` before writing code and `docs/adr/README.md` before changing a design decision. Every change goes through a pull request that passes CI (ruff, mypy --strict, pytest, codespell). Design changes need a new ADR or an amendment to an existing one; never edit a frozen bundle in `harness/` or `bundles/`: any change is a new bundle with a new content hash.
+Every change goes through a pull request that passes the checks below.
+
+## Checks
+
+```bash
+poetry install --with dev,test
+poetry run ruff check src tests examples experiments
+poetry run ruff format --check src tests examples experiments
+poetry run mypy                                  # strict
+poetry run pytest -m 'not integration'
+poetry run pytest -m integration                 # the whole pipeline on fakes
+```
+
+## Code
+
+- Python 3.10+ with `from __future__ import annotations` and full type hints;
+  `mypy --strict` must pass. Single quotes and a line length of 88 (ruff).
+- Pydantic models are `frozen=True`. Functions return new objects and never
+  mutate their inputs.
+- Protocol facts and thresholds live in `emoharness.common.constants` or
+  `configs/`, nowhere else.
+- Validate at the boundary: everything read from disk, an API or a model
+  reply is parsed into a pydantic model or rejected with a `ValidationError`.
+- Errors derive from `emoharness.common.errors.EmoHarnessError`. Never
+  swallow an exception.
+- Every billable call records a ledger entry.
+- Heavy runtime dependencies are imported lazily inside the function that
+  needs them. This covers vLLM, faster-whisper, openSMILE and the API SDKs.
+- The harness never branches on a task name; it only sees the prompt.
+
+## Tests
+
+- `tests/unit/<subpackage>/test_<module>.py` mirrors
+  `src/emoharness/<subpackage>/<module>.py`.
+- Use fakes, not mocks. Each seam ships its fake next to its real adapter, and
+  only `runner/context.py` chooses between them.
+- Tests generate their media in `tmp_path` and never touch the network, a GPU
+  or an API key.
+
+## Entry points and artifacts
+
+- `examples/<step>.py` is one pipeline phase: argparse, one `main()`, and a
+  `--fake` mode. `scripts/<step>.sh` wraps it, with environment-variable
+  overrides.
+- Steps write under `data/` and `results/`, both untracked. They refuse to
+  overwrite an artifact without `--force`.
+- Never edit a frozen bundle in `harness/` or `bundles/`: any change is a new
+  bundle with a new content hash.
