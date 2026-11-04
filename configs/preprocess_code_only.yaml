@@ -1,0 +1,6 @@
+# Strict perception: ffmpeg and openSMILE only. No ASR or diarization model.
+frames: {fps: 2.0, min_frames: 4, max_frames: 32, judge_fps: 1.0, judge_max_frames: 10}
+asr: {model: none, backend: none, word_timestamps: false}
+prosody: {feature_set: eGeMAPSv02, reference_stats: data/derived/reference_stats.json}
+diarization: {backend: none, subject_rule: dominant_by_duration}
+cache_root: data/derived

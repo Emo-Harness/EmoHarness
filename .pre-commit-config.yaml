@@ -1,3 +1,7 @@
+# harness/ and bundles/ are frozen: their content hashes are pinned in
+# experiments/common.py, so no hook may rewrite them.
+exclude: ^(harness|bundles)/
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -15,7 +19,10 @@ repos:
     rev: v3.0.1
     hooks:
       - id: prettier
-        types_or: [html, javascript, css, markdown, yaml, json]
+        # Markdown only: the hand-written YAML configs keep their layout
+        types_or: [markdown]
+        # a pinned Node, so the hook installs without picking a prerelease
+        language_version: 22.11.0
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.3.0
@@ -24,14 +31,15 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+  # the same mypy run as CI, in the project's environment
+  - repo: local
     hooks:
       - id: mypy
-        additional_dependencies:
-          - pydantic>=2.8.2
-          - types-setuptools
-          - types-pyyaml
+        name: mypy
+        entry: poetry run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.14.1

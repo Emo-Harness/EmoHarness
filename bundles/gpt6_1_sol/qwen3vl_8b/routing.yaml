@@ -1,0 +1,15 @@
+# Which modules run, in which order, and which deterministic checks they use.
+# stages must be a subset of the pipeline's known stage names, in order.
+# verification.agreement_check names the module under verification/ that exports
+# modalities_agree; verification.ranker names the one that exports rank.
+stages:
+  - extract_visual
+  - generate_hypotheses
+  - verify
+  - synthesize
+verification:
+  agreement_check: cross_modal
+  ranker: alternative_hypotheses
+# always preserves the four-call scaffold; conflict skips student verification
+# only when the deterministic agreement check succeeds without a fallback.
+verify_on: always
