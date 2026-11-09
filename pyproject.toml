@@ -27,7 +27,7 @@ tqdm = "^4.66.0"
 optional = true
 
 [tool.poetry.group.api.dependencies]
-openai = "^1.40.0"
+openai = ">=1.40,<4.0"
 google-genai = "^1.0.0"
 
 [tool.poetry.group.audio]
