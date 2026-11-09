@@ -1,0 +1,15 @@
+# Transfer student (2026-09-13 batch). Gemma 4 E4B-it: "E4B" is an effective
+# parameter count, not an equal-total-parameter 4B comparison. Its native audio
+# channel is deliberately unused in this batch -- the student receives the same
+# frames and the same Whisper/openSMILE text every other student receives.
+# Served by vLLM 0.19.1 (torch 2.10.0+cu128); 0.11.2 does not register
+# Gemma4ForConditionalGeneration.
+model_id: google/gemma-4-E4B-it
+endpoint: ${VLLM_ENDPOINT:-http://127.0.0.1:8000/v1}
+decoding: {temperature: 0.0, top_p: 1.0, seed: 0, max_tokens: 1024}
+video: {fps: 2.0, min_frames: 4, max_frames: 32}
+call_budget: {expected: 4, hard_cap: 6, retries_per_stage: 1}
+# Its chat template exposes the same thinking switch as Qwen3.5's; the plan
+# calls for thinking disabled in this main comparison.
+chat_template_kwargs: {enable_thinking: false}
+pricing_usd_per_million: {input: 0.0, output: 0.0}   # local serving; GPU time is tracked separately

@@ -1,0 +1,10 @@
+# Alternative teacher provider: Gemini Direct, the only path that can
+# take native video. Pricing is a placeholder; confirm before Phase 7.
+provider: gemini
+model_id: gemini-3.1-pro
+endpoint: ${GEMINI_ENDPOINT:-https://generativelanguage.googleapis.com/v1beta}
+api_key_env: GEMINI_API_KEY
+decoding: {temperature: 0.0, top_p: 1.0, seed: 0, max_tokens: 1024}
+video: {fps: 2.0, min_frames: 4, max_frames: 32}
+call_budget: {expected: 1, hard_cap: 2, retries_per_stage: 1}
+pricing_usd_per_million: {input: 2.0, output: 12.0}

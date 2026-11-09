@@ -1,0 +1,14 @@
+# Shared preprocessing cache.
+# Fixed perception tools: ffmpeg frame sampling, faster-whisper
+# transcription with language detection, and openSMILE eGeMAPS prosody
+# functionals turned into phrases against fitted reference statistics.
+# Whisper transcription is allowed; no additional analysis language model is called: the earlier Qwen2.5-Omni-7B description
+# and opinion channels were removed because a second model's judgment is not a
+# tool. No diarization on this box (pyannote.audio does not import against its
+# torchaudio; MME clips are single-utterance, so the whole transcript is the
+# subject's). Every setting here is part of the cache hash.
+frames: {fps: 2.0, min_frames: 4, max_frames: 32, judge_fps: 1.0, judge_max_frames: 10}
+asr: {model: large-v3, backend: faster_whisper, word_timestamps: true}
+prosody: {feature_set: eGeMAPSv02, reference_stats: data/derived/reference_stats.json}
+diarization: {backend: none, subject_rule: dominant_by_duration}
+cache_root: data/derived

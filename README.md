@@ -1,170 +1,242 @@
-# Open-Source Research Project in Python: A Template
+<h1 align="center">EmoHarness</h1>
 
-[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3109/)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
-<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
-[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
-[![bear-ified](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.readthedocs.io)
-[![Github Action](https://github.com/lwaekfjlk/python-project-template/actions/workflows/pytest.yml/badge.svg?branch=main)]()
+<p align="center">
+  <b>Boosting Multimodal Emotion Understanding with Meta-Harness Evolving</b>
+</p>
 
-> [!NOTE]
-> This repo is continuously updating with more tools. Any contribution is welcome.
+<p align="center">
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue" alt="Python 3.10-3.12"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://github.com/4R5T/EmoHarness/pulls"><img src="https://img.shields.io/badge/PRs-welcome-red" alt="PRs welcome"></a>
+  <a href="https://pre-commit.com/"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="pre-commit"></a>
+</p>
 
-## ✨ Motivation
+![EmoHarness: Meta-Harness Evolving builds a harness offline, and the frozen student runs it at inference](assets/emoharness_overview.png)
 
-To ensure high standards in engineering projects, we offer a standardized template specifically designed for open-source Python research projects. This template is an excellent choice if you:
+Small multimodal models misjudge emotion when words, voice and visual cues
+conflict. **EmoHarness** runs such a model, the frozen **student**, inside a
+**harness**: the prompts, settings and verification code around its calls. The
+human-written starting harness, the **Shared scaffold**, numbers the student's
+visual observations, transcript and prosody descriptions as citable evidence and
+has the student weigh candidate emotions against it in four calls (Observe,
+Propose, Review, Explain). In **Meta-Harness Evolving (MHE)** a stronger LLM, the
+**Builder**, reads the student's errors and execution traces offline and edits the
+harness; static checks and validation gates decide which edits are kept, and the
+Builder never sees evaluation items. The student's weights never change.
 
-1. Want to facilitate seamless collaboration and extension of your project by other researchers.
-2. Aim to bridge communication gaps among collaborators effectively.
-3. Seek to make rapid iterations with assurance that small code modifications won’t disrupt the overall project.
-4. Wish to reduce the frequency of frustrating runtime errors during experiments.
+## Installation
 
-## 🔨 Continuous Integration (CI) Workflow
+```bash
+# any Python >=3.10,<3.13 works; conda shown
+conda create -n emoharness python=3.11 -y
+conda activate emoharness
 
-Here's a clearer and more straightforward guideline of the steps for working with your codebase. If working in a small group or working on a simple project, some of the steps can be skipped.
+# install Poetry if you do not have it
+curl -sSL https://install.python-poetry.org | python3 -
+export PATH="$HOME/.local/bin:$PATH"
 
-1. **Create Issue**
-
-   Before starting, open a new issue in the repository detailing what you plan to implement. Assign the issue to yourself.
-
-2. **Sync Repo**
-
-   Update your local repository to match the latest version of the remote repository.
-
-3. **Create Branch**
-
-   Create a new branch for your task. Name it appropriately based on the type of task, such as `feature/feature-name`, `bug/bug-name`, or `exp/exp-name`.
-
-4. **Implement Code**
-
-   Work on your task and make necessary changes to the codebase.
-
-5. **Test Locally**
-
-   Run tests using tools like mypy, pytest, and pre-commit. Ensure all tests pass before proceeding.
-
-6. **Change Commit**
-
-   Add and commit your changes to the branch, then push the branch to the repository.
-
-7. **Create PR**
-
-   Open a Pull Request (PR) for the branch you've pushed.
-
-8. **Link PR to Issue**
-
-   In your PR, include "Closes #ISSUE_NUM" to link it to the original issue.
-
-9. **Pass Continuous Integration**
-
-   Ensure all GitHub Actions checks pass. If they fail, revise your code based on the errors reported.
-
-10. **Review PR Checklist**
-
-    Verify that all items in the PR checklist are completed, such as updating documentation or adding package requirements.
-
-11. **Ask for Code Review**
-
-    Invite a colleague to review your PR. One approved, Use the "Squash and Merge" option to merge your PR, ensuring a clean commit history.
-
-12. **Troubleshooting**
-
-    If you break down the commit history or main branch, contact the repository owner for assistance with `rebase` or other needed actions.
-
-## 💼 Template Structure
-
-The current project template supports the final package release of our codebase.
-
-```
-Template/
-│
-├── .github/                  # Contains GitHub related files like workflows
-├── docs/                     # Documentation for the project
-├── src/                      # Main package directory
-├── stubs/                    # Type stubs for static typing (for mypy strict mode)
-├── tests/                    # Test scripts and resources
-│
-├── .gitignore                # Specifies untracked files to ignore
-├── .pre-commit-config.yaml   # Configurations for pre-commit hooks
-├── poetry.lock               # Lock file generated by poetry for dependencies
-├── pyproject.toml            # Project metadata and tool configurations
+git clone https://github.com/4R5T/EmoHarness.git
+cd EmoHarness
+poetry install --with api,audio      # puts the `emoharness` command on the PATH
 ```
 
-## ❓ Issue & Pull Request
+| Group     | Command                          | When you need it                                                              |
+| --------- | -------------------------------- | ----------------------------------------------------------------------------- |
+| api       | `poetry install --with api`      | the Builder, the proposal reviewer and the reasoning-proxy judge (OpenAI SDK) |
+| audio     | `poetry install --with audio`    | perception: Whisper large-v3 (faster-whisper) and openSMILE eGeMAPSv02        |
+| dev, test | `poetry install --with dev,test` | the checks and the test suite                                                 |
 
-An issue typically describes a new feature (`feature`), fixing an old bug (`bug`), launching a group of experiments (`exp`), or refactoring part of the code (`refactor`). Using different issue templates for different issues.
+The students are served with [vLLM](https://github.com/vllm-project/vllm) from
+their own environments, which `emoharness serve` and the pipeline expect at
+`~/.venvs/emoharness-vllm011` (vLLM 0.11.2, Qwen3-VL), `~/.venvs/emoharness-vllm019`
+(vLLM 0.19.1, Qwen3.5) and `~/.venvs/emoharness-vllm019-tf513` (vLLM 0.19.1 with
+transformers 5.13.1, Gemma 4). Perception needs `ffmpeg` on the `PATH` and a GPU.
 
-A PR typically implements the content mentioned in one issue.
+## Setup
 
-Notice about the development:
+```bash
+export OPENAI_API_KEY="your-openai-key"   # the Builder, reviewer and proxy judge (only `evolve` needs it)
+```
 
-1. When creating an issue, assign the responsible member for fixing that if possible
-2. When creating a PR, make sure you uses `feature/feature-name`, `bug/bug-name`, `exp/exp-name` for its branch
-3. When finishing one PR, make sure all the github action is passed and all the checks are done.
-4. When merging one PR, make sure using `squash and merge` instead of `merge a pull request`.
-5. Avoid making any direct commit to the `main` branch and try to avoid any `--force` push to any branch unless you are pretty sure about that.
+Put the datasets under `data/raw/` (or point `MME_EMOTION_ROOT` at MME-Emotion):
 
-## 👷 Type Checking
+```
+data/raw/mme_emotion/                         MME-Emotion (github.com/QwenAudio/MME-Emotion)
+data/raw/intentqa/test.csv                    IntentQA annotations (JoseponLee/IntentQA)
+data/raw/intentqa/hf_mirror/IntentQA/videos/  IntentQA videos (hamedrahimi/IntentQA on Hugging Face)
+data/raw/social_iq_video/{qa,video}/          Social-IQ 2.0 (PediaMedAI/Social-IQ-Video), optional
+```
 
-- Tools
+Each student is pinned to a Hugging Face revision (`experiments/common.py`);
+download it into the Hugging Face cache before serving.
 
-  - static type checking (`mypy`)
+## Get started
 
-  - dynamic type checking (`beartype`)
+### Check the wiring on fakes
 
-- Guidelines
-  - Run `mypy --strict ./` under the root of the current repo to test the static type.
+The whole pipeline runs on fakes in under a minute, with no GPU, data, API key
+or network:
 
-## 🏅️ Unit Testing
+```bash
+emoharness reproduce --fake --root /tmp/emoharness-fake
+```
 
-- Tools
+### 1. Prepare the data
 
-  - testing code components based on testing function (`pytest`)
+```bash
+emoharness prepare
+```
 
-- Guidelines
-  - Run `pytest` under the root of the current repo to check unit test results.
+This builds the MME-Emotion manifest, carves the construction split out of the
+seen task types and isolates it (399 build, 394 validation, 129 reserved items;
+5,507 evaluation items), and fills the perception cache: 2 fps frames, the
+Whisper transcript and openSMILE prosody.
 
-## 🧐 Code Spell Checking
+### 2. Evaluate the four conditions
 
-- Tools
+```bash
+emoharness evaluate --student qwen3vl_4b
+```
 
-  - code spell checking (`codespell`)
+| Paper      | Row  | Student calls        | What the student sees                                   |
+| ---------- | ---- | -------------------- | ------------------------------------------------------- |
+| **Video**  | `L0` | 1                    | the native video                                        |
+| **Audio**  | `L1` | 1                    | the video plus the transcript and prosody text          |
+| **Shared** | `L3` | 4 (≤ 6 with retries) | the human-written scaffold in [`harness/`](harness/)    |
+| **MHE**    | `L5` | about 4 (≤ 6)        | the student's evolved harness in [`bundles/`](bundles/) |
 
-- Guidelines
-  - Commonly need to ignore part of the files in the repository like `/data`.
+Each command starts the student's vLLM server and stops it afterwards, or reuses
+one already started with `emoharness serve --student qwen3vl_4b`.
 
-## 🪝 Pre-commit Hook
+### 3. Evolve a harness with Meta-Harness Evolving
 
-- Tools
+```bash
+emoharness evolve --student qwen3vl_4b --builder sol
+```
 
-  - code formatting (`prettier`)
+Four generations on the construction split; each generation the Builder proposes
+up to four candidate harnesses, and a candidate replaces the incumbent only if it
+passes the static checks, the proposal reviewer and the validation gates
+(Recognition gain, ≤ 5 % regression, ≤ 4.5 mean calls, reasoning proxy within 2
+points). The evolved harness is then evaluated like step 2. `--builder` takes
+`luna` (GPT-5.6 Luna, whose harnesses are the frozen [`bundles/`](bundles/)), `sol`
+(GPT-6.1 Sol) or `gpt6-luna` (GPT-6 Luna). The Luna and Sol harnesses are shipped
+in [`bundles/`](bundles/); a rebuild makes paid API calls and, since the Builder
+is not deterministic, yields a new harness with its own hash. A rebuilt Sol or
+GPT-6 Luna harness replaces the shipped one in every later stage (IntentQA, the
+report and the cases); the frozen Luna bundles stay what `evaluate` runs.
 
-  - import package sorting (`isort`)
+### 4. Emotion context on IntentQA
 
-  - ipynb output clear (`nbstripout`)
+```bash
+emoharness intentqa --student qwen3vl_4b --dataset intentqa_test
+```
 
-  - code bug checking (`ruff`)
+Each Builder's harness writes one emotion context per video without seeing any
+question; the bare student then answers every question from the frames
+(Frames), plus the transcript and prosody (Audio), plus the emotion context
+(Audio + Emotion).
 
-- Guidelines
+### 5. Report
 
-  - Run `python -m pip install pre-commit` to install `pre-commit`
+```bash
+emoharness report
+```
 
-  - Run `pre-commit install` to allow hooking pre-commit with any `git commit` commands.
+Reads the finished runs and writes the tables, figure data and numbers to
+`results/paper/`.
 
-## 🧑‍💼 Dependency Management
+## Reproducing the paper
 
-- Tools
+```bash
+emoharness reproduce                 # every stage above for all four students and both Builders
+emoharness reproduce --dry-run       # print every command, run nothing
+```
 
-  - We utilize `poetry` to support the dependency requirements. Dependency for different usage of the repo can be defined separately in `pyproject.toml`.
+Every stage skips the steps that already finished, so an interrupted run resumes.
+`scripts/reproduce_paper.sh` is the same command.
 
-- Guidelines
+## Package structure
 
-  - Run `pip install poetry` to finish the installation of poetry.
+```
+src/emoharness/                 # the library
+├── __main__.py                 # the `emoharness` command (dispatches into experiments/ and examples/)
+├── data/                       # MME-Emotion tasks, prompt grammar, label sets, manifests, splits, isolation
+├── perceive/                   # 2 fps frames, Whisper ASR, openSMILE prosody descriptors, the clip cache
+├── harness/                    # the four-call runtime: evidence, verification, the fixed output controller
+├── builder/                    # MHE: failure clusters, diagnostic packet, patches, reviewer, gates, loop
+├── target/                     # vLLM (OpenAI-compatible) and Gemini clients, the call cache
+├── baselines/                  # the single-call conditions (Video, Audio)
+├── evaluation/                 # Recognition scoring, scoreboard, paired bootstrap, Holm, the proxy judge
+├── runner/                     # paths, item sets, rows, construction, CLI plumbing
+└── common/                     # I/O, hashing, logging, cost ledger, errors, constants
 
-  - Create `conda environment` with a specified Python version
+experiments/                    # the paper's experiments
+├── layout.py                   # where every run writes; the Builders
+├── common.py                   # the four students, their bundles, one owned vLLM server
+├── paper/                      # pipeline (the stages), report, cases, export, serve
+├── emotion_context/            # IntentQA: per-video emotion context, then the answering conditions
+└── transfer/                   # IntentQA / Social-IQ 2.0 manifests
 
-  - Run `poetry install` to install required dependencies.
+examples/                       # one entry script per single step
+├── data/                       # prepare_benchmark, split_construction, isolate_construction, fit_prosody_reference, preprocess, leakage_report
+├── mme/                        # run_ladder
+└── mhe/                        # build_harness
+scripts/                        # one shell twin per example (same layout, the paper's settings), plus
+├── serve_student.sh            # one student on vLLM
+└── reproduce_paper.sh          # every stage, in order
 
-## ❤️ Contribution
+harness/                        # the Shared scaffold (prompts, YAML settings, schemas, verification code)
+bundles/                        # the frozen MHE harnesses, hashes pinned in experiments/common.py
+├── <student>/                  # GPT-5.6 Luna, one per student
+└── gpt6_1_sol/<student>/       # GPT-6.1 Sol, one per student
+configs/                        # builder/, target/, data/, experiments/ladder.yaml, preprocess.yaml
+tests/                          # unit and integration tests, all on fakes
+```
 
-I welcome all kinds of contributions, e.g. adding more tools, better practices, and discussion on trade-offs.
+In the code the student is the _Target_, the proposal reviewer the _verifier_,
+MHE a _Stage 3_ construction, and the four harness calls Observe, Propose, Review
+and Explain are `harness/prompts/extract_visual.md`, `generate_hypotheses.md`,
+`verify.md` and `synthesize.md`. Runs write `data/`, `results/` and `logs/`, none
+of which git tracks.
+
+<details>
+<summary><b>All commands</b></summary>
+
+`emoharness <command> --help` shows a command's own flags. Every paper command
+takes `--student`, `--root`, `--fake`, `--dry-run` and `--force` where they apply.
+
+| Command                                                                                                          | What it does                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `reproduce`                                                                                                      | every stage below, in order; resumes where it stopped                                                  |
+| `prepare`                                                                                                        | the data: manifest, construction split, isolation, prosody reference, perception cache, leakage report |
+| `serve`                                                                                                          | serve one student with vLLM on port 8000                                                               |
+| `evaluate`                                                                                                       | Video, Audio, Shared and the frozen MHE harness on MME-Emotion                                         |
+| `evolve`                                                                                                         | one MHE construction per Builder (`--builder luna sol gpt6-luna`), then its harness on MME-Emotion     |
+| `intentqa`                                                                                                       | each harness's emotion context on IntentQA (`--dataset`), then Frames / Audio / Audio + Emotion        |
+| `report`                                                                                                         | the tables, figure data and numbers, under `results/paper/`                                            |
+| `cases`                                                                                                          | the case studies (`--paper`), or one item's records under every condition                              |
+| `export`                                                                                                         | a per-item data package of every run                                                                   |
+| `prepare-benchmark`, `split-construction`, `isolate-construction`, `fit-prosody`, `preprocess`, `leakage-report` | the data steps one at a time (`examples/data/`)                                                        |
+| `run-ladder`                                                                                                     | run ladder rows over an item set (`examples/mme/run_ladder.py`)                                        |
+| `build-harness`                                                                                                  | run one construction stage (`examples/mhe/build_harness.py`)                                           |
+
+</details>
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the conventions and run the same
+checks as CI before opening a pull request:
+
+```bash
+poetry run ruff check src tests examples experiments
+poetry run ruff format --check src tests examples experiments
+poetry run mypy
+poetry run pytest -m 'not integration'
+poetry run pytest -m integration        # the whole pipeline on fakes
+```
+
+## License
+
+MIT, see [LICENSE](LICENSE). MME-Emotion, IntentQA and the student models are
+used under their own terms.
