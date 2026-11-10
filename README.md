@@ -5,9 +5,11 @@
 </p>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2611.11994"><img src="https://img.shields.io/badge/arXiv-2611.11994-b31b1b.svg" alt="arXiv 2611.11994"></a>
+  <a href="https://emo-harness.github.io"><img src="https://img.shields.io/badge/project-page-6a3d9a.svg" alt="Project page"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue" alt="Python 3.10-3.12"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
-  <a href="https://github.com/4R5T/EmoHarness/pulls"><img src="https://img.shields.io/badge/PRs-welcome-red" alt="PRs welcome"></a>
+  <a href="https://github.com/Emo-Harness/EmoHarness/pulls"><img src="https://img.shields.io/badge/PRs-welcome-red" alt="PRs welcome"></a>
   <a href="https://pre-commit.com/"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="pre-commit"></a>
 </p>
 
@@ -35,7 +37,7 @@ conda activate emoharness
 curl -sSL https://install.python-poetry.org | python3 -
 export PATH="$HOME/.local/bin:$PATH"
 
-git clone https://github.com/4R5T/EmoHarness.git
+git clone https://github.com/Emo-Harness/EmoHarness.git
 cd EmoHarness
 poetry install --with api,audio      # puts the `emoharness` command on the PATH
 ```
@@ -234,6 +236,23 @@ poetry run ruff format --check src tests examples experiments
 poetry run mypy
 poetry run pytest -m 'not integration'
 poetry run pytest -m integration        # the whole pipeline on fakes
+```
+
+## Citation
+
+If you use EmoHarness, please cite the
+[paper](https://arxiv.org/abs/2611.11994):
+
+```bibtex
+@misc{li2026emoharness,
+  title         = {EmoHarness: Boosting Multimodal Emotion Understanding with Meta-Harness Evolving},
+  author        = {Li, Fenghai and Li, Bingxuan and Zhang, Jiawen and Shen, Yifan and Liu, Jiateng and Zhang, Yutong and Guo, Yue},
+  year          = {2026},
+  eprint        = {2611.11994},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2611.11994}
+}
 ```
 
 ## License
